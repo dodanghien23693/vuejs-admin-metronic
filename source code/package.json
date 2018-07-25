@@ -26,7 +26,6 @@
     "vue-cli-plugin-build-watch": "^1.0.0"
   },
   "gitHooks": {
- 
   },
   "lint-staged": {
     "*.js": [
