@@ -9235,7 +9235,6 @@ var mLayout = function() {
 
         asideLeftToggle.on('toggle', function(toggle) {     
             // mainPortlet.updateSticky();       
-            
             // horMenu.pauseDropdownHover(800);
             // asideMenu.pauseDropdownHover(800);
 

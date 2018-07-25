@@ -1,121 +1,112 @@
 <template>
-    <div class="m-grid__item m-grid__item--fluid m-wrapper" id="app-5">
-					<!-- <div class="m-subheader ">
-						<div class="d-flex align-items-center">
-							<div class="mr-auto">
-								<h3 class="m-subheader__title m-subheader__title--separator">
-									Profile Dao HAi
-								</h3>
-							</div>
-						</div>
-					</div> -->
-					<div class="m-content" id="m_datepicker_modal">
-						<div class="m-portlet">
-							<div class="m-portlet__head">
-								<div class="m-portlet__head-caption">
-									<div class="m-portlet__head-title">
-										<span class="m-portlet__head-icon m--hide">
-											<i class="la la-gear"></i>
-										</span>
-										<h3 class="m-portlet__head-text">
-											Infor User
-										</h3>
-									</div>
-								</div>
-							</div>
-                            <!-- thong tin user -->
-                            <form class="m-form">
-								<div class="m-portlet__body">
-									<div class="m-form__section m-form__section--first">
-                                        <div class="form-group m-form__group row">
-											<img  :src="userInfor.image" width="200px" height="200px" class="rounded d-block" alt="...">
-										</div>
-										<div class="form-group m-form__group row">
-											<label class="col-lg-2 col-form-label">
-												Full Name:
-											</label>
-											<div class="col-lg-4">
-                                                <input type="text" v-model="userInfor.name" class="form-control m-input" placeholder="Enter full name">
-											</div>
-										</div>
-										<div class="form-group m-form__group row">
-											<label class="col-lg-2 col-form-label">
-												Email address:
-											</label>
-											<div class="col-lg-4">
-												<input type="email" v-model="userInfor.email" class="form-control m-input" placeholder="Enter full email">
-											</div>
-										</div>
-                                        <div class="form-group m-form__group row">
-                                            <label class=" col-lg-2 col-form-label">
-                                                birthday
-                                            </label>
-                                            <div class="col-lg-4 col-md-9 col-sm-12">
-                                                <input type="text" class="form-control" id="m_datepicker_1_modal" v-model="userInfor.birthday" placeholder="Select date"/>
-										    </div>
-                                        </div>
-                                        <div class="form-group m-form__group row">
-                                            <label class="col-lg-2 col-form-label">
-												sex:
-											</label>
-											<div class="col-xl-8 col-lg-8 col-sm-12 col-md-12">
-												<div class="m-radio-inline">
-													<label class="m-radio" >
-														<input type="radio" value="man" v-model="userInfor.sex">
-														man
-														<span></span>
-													</label>
-													<label class="m-radio">
-														<input type="radio" value="girl" v-model="userInfor.sex">
-														girl
-														<span></span>
-													</label>
-												</div>
-											</div>
-                                        </div>
-										<div class="form-group m-form__group row">
-											<label class="col-lg-2 col-form-label">
-												Contact
-											</label>
-											<div class="col-lg-4">
-												<input type="number" v-model="userInfor.contact" class="form-control m-input" placeholder="Enter full email">
-											</div>
-										</div>
-										<div class="m-form__group form-group row">
-											<label class="col-lg-2 col-form-label">
-												Super Admin:
-											</label>
-											<div class="col-xl-8 col-lg-8 col-sm-12 col-md-12">
-												<div class="m-checkbox-inline">
-													<label class="m-checkbox">
-														<input type="checkbox" v-model="userInfor.isSupperAdmin">
-														<span></span>
-													</label>
-												</div>
-											</div>
-										</div>
-										<div class="m-form__seperator m-form__seperator--dashed  m-form__seperator--space m--margin-bottom-10"></div>
-									</div>
-								</div>
-								<div class="m-portlet__foot m-portlet__foot--fit">
-									<div class="m-form__actions m-form__actions">
-										<div class="row">
-											<div class="col-lg-2"></div>
-											<div class="col-lg-2">
-												<button v-on:click="Change"  class="btn btn-success">
-													Change
-												</button>
-												<button type="reset" class="btn btn-secondary">
-													Cancel
-												</button>
-											</div>
-										</div>
-									</div>
-								</div>
-							</form>
+	<div class="m-grid__item m-grid__item--fluid m-wrapper">
+		<div class="m-content" id="m_datepicker_modal">
+			<div class="m-portlet">
+				<div class="m-portlet__head">
+					<div class="m-portlet__head-caption">
+						<div class="m-portlet__head-title">
+							<span class="m-portlet__head-icon m--hide">
+												<i class="la la-gear"></i>
+											</span>
+							<h3 class="m-portlet__head-text">
+								Infor User
+							</h3>
 						</div>
 					</div>
 				</div>
+				<!-- thong tin user -->
+				<form class="m-form">
+					<div class="m-portlet__body">
+						<div class="m-form__section m-form__section--first">
+							<div class="form-group m-form__group row">
+								<img :src="userInfor.image" width="200px" height="200px" class="rounded d-block" alt="...">
+							</div>
+							<div class="form-group m-form__group row">
+								<label class="col-lg-2 col-form-label">
+													Full Name:
+												</label>
+								<div class="col-lg-4">
+									<input type="text" v-model="userInfor.name" class="form-control m-input" placeholder="Enter full name">
+								</div>
+							</div>
+							<div class="form-group m-form__group row">
+								<label class="col-lg-2 col-form-label">
+													Email address:
+												</label>
+								<div class="col-lg-4">
+									<input type="email" v-model="userInfor.email" class="form-control m-input" placeholder="Enter full email">
+								</div>
+							</div>
+							<div class="form-group m-form__group row">
+								<label class=" col-lg-2 col-form-label">
+	                                                birthday
+	                                            </label>
+								<div class="col-lg-4 col-md-9 col-sm-12">
+									<input type="text" class="form-control" id="m_datepicker_1_modal" v-model="userInfor.birthday" placeholder="Select date" />
+								</div>
+							</div>
+							<div class="form-group m-form__group row">
+								<label class="col-lg-2 col-form-label">
+													sex:
+												</label>
+								<div class="col-xl-8 col-lg-8 col-sm-12 col-md-12">
+									<div class="m-radio-inline">
+										<label class="m-radio">
+															<input type="radio" value="man" v-model="userInfor.sex">
+															man
+															<span></span>
+														</label>
+										<label class="m-radio">
+															<input type="radio" value="girl" v-model="userInfor.sex">
+															girl
+															<span></span>
+														</label>
+									</div>
+								</div>
+							</div>
+							<div class="form-group m-form__group row">
+								<label class="col-lg-2 col-form-label">
+													Contact
+												</label>
+								<div class="col-lg-4">
+									<input type="number" v-model="userInfor.contact" class="form-control m-input" placeholder="Enter full email">
+								</div>
+							</div>
+							<div class="m-form__group form-group row">
+								<label class="col-lg-2 col-form-label">
+													Super Admin:
+												</label>
+								<div class="col-xl-8 col-lg-8 col-sm-12 col-md-12">
+									<div class="m-checkbox-inline">
+										<label class="m-checkbox">
+											<input type="checkbox" v-model="userInfor.isSupperAdmin">
+											<span></span>
+										</label>
+									</div>
+								</div>
+							</div>
+							<div class="m-form__seperator m-form__seperator--dashed  m-form__seperator--space m--margin-bottom-10"></div>
+						</div>
+					</div>
+					<div class="m-portlet__foot m-portlet__foot--fit">
+						<div class="m-form__actions m-form__actions">
+							<div class="row">
+								<div class="col-lg-2"></div>
+								<div class="col-lg-2">
+									<button v-on:click="Change" class="btn btn-success">
+										Change
+									</button>
+									<button type="reset" class="btn btn-secondary">
+										Cancel
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
 </template>
 
 <script>
@@ -124,27 +115,28 @@ export default {
   data: function() {
     return {
       userInfor: {
-        image:"https://vietnammoi.vn/stores/news_dataimages/htt/032018/21/10/4006_ef50189c12294e6298121aa3a2b58d91.jpg",
+        image:
+          "https://vietnammoi.vn/stores/news_dataimages/htt/032018/21/10/4006_ef50189c12294e6298121aa3a2b58d91.jpg",
         name: "Đào Văn Hai",
         email: "daohai3031996@gmail.com",
         contact: "0943611060",
         isSupperAdmin: true,
         sex: "girl",
-        birthday:"05/20/2017"
+        birthday: "05/20/2017"
       }
     };
   },
   created: function() {
-      this.changeName();
+    this.changeName();
   },
   methods: {
-    changeName: function () {
+    changeName: function() {
       setTimeout(() => {
-          this.userInfor.name="dao van hai"
+        this.userInfor.name = "dao van hai";
       }, 2000);
     },
     Change: function() {
-        console.log(this.userInfor);
+      console.log(this.userInfor);
     }
   }
 };

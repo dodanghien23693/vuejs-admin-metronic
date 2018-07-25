@@ -1,13 +1,13 @@
 
 
 <script>
-import template from './AppHeader.html';
+import template from "./AppHeader.html";
 
 export default {
   name: "app-header",
   template: template,
-  mounted(){
-      mLayout.initHeader();
+  mounted() {
+    mLayout.initHeader();
   }
 };
 </script>

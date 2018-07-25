@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require("path");
 
 module.exports = {
   lintOnSave: true,
@@ -11,7 +11,6 @@ module.exports = {
     // },
     module: {
       rules: [
-        
         // {
         //   test: /\.html$/,
         //   loader: 'vue-template-loader'
@@ -21,12 +20,10 @@ module.exports = {
         {
           test: /\.html$/,
           exclude: /node_modules/,
-          use: {loader: 'html-loader'}
+          use: { loader: "html-loader" }
         }
       ]
     },
-    plugins: [
-      
-    ]
+    plugins: []
   }
-}
+};

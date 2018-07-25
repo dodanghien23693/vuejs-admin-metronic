@@ -18,31 +18,28 @@
 </template>
 
 <script>
-import AppHeader from "@/pages/components/AppHeader.vue";
-import LeftSidebar from "@/pages/components/LeftSidebar.vue";
+import AppHeader from "@/pages/layout/AppHeader.vue";
+import LeftSidebar from "@/pages/layout/LeftSidebar.vue";
 
 export default {
   name: "admin-page",
   data: function() {
-      return {}
+    return {};
   },
   components: {
     AppHeader,
     LeftSidebar
   },
-  mounted(){
-    
-  },
+  mounted() {},
   methods: {}
-
 };
 </script>
 
 <style lang="scss" scoped>
-#page-view-container{
+#page-view-container {
   padding: 20px;
   height: calc(100vh - 70px);
   overflow: auto;
-  margin:0;
+  margin: 0;
 }
 </style>
