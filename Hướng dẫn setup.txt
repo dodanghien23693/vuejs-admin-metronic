@@ -2,3 +2,13 @@ Chạy lệnh trong thư mục 'source code'
 
 npm install
 npm run serve
+
+Cài plugin cho visual studio code: Prettier - Code formatter (https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+
+Cấu hình user setting trong visual studio để sủ dụng prettier format code:
+
+File->Preferences->Settings và Thêm các dòng sau vào phía cuối file
+
+"editor.formatOnSave": true,
+"prettier.useTabs": true,
+"prettier.tabWidth": 2

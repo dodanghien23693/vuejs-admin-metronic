@@ -10,7 +10,6 @@
       <left-sidebar></left-sidebar>
       <div class="m-grid__item m-grid__item--fluid m-wrapper" style="margin:0">
           <router-view id="page-view-container">
-
           </router-view>
       </div>
     </div>
@@ -22,24 +21,24 @@ import AppHeader from "@/pages/layout/AppHeader.vue";
 import LeftSidebar from "@/pages/layout/LeftSidebar.vue";
 
 export default {
-  name: "admin-page",
-  data: function() {
-    return {};
-  },
-  components: {
-    AppHeader,
-    LeftSidebar
-  },
-  mounted() {},
-  methods: {}
+	name: "admin-page",
+	data: function() {
+		return {};
+	},
+	components: {
+		AppHeader,
+		LeftSidebar
+	},
+	mounted() {},
+	methods: {}
 };
 </script>
 
 <style lang="scss" scoped>
 #page-view-container {
-  padding: 20px;
-  height: calc(100vh - 70px);
-  overflow: auto;
-  margin: 0;
+	padding: 20px;
+	height: calc(100vh - 70px);
+	overflow: auto;
+	margin: 0;
 }
 </style>
