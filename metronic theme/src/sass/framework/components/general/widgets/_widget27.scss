@@ -1,0 +1,114 @@
+//
+//** Widget 27 Component
+//
+
+//== Component Base
+@mixin m-build-component--widget27-base() {
+    .m-widget27 {         
+        .m-widget27__pic {
+            position: relative;
+
+            > img {
+                width: 100%;
+                height: 286px;
+            }           
+
+            .m-widget27__title {
+                position: absolute;
+                left: 50%;
+                top: 60%;
+                transform: translate(-50%, -50%);
+                display: block;
+                z-index: 1;
+
+                > span {
+                    font-size: 4.5rem;
+
+                    > span {
+                        font-size: 2.5rem;
+                        padding-right: 0.4rem;
+                    }                                    
+                }                
+            }
+
+            .m-widget27__btn {
+                .btn {
+                    position: absolute;
+                    left: 50%;
+                    top: 100%;
+                    transform: translate(-50%, -50%);                
+                    z-index: 1;
+                    display: block;
+                    font-size: get-font-size(regular, '+');
+                    padding: 1rem 2.5rem;
+                }
+            }
+        }
+
+        .m-widget27__container {
+            margin-top: 3rem;
+            width: 100%;
+            padding: 1rem 1.5rem 0 1.5rem;
+
+            .m-widget27__nav-items {
+                display: table;
+                width: 100%;
+                table-layout: fixed;
+                border-spacing: 0.7rem;               
+
+                .m-widget27__nav-item {
+                    display: table-cell;                                       
+
+                    > a {
+                        text-align: center;                         
+                        font-size: get-font-size(regular, '+');
+                        font-weight: get-font-weight(bolder); 
+                        padding: 0.8rem 0 0.8rem 0;
+                    }                                        
+                }
+            }
+        }     
+    } 
+}
+
+//== Component Skin
+@mixin m-build-component--widget27-skin() {
+    $skin: get-default-skin();    
+
+    .m-widget27 {
+        .m-widget27__pic {            
+            .m-widget27__btn {
+                .btn {
+                    color: get-color($skin, regular, '--');
+                }
+            }
+        }
+
+        .m-widget27__container {
+            .m-widget27__nav-items {
+                .m-widget27__nav-item {
+                    > a {
+                        color: get-color($skin, regular, '-----');
+                        border: 1px solid get-color($skin, panel);
+
+                        &.active { 
+                            background-color: get-state-color(focus, base);
+                            border-color: get-state-color(focus, base) !important;
+                            color: get-state-color(focus, inverse);
+                        } 
+                    }    
+                }
+            }
+        }             
+    }
+}
+
+ 
+
+//== Build Component Base
+@include m-build-component--widget27-base();
+
+//== Build Component Skin
+@include m-build-component--widget27-skin();
+
+ 

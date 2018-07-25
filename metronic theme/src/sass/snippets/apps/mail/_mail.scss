@@ -1,0 +1,25 @@
+//
+//** Mail App
+//
+
+//==== Component Mixins ====//
+
+//== Component Base
+@mixin m-build-component--mail-base() {
+    .m-mail {
+        
+    }    
+}
+
+//== Component Skin
+@mixin m-build-component--mail-skin() {    
+    
+}
+
+//==== Generate Component ====//
+
+//== Component Base
+@include m-build-component--mail-base();
+
+//== Component Skin
+@include m-build-component--mail-skin();
