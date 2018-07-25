@@ -1,0 +1,4 @@
+Chạy lệnh trong thư mục 'source code'
+
+npm install
+npm run serve
