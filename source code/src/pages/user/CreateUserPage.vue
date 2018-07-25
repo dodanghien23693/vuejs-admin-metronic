@@ -1,11 +1,7 @@
-<template>
-    <div>
-        <h1>Create user form</h1>
-    </div>
-</template>
-
 <script>
+import template from "./CreateUserPage.html";
 export default {
+    template: template,
     name:'create-user-page',
     methods:{
         doLogin(){
