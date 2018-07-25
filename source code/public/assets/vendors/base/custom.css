@@ -1,0 +1,45 @@
+.m--width-10{
+    width: 10%;
+}
+.m--width-20{
+    width: 20%;
+}
+.m--width-30{
+    width: 30%;
+}
+.m--width-40{
+    width: 40%;
+}
+.m--width-50{
+    width: 50%;
+}
+.m--width-60{
+    width: 60%;
+}
+.m--width-70{
+    width: 70%;
+}
+.m--width-80{
+    width: 80%;
+}
+.m--width-90{
+    width: 90%;
+}
+.m--width-100{
+    width: 100%;
+}
+.m-brand.m-brand--skin-dark{
+    background: #716aca !important;
+}
+.m-body .m-content {
+    padding: 15px 15px;
+}
+.m--font-size-14{
+    font-size: 14px !important;
+}
+.m-widget2__item:hover{
+    background: #f8f8fb;
+}
+.m-aside-menu .m-menu__nav .m-menu__section{
+    padding: 0px !important;
+}
