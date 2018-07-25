@@ -8,8 +8,8 @@
       </button>
 
       <left-sidebar></left-sidebar>
-      <div class="m-grid__item m-grid__item--fluid m-wrapper">
-          <router-view id="page-view-container" >
+      <div class="m-grid__item m-grid__item--fluid m-wrapper" style="margin:0">
+          <router-view id="page-view-container">
 
           </router-view>
       </div>
@@ -41,5 +41,8 @@ export default {
 <style lang="scss" scoped>
 #page-view-container{
   padding: 20px;
+  height: calc(100vh - 70px);
+  overflow: auto;
+  margin:0;
 }
 </style>
