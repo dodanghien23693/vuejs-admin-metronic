@@ -2804,7 +2804,7 @@ function nodeName( elem, name ) {
 
   return elem.nodeName && elem.nodeName.toLowerCase() === name.toLowerCase();
 
-};
+}
 var rsingleTag = ( /^<([a-z][^\/\0>:\x20\t\r\n\f]*)[\x20\t\r\n\f]*\/?>(?:<\/\1>|)$/i );
 
 
@@ -12906,7 +12906,7 @@ return Popper;
  * Copyright 2006, 2015 Klaus Hartl & Fagner Brack
  * Released under the MIT license
  */
-;(function (factory) {
+(function (factory) {
 	var registeredInModuleLoader = false;
 	if (typeof define === 'function' && define.amd) {
 		define(factory);
@@ -14480,7 +14480,7 @@ $.fn.repeater = function (fig) {
  * Thanks to Amir-Hossein Sobhi for some excellent contributions!
  */
 
-;(function() {
+(function() {
 /*jshint eqeqeq:false curly:false latedef:false */
 "use strict";
 
@@ -18805,7 +18805,7 @@ $.fn.timepicker.defaults = $.extend(true, {}, $.fn.timepicker.defaults, {
     return array1.length === array2.length && array1.every(function(element, index) {
       return element === array2[index]; 
     });
-  };
+  }
 
   //<editor-fold desc="Shims">
   if (!String.prototype.startsWith) {
@@ -20861,7 +20861,7 @@ $.fn.timepicker.defaults = $.extend(true, {}, $.fn.timepicker.defaults, {
           no_results = document.createElement('li');
 
       this.$button.on('click.bs.dropdown.data-api', function () {
-        if (!!that.$searchbox.val()) {
+        if (that.$searchbox.val()) {
           that.$searchbox.val('');
         }
       });
@@ -21355,7 +21355,7 @@ $.fn.timepicker.defaults = $.extend(true, {}, $.fn.timepicker.defaults, {
  * Released under the MIT license
  * https://github.com/select2/select2/blob/master/LICENSE.md
  */
-;(function (factory) {
+(function (factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
     define(['jquery'], factory);
@@ -35198,7 +35198,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ })
 /******/ ])
 });
-;
+
 /*!
 * jquery.inputmask.bundle.js
 * https://github.com/RobinHerbots/Inputmask
@@ -41461,7 +41461,7 @@ function closure ( target, options, originalOptions ){
  * @todo Test Zepto
  * @todo stagePadding calculate wrong active classes
  */
-;(function($, window, document, undefined) {
+(function($, window, document, undefined) {
 
 	/**
 	 * Creates a carousel.
@@ -43207,7 +43207,7 @@ function closure ( target, options, originalOptions ){
  * @author David Deutsch
  * @license The MIT License (MIT)
  */
-;(function($, window, document, undefined) {
+(function($, window, document, undefined) {
 
 	/**
 	 * Creates the auto refresh plugin.
@@ -43319,7 +43319,7 @@ function closure ( target, options, originalOptions ){
  * @author David Deutsch
  * @license The MIT License (MIT)
  */
-;(function($, window, document, undefined) {
+(function($, window, document, undefined) {
 
 	/**
 	 * Creates the lazy plugin.
@@ -43469,7 +43469,7 @@ function closure ( target, options, originalOptions ){
  * @author David Deutsch
  * @license The MIT License (MIT)
  */
-;(function($, window, document, undefined) {
+(function($, window, document, undefined) {
 
 	/**
 	 * Creates the auto height plugin.
@@ -43602,7 +43602,7 @@ function closure ( target, options, originalOptions ){
  * @author David Deutsch
  * @license The MIT License (MIT)
  */
-;(function($, window, document, undefined) {
+(function($, window, document, undefined) {
 
 	/**
 	 * Creates the video plugin.
@@ -43930,7 +43930,7 @@ function closure ( target, options, originalOptions ){
  * @author David Deutsch
  * @license The MIT License (MIT)
  */
-;(function($, window, document, undefined) {
+(function($, window, document, undefined) {
 
 	/**
 	 * Creates the animate plugin.
@@ -44054,7 +44054,7 @@ function closure ( target, options, originalOptions ){
  * @author Tom De Caluwé
  * @license The MIT License (MIT)
  */
-;(function($, window, document, undefined) {
+(function($, window, document, undefined) {
 
 	/**
 	 * Creates the autoplay plugin.
@@ -44286,7 +44286,7 @@ function closure ( target, options, originalOptions ){
  * @author David Deutsch
  * @license The MIT License (MIT)
  */
-;(function($, window, document, undefined) {
+(function($, window, document, undefined) {
 	'use strict';
 
 	/**
@@ -44693,7 +44693,7 @@ function closure ( target, options, originalOptions ){
  * @author David Deutsch
  * @license The MIT License (MIT)
  */
-;(function($, window, document, undefined) {
+(function($, window, document, undefined) {
 	'use strict';
 
 	/**
@@ -44818,7 +44818,7 @@ function closure ( target, options, originalOptions ){
  * @author David Deutsch
  * @license The MIT License (MIT)
  */
-;(function($, window, document, undefined) {
+(function($, window, document, undefined) {
 
 	var style = $('<support>').get(0).style,
 		prefixes = 'Webkit Moz O ms'.split(' '),
@@ -45200,7 +45200,7 @@ function closure ( target, options, originalOptions ){
 // http://ionden.com/a/plugins/licence-en.html
 // =====================================================================================================================
 
-;(function(factory) {
+(function(factory) {
     if (typeof define === "function" && define.amd) {
         define(["jquery"], function (jQuery) {
             return factory(jQuery, document, window, navigator);
@@ -59030,7 +59030,6 @@ Markdown.dialects.Gruber = {
           var li_accumulate = "";
 
           // Loop over the lines in this block looking for tight lists.
-          tight_search:
           for ( var line_no = 0; line_no < lines.length; line_no++ ) {
             var nl = "",
                 l = lines[line_no].replace(/^\n/, function(n) { nl = n; return ""; });
@@ -72354,11 +72353,11 @@ $.notifyDefaults({
 		 */
 		this.restore_state = function () {
 			var k = $.vakata.storage.get(this.settings.state.key);
-			if(!!k) { try { k = JSON.parse(k); } catch(ex) { return false; } }
+			if(k) { try { k = JSON.parse(k); } catch(ex) { return false; } }
 			if(!!k && k.ttl && k.sec && +(new Date()) - k.sec > k.ttl) { return false; }
 			if(!!k && k.state) { k = k.state; }
 			if(!!k && $.isFunction(this.settings.state.filter)) { k = this.settings.state.filter.call(this, k); }
-			if(!!k) {
+			if(k) {
 				if (!this.settings.state.preserve_loaded) {
 					delete k.core.loaded;
 				}
@@ -81379,7 +81378,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ }
 /******/ ])
 });
-;
+
 /* @license
 morris.js v0.5.0
 Copyright 2014 Olly Smith All rights reserved.
@@ -84443,7 +84442,7 @@ var Chartist = {
     return segments;
   };
 }(window, document, Chartist));
-;/**
+/**
  * Chartist path interpolation functions.
  *
  * @module Chartist.Interpolation
@@ -84880,7 +84879,7 @@ var Chartist = {
   };
 
 }(window, document, Chartist));
-;/**
+/**
  * A very basic event module that helps to generate and catch events.
  *
  * @module Chartist.Event
@@ -84958,7 +84957,7 @@ var Chartist = {
   };
 
 }(window, document, Chartist));
-;/**
+/**
  * This module provides some basic prototype inheritance utilities.
  *
  * @module Chartist.Class
@@ -85069,7 +85068,7 @@ var Chartist = {
   };
 
 }(window, document, Chartist));
-;/**
+/**
  * Base for all chart types. The methods in Chartist.Base are inherited to all chart types.
  *
  * @module Chartist.Base
@@ -85262,7 +85261,7 @@ var Chartist = {
   });
 
 }(window, document, Chartist));
-;/**
+/**
  * Chartist SVG module for simple SVG DOM abstraction
  *
  * @module Chartist.Svg
@@ -85860,7 +85859,7 @@ var Chartist = {
     constructor: SvgList
   });
 }(window, document, Chartist));
-;/**
+/**
  * Chartist SVG path module for SVG path description creation and modification.
  *
  * @module Chartist.Svg.Path
@@ -86245,7 +86244,7 @@ var Chartist = {
   Chartist.Svg.Path.elementDescriptions = elementDescriptions;
   Chartist.Svg.Path.join = join;
 }(window, document, Chartist));
-;/* global Chartist */
+/* global Chartist */
 (function (window, document, Chartist) {
   'use strict';
 
@@ -86361,7 +86360,7 @@ var Chartist = {
   Chartist.Axis.units = axisUnits;
 
 }(window, document, Chartist));
-;/**
+/**
  * The auto scale axis uses standard linear scale projection of values along an axis. It uses order of magnitude to find a scale automatically and evaluates the available space in order to find the perfect amount of ticks for your chart.
  * **Options**
  * The following options are used by this axis in addition to the default axis options outlined in the axis configuration of the chart default settings.
@@ -86412,7 +86411,7 @@ var Chartist = {
   });
 
 }(window, document, Chartist));
-;/**
+/**
  * The fixed scale axis uses standard linear projection of values along an axis. It makes use of a divisor option to divide the range provided from the minimum and maximum value or the options high and low that will override the computed minimum and maximum.
  * **Options**
  * The following options are used by this axis in addition to the default axis options outlined in the axis configuration of the chart default settings.
@@ -86468,7 +86467,7 @@ var Chartist = {
   });
 
 }(window, document, Chartist));
-;/**
+/**
  * The step axis for step based charts like bar chart or step based line charts. It uses a fixed amount of ticks that will be equally distributed across the whole axis length. The projection is done using the index of the data value rather than the value itself and therefore it's only useful for distribution purpose.
  * **Options**
  * The following options are used by this axis in addition to the default axis options outlined in the axis configuration of the chart default settings.
@@ -86508,7 +86507,7 @@ var Chartist = {
   });
 
 }(window, document, Chartist));
-;/**
+/**
  * The Chartist line chart can be used to draw Line or Scatter charts. If used in the browser you can access the global `Chartist` namespace where you find the `Line` function as a main entry point.
  *
  * For examples on how to use the line chart please check the examples of the `Chartist.Line` method.
@@ -86923,7 +86922,7 @@ var Chartist = {
   });
 
 }(window, document, Chartist));
-;/**
+/**
  * The bar chart module of Chartist that can be used to draw unipolar or bipolar bar and grouped bar charts.
  *
  * @module Chartist.Bar
@@ -87366,7 +87365,7 @@ var Chartist = {
   });
 
 }(window, document, Chartist));
-;/**
+/**
  * The pie chart module of Chartist that can be used to draw pie, donut or gauge charts
  *
  * @module Chartist.Pie
@@ -89435,7 +89434,7 @@ module.exports = {
 //! license : MIT
 //! momentjs.com
 
-;(function (global, factory) {
+(function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
     global.moment = factory()
@@ -92457,7 +92456,7 @@ function createDuration (input, key) {
         } else {
             duration.milliseconds = input;
         }
-    } else if (!!(match = aspNetRegex.exec(input))) {
+    } else if (match = aspNetRegex.exec(input)) {
         sign = (match[1] === '-') ? -1 : 1;
         duration = {
             y  : 0,
@@ -92467,7 +92466,7 @@ function createDuration (input, key) {
             s  : toInt(match[SECOND])                       * sign,
             ms : toInt(absRound(match[MILLISECOND] * 1000)) * sign // the millisecond decimal point is included in the match
         };
-    } else if (!!(match = isoRegex.exec(input))) {
+    } else if (match = isoRegex.exec(input)) {
         sign = (match[1] === '-') ? -1 : (match[1] === '+') ? 1 : 1;
         duration = {
             y : parseIso(match[2], sign),
