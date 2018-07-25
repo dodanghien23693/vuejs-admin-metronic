@@ -1,4 +1,4 @@
-(function($) {
+(function ($) {
 
 	$.fn.mDatatable = $.fn.mDatatable || {};
 
@@ -7,31 +7,67 @@
 	 * @param options Extension options
 	 * @returns {*}
 	 */
-	$.fn.mDatatable.checkbox = function(datatable, options) {
+	$.fn.mDatatable.checkbox = function (datatable, options) {
 
 		var Extension = {
 			selectedAllRows: false,
 			selectedRows: [],
 			unselectedRows: [],
 
-			init: function() {
+			init: function () {
 				if (Extension.selectorEnabled()) {
+					// reset
+					datatable.setDataSourceParam(options.vars.selectedAllRows, false);
+					datatable.stateRemove('checkbox');
+
 					// requestIds is not null
 					if (options.vars.requestIds) {
 						// request ids in response
 						datatable.setDataSourceParam(options.vars.requestIds, true);
 					}
 
+					// remove selected checkbox on datatable reload
+					$(datatable).on('m-datatable--on-reloaded', function () {
+						datatable.stateRemove('checkbox');
+						datatable.setDataSourceParam(options.vars.selectedAllRows, false);
+						Extension.selectedAllRows = false;
+						Extension.selectedRows = [];
+						Extension.unselectedRows = [];
+					});
+
 					// select all on extension init
 					Extension.selectedAllRows = datatable.getDataSourceParam(options.vars.selectedAllRows);
 
-					$(datatable).on('m-datatable--on-layout-updated', function(e, args) {
+					$(datatable).on('m-datatable--on-layout-updated', function (e, args) {
 						if (args.table != $(datatable.wrap).attr('id')) return;
-						datatable.ready(function() {
+						datatable.ready(function () {
 							Extension.initVars();
 							Extension.initEvent();
 							Extension.initSelect();
 						});
+					});
+
+					$(datatable).on('m-datatable--on-check', function (e, ids) {
+						ids.forEach(function (id) {
+							Extension.selectedRows.push(id);
+							// // remove from unselected rows
+							Extension.unselectedRows = Extension.remove(Extension.unselectedRows, id);
+						});
+						var storage = {};
+						storage['selectedRows'] = $.unique(Extension.selectedRows);
+						storage['unselectedRows'] = $.unique(Extension.unselectedRows);
+						datatable.stateKeep('checkbox', storage);
+					});
+					$(datatable).on('m-datatable--on-uncheck', function (e, ids) {
+						ids.forEach(function (id) {
+							Extension.unselectedRows.push(id);
+							// // remove from selected rows
+							Extension.selectedRows = Extension.remove(Extension.selectedRows, id);
+						});
+						var storage = {};
+						storage['selectedRows'] = $.unique(Extension.selectedRows);
+						storage['unselectedRows'] = $.unique(Extension.unselectedRows);
+						datatable.stateKeep('checkbox', storage);
 					});
 				}
 			},
@@ -39,9 +75,9 @@
 			/**
 			 * Init checkbox clicks event
 			 */
-			initEvent: function() {
+			initEvent: function () {
 				// select all checkbox click
-				$(datatable.tableHead).find('.m-checkbox--all > [type="checkbox"]').click(function(e) {
+				$(datatable.tableHead).find('.m-checkbox--all > [type="checkbox"]').click(function (e) {
 					// clear selected and unselected rows
 					Extension.selectedRows = Extension.unselectedRows = [];
 					datatable.stateRemove('checkbox');
@@ -56,10 +92,9 @@
 					// local select all current page rows
 					if (!options.vars.requestIds) {
 						if ($(this).is(':checked')) {
-							Extension.selectedRows = $.makeArray($(datatable.tableBody).find('.m-checkbox--single > [type="checkbox"]').
-								map(function(i, chk) {
-									return $(chk).val();
-								}));
+							Extension.selectedRows = $.makeArray($(datatable.tableBody).find('.m-checkbox--single > [type="checkbox"]').map(function (i, chk) {
+								return $(chk).val();
+							}));
 						}
 						var storage = {};
 						storage['selectedRows'] = $.unique(Extension.selectedRows);
@@ -73,7 +108,7 @@
 				});
 
 				// single row checkbox click
-				$(datatable.tableBody).find('.m-checkbox--single > [type="checkbox"]').click(function(e) {
+				$(datatable.tableBody).find('.m-checkbox--single > [type="checkbox"]').click(function (e) {
 					var id = $(this).val();
 					if ($(this).is(':checked')) {
 						Extension.selectedRows.push(id);
@@ -100,7 +135,7 @@
 				});
 			},
 
-			initSelect: function() {
+			initSelect: function () {
 				// selected all rows from server
 				if (Extension.selectedAllRows && options.vars.requestIds) {
 					if (!datatable.hasClass('m-datatable--error')) {
@@ -112,13 +147,13 @@
 					datatable.setActiveAll(true);
 
 					// remove unselected rows
-					Extension.unselectedRows.forEach(function(id) {
+					Extension.unselectedRows.forEach(function (id) {
 						datatable.setInactive(id);
 					});
 
 				} else {
 					// single check for server and local
-					Extension.selectedRows.forEach(function(id) {
+					Extension.selectedRows.forEach(function (id) {
 						datatable.setActive(id);
 					});
 
@@ -133,13 +168,13 @@
 			/**
 			 * Check if selector is enabled from options
 			 */
-			selectorEnabled: function() {
-				return $.grep(datatable.options.columns, function(n, i) {
+			selectorEnabled: function () {
+				return $.grep(datatable.options.columns, function (n, i) {
 					return n.selector || false;
 				})[0];
 			},
 
-			initVars: function() {
+			initVars: function () {
 				// get single select/unselect from localstorage
 				var storage = datatable.stateGet('checkbox');
 				if (typeof storage !== 'undefined') {
@@ -148,7 +183,7 @@
 				}
 			},
 
-			getSelectedId: function(path) {
+			getSelectedId: function (path) {
 				Extension.initVars();
 
 				// server selected all rows
@@ -160,7 +195,7 @@
 
 					if (selectedAllRows.length > 0) {
 						// remove single unselected rows from selectedAllRows ids from server response emta
-						Extension.unselectedRows.forEach(function(id) {
+						Extension.unselectedRows.forEach(function (id) {
 							selectedAllRows = Extension.remove(selectedAllRows, parseInt(id));
 						});
 					}
@@ -171,15 +206,15 @@
 				return Extension.selectedRows;
 			},
 
-			remove: function(array, element) {
-				return array.filter(function(e) {
+			remove: function (array, element) {
+				return array.filter(function (e) {
 					return e !== element;
 				});
 			},
 		};
 
 		// make the extension accessible from datatable init
-		datatable.checkbox = function() {
+		datatable.checkbox = function () {
 			return Extension;
 		};
 

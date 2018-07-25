@@ -62,6 +62,7 @@
             }
 
             &.bs-popover-bottom {
+                .popover-header::before,
                 .arrow::after {
                     border-bottom-color: get-color($skin, box, '-');
                 }

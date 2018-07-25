@@ -1,9 +1,9 @@
-(function($) {
+(function ($) {
 
 	if (typeof mUtil === 'undefined') throw new Error('mUtil is required and must be included before mDatatable.');
 
 	// plugin setup
-	$.fn.mDatatable = function(options) {
+	$.fn.mDatatable = function (options) {
 		if ($(this).length === 0) {
 			console.log('No mDatatable element exist.');
 			return;
@@ -33,10 +33,12 @@
 			stateId: 'meta',
 			ajaxParams: {},
 
-			init: function(options) {
+			init: function (options) {
+				var isHtmlTable = false;
 				// data source option empty is normal table
 				if (options.data.source === null) {
 					Plugin.extractTable();
+					isHtmlTable = true;
 				}
 
 				Plugin.setupBaseDOM.call();
@@ -52,7 +54,7 @@
 				if (datatable.debug) Plugin.stateRemove(Plugin.stateId);
 
 				// initialize extensions
-				$.each(Plugin.getOption('extensions'), function(extName, extOptions) {
+				$.each(Plugin.getOption('extensions'), function (extName, extOptions) {
 					if (typeof $.fn.mDatatable[extName] === 'function')
 						new $.fn.mDatatable[extName](datatable, extOptions);
 				});
@@ -71,8 +73,13 @@
 					Plugin.dataRender();
 				}
 
-				Plugin.setHeadTitle();
-				Plugin.setHeadTitle(datatable.tableFoot);
+				if (!isHtmlTable) {
+					// if not a html table, setup header
+					Plugin.setHeadTitle();
+					if (Plugin.getOption('layout.footer')) {
+						Plugin.setHeadTitle(datatable.tableFoot);
+					}
+				}
 
 				// hide header
 				if (typeof options.layout.header !== 'undefined' &&
@@ -104,9 +111,9 @@
 
 				$(datatable).height('');
 
-				$(Plugin.getOption('search.input')).on('keyup', function(e) {
+				$(Plugin.getOption('search.input')).on('keyup', function (e) {
 					if (Plugin.getOption('search.onEnter') && e.which !== 13) return;
-					Plugin.search($(this).val().toLowerCase());
+					Plugin.search($(this).val());
 				});
 
 				return datatable;
@@ -115,56 +122,49 @@
 			/**
 			 * Extract static HTML table content into datasource
 			 */
-			extractTable: function() {
+			extractTable: function () {
 				var columns = [];
-				var headers = $(datatable).
-					find('tr:first-child th').
-					get().
-					map(function(cell, i) {
-						var field = $(cell).data('field');
-						if (typeof field === 'undefined') {
-							field = $(cell).text().trim();
+				var headers = $(datatable).find('tr:first-child th').get().map(function (cell, i) {
+					var field = $(cell).data('field');
+					if (typeof field === 'undefined') {
+						field = $(cell).text().trim();
+					}
+					var column = {field: field, title: field};
+					for (var ii in options.columns) {
+						if (options.columns[ii].field === field) {
+							column = $.extend(true, {}, options.columns[ii], column);
 						}
-						var column = {field: field, title: field};
-						for (var ii in options.columns) {
-							if (options.columns[ii].field === field) {
-								column = $.extend(true, {}, options.columns[ii], column);
-							}
-						}
-						columns.push(column);
-						return field;
-					});
+					}
+					columns.push(column);
+					return field;
+				});
 				// auto create columns config
 				options.columns = columns;
 
 				var rowProp = [];
-				var data = $(datatable).find('tr').get().map(function(row) {
-					if ($(row).find('td').length) {
-						rowProp.push($(row).prop('attributes'));
+				var source = [];
+
+				$(datatable).find('tr').each(function () {
+					if ($(this).find('td').length) {
+						rowProp.push($(this).prop('attributes'));
 					}
-					return $(row).find('td').get().map(function(cell, i) {
-						return $(cell).html();
+					var td = {};
+					$(this).find('td').each(function (i, cell) {
+						td[headers[i]] = cell.innerHTML.trim();
 					});
+					if (!mUtil.isEmpty(td)) {
+						source.push(td);
+					}
 				});
 
 				options.data.attr.rowProps = rowProp;
-
-				var source = [];
-				$.each(data, function(i, row) {
-					if (row.length === 0) return;
-					var td = {};
-					$.each(row, function(index, value) {
-						td[headers[index]] = $.trim(value);
-					});
-					source.push(td);
-				});
 				options.data.source = source;
 			},
 
 			/**
 			 * One time layout update on init
 			 */
-			layoutUpdate: function() {
+			layoutUpdate: function () {
 				// setup nested datatable, if option enabled
 				Plugin.setupSubDatatable.call();
 
@@ -193,11 +193,11 @@
 				$(datatable).trigger('m-datatable--on-layout-updated', {table: $(datatable.wrap).attr('id')});
 			},
 
-			lockTable: function() {
+			lockTable: function () {
 				// todo; revise lock table responsive
 				var lock = {
 					lockEnabled: false,
-					init: function() {
+					init: function () {
 						// check if table should be locked columns
 						lock.lockEnabled = Plugin.lockEnabledColumns();
 						if (lock.lockEnabled.left.length === 0 &&
@@ -206,8 +206,8 @@
 						}
 						lock.enable();
 					},
-					enable: function() {
-						var enableLock = function(tablePart) {
+					enable: function () {
+						var enableLock = function (tablePart) {
 							// check if already has lock column
 							if ($(tablePart).find('.m-datatable__lock').length > 0) {
 								Plugin.log('Locked container already exist in: ', tablePart);
@@ -220,24 +220,15 @@
 							}
 
 							// locked div container
-							var lockLeft = $('<div/>').
-								addClass('m-datatable__lock m-datatable__lock--left');
-							var lockScroll = $('<div/>').
-								addClass('m-datatable__lock m-datatable__lock--scroll');
-							var lockRight = $('<div/>').
-								addClass('m-datatable__lock m-datatable__lock--right');
+							var lockLeft = $('<div/>').addClass('m-datatable__lock m-datatable__lock--left');
+							var lockScroll = $('<div/>').addClass('m-datatable__lock m-datatable__lock--scroll');
+							var lockRight = $('<div/>').addClass('m-datatable__lock m-datatable__lock--right');
 
-							$(tablePart).find('.m-datatable__row').each(function() {
-								var rowLeft = $('<tr/>').
-									addClass('m-datatable__row').
-									appendTo(lockLeft);
-								var rowScroll = $('<tr/>').
-									addClass('m-datatable__row').
-									appendTo(lockScroll);
-								var rowRight = $('<tr/>').
-									addClass('m-datatable__row').
-									appendTo(lockRight);
-								$(this).find('.m-datatable__cell').each(function() {
+							$(tablePart).find('.m-datatable__row').each(function () {
+								var rowLeft = $('<tr/>').addClass('m-datatable__row').appendTo(lockLeft);
+								var rowScroll = $('<tr/>').addClass('m-datatable__row').appendTo(lockScroll);
+								var rowRight = $('<tr/>').addClass('m-datatable__row').appendTo(lockRight);
+								$(this).find('.m-datatable__cell').each(function () {
 									var locked = $(this).data('locked');
 									if (typeof locked !== 'undefined') {
 										if (typeof locked.left !== 'undefined' || locked === true) {
@@ -268,10 +259,10 @@
 							}
 						};
 
-						$(datatable.table).find('thead,tbody,tfoot').each(function() {
+						$(datatable.table).find('thead,tbody,tfoot').each(function () {
 							var tablePart = this;
 							if ($(this).find('.m-datatable__lock').length === 0) {
-								$(this).ready(function() {
+								$(this).ready(function () {
 									enableLock(tablePart);
 								});
 							}
@@ -285,19 +276,29 @@
 			/**
 			 * Render everything for resize
 			 */
-			fullRender: function() {
-				// todo; full render datatable for specific condition only
-				Plugin.spinnerCallback(true);
-				$(datatable.wrap).removeClass('m-datatable--loaded');
+			fullRender: function () {
+				if (Plugin.isLocked()) {
 
-				Plugin.insertData();
+					$(datatable.tableHead).empty();
+					Plugin.setHeadTitle();
+					if (Plugin.getOption('layout.footer')) {
+						$(datatable.tableFoot).empty();
+						Plugin.setHeadTitle(datatable.tableFoot);
+					}
+
+					// todo; full render datatable for specific condition only
+					Plugin.spinnerCallback(true);
+					$(datatable.wrap).removeClass('m-datatable--loaded');
+
+					Plugin.insertData();
+				}
 			},
 
-			lockEnabledColumns: function() {
+			lockEnabledColumns: function () {
 				var screen = $(window).width();
 				var columns = options.columns;
 				var enabled = {left: [], right: []};
-				$.each(columns, function(i, column) {
+				$.each(columns, function (i, column) {
 					if (typeof column.locked !== 'undefined') {
 						if (typeof column.locked.left !== 'undefined') {
 							if (mUtil.getBreakpoint(column.locked.left) <= screen) {
@@ -319,9 +320,9 @@
 			 * @param e
 			 * @param args
 			 */
-			afterRender: function(e, args) {
+			afterRender: function (e, args) {
 				if (args.table == $(datatable.wrap).attr('id')) {
-					$(datatable).ready(function() {
+					$(datatable).ready(function () {
 						if (!Plugin.isLocked()) {
 							Plugin.redraw();
 							// work on non locked columns
@@ -332,20 +333,15 @@
 							}
 						}
 
-						// row even class
-						$(datatable.tableBody).find('.m-datatable__row').removeClass('m-datatable__row--even');
-						if ($(datatable.wrap).hasClass('m-datatable--subtable')) {
-							$(datatable.tableBody).find('.m-datatable__row:not(.m-datatable__row-detail):even').addClass('m-datatable__row--even');
-						} else {
-							$(datatable.tableBody).find('.m-datatable__row:nth-child(even)').addClass('m-datatable__row--even');
-						}
+						Plugin.rowEvenOdd.call();
 
 						// redraw locked columns table
 						if (Plugin.isLocked()) Plugin.redraw();
 						$(datatable.tableBody).css('visibility', '');
 						$(datatable.wrap).addClass('m-datatable--loaded');
-						Plugin.scrollbar.call();
+
 						Plugin.sorting.call();
+						Plugin.scrollbar.call();
 
 						// Plugin.hoverColumn.call();
 						Plugin.spinnerCallback(false);
@@ -355,75 +351,53 @@
 
 			hoverTimer: 0,
 			isScrolling: false,
-			setupHover: function() {
-				$(window).scroll(function(e) {
+			setupHover: function () {
+				$(window).scroll(function (e) {
 					// stop hover when scrolling
 					clearTimeout(Plugin.hoverTimer);
 					Plugin.isScrolling = true;
 				});
 
-				$(datatable.tableBody).
-					find('.m-datatable__cell').
-					off('mouseenter', 'mouseleave').
-					on('mouseenter', function() {
-						// reset scroll timer to hover class
-						Plugin.hoverTimer = setTimeout(function() {
-							Plugin.isScrolling = false;
-						}, 200);
-						if (Plugin.isScrolling) return;
+				$(datatable.tableBody).find('.m-datatable__cell').off('mouseenter', 'mouseleave').on('mouseenter', function () {
+					// reset scroll timer to hover class
+					Plugin.hoverTimer = setTimeout(function () {
+						Plugin.isScrolling = false;
+					}, 200);
+					if (Plugin.isScrolling) return;
 
-						// normal table
-						var row = $(this).
-							closest('.m-datatable__row').
-							addClass('m-datatable__row--hover');
-						var index = $(row).index() + 1;
+					// normal table
+					var row = $(this).closest('.m-datatable__row').addClass('m-datatable__row--hover');
+					var index = $(row).index() + 1;
 
-						// lock table
-						$(row).
-							closest('.m-datatable__lock').
-							parent().
-							find('.m-datatable__row:nth-child(' + index + ')').
-							addClass('m-datatable__row--hover');
-					}).
-					on('mouseleave', function() {
-						// normal table
-						var row = $(this).
-							closest('.m-datatable__row').
-							removeClass('m-datatable__row--hover');
-						var index = $(row).index() + 1;
+					// lock table
+					$(row).closest('.m-datatable__lock').parent().find('.m-datatable__row:nth-child(' + index + ')').addClass('m-datatable__row--hover');
+				}).on('mouseleave', function () {
+					// normal table
+					var row = $(this).closest('.m-datatable__row').removeClass('m-datatable__row--hover');
+					var index = $(row).index() + 1;
 
-						// look table
-						$(row).
-							closest('.m-datatable__lock').
-							parent().
-							find('.m-datatable__row:nth-child(' + index + ')').
-							removeClass('m-datatable__row--hover');
-					});
+					// look table
+					$(row).closest('.m-datatable__lock').parent().find('.m-datatable__row:nth-child(' + index + ')').removeClass('m-datatable__row--hover');
+				});
 			},
 
 			/**
 			 * Adjust width of locked table containers by resize handler
 			 * @returns {number}
 			 */
-			adjustLockContainer: function() {
+			adjustLockContainer: function () {
 				if (!Plugin.isLocked()) return 0;
 
 				// refer to head dimension
 				var containerWidth = $(datatable.tableHead).width();
-				var lockLeft = $(datatable.tableHead).
-					find('.m-datatable__lock--left').
-					width();
-				var lockRight = $(datatable.tableHead).
-					find('.m-datatable__lock--right').
-					width();
+				var lockLeft = $(datatable.tableHead).find('.m-datatable__lock--left').width();
+				var lockRight = $(datatable.tableHead).find('.m-datatable__lock--right').width();
 
 				if (typeof lockLeft === 'undefined') lockLeft = 0;
 				if (typeof lockRight === 'undefined') lockRight = 0;
 
 				var lockScroll = Math.floor(containerWidth - lockLeft - lockRight);
-				$(datatable.table).
-					find('.m-datatable__lock--scroll').
-					css('width', lockScroll);
+				$(datatable.table).find('.m-datatable__lock--scroll').css('width', lockScroll);
 
 				return lockScroll;
 			},
@@ -431,52 +405,41 @@
 			/**
 			 * todo; not in use
 			 */
-			dragResize: function() {
+			dragResize: function () {
 				var pressed = false;
 				var start = undefined;
 				var startX, startWidth;
-				$(datatable.tableHead).
-					find('.m-datatable__cell').
-					mousedown(function(e) {
-						start = $(this);
-						pressed = true;
-						startX = e.pageX;
-						startWidth = $(this).width();
-						$(start).addClass('m-datatable__cell--resizing');
+				$(datatable.tableHead).find('.m-datatable__cell').mousedown(function (e) {
+					start = $(this);
+					pressed = true;
+					startX = e.pageX;
+					startWidth = $(this).width();
+					$(start).addClass('m-datatable__cell--resizing');
 
-					}).
-					mousemove(function(e) {
-						if (pressed) {
-							var i = $(start).index();
-							var tableBody = $(datatable.tableBody);
-							var ifLocked = $(start).closest('.m-datatable__lock');
+				}).mousemove(function (e) {
+					if (pressed) {
+						var i = $(start).index();
+						var tableBody = $(datatable.tableBody);
+						var ifLocked = $(start).closest('.m-datatable__lock');
 
-							if (ifLocked) {
-								var lockedIndex = $(ifLocked).index();
-								tableBody = $(datatable.tableBody).
-									find('.m-datatable__lock').
-									eq(lockedIndex);
-							}
-
-							$(tableBody).find('.m-datatable__row').each(function(tri, tr) {
-								$(tr).
-									find('.m-datatable__cell').
-									eq(i).
-									width(startWidth + (e.pageX - startX)).
-									children().
-									width(startWidth + (e.pageX - startX));
-							});
-
-							$(start).children().css('width', startWidth + (e.pageX - startX));
+						if (ifLocked) {
+							var lockedIndex = $(ifLocked).index();
+							tableBody = $(datatable.tableBody).find('.m-datatable__lock').eq(lockedIndex);
 						}
 
-					}).
-					mouseup(function() {
-						$(start).removeClass('m-datatable__cell--resizing');
-						pressed = false;
-					});
+						$(tableBody).find('.m-datatable__row').each(function (tri, tr) {
+							$(tr).find('.m-datatable__cell').eq(i).width(startWidth + (e.pageX - startX)).children().width(startWidth + (e.pageX - startX));
+						});
 
-				$(document).mouseup(function() {
+						$(start).children().css('width', startWidth + (e.pageX - startX));
+					}
+
+				}).mouseup(function () {
+					$(start).removeClass('m-datatable__cell--resizing');
+					pressed = false;
+				});
+
+				$(document).mouseup(function () {
 					$(start).removeClass('m-datatable__cell--resizing');
 					pressed = false;
 				});
@@ -485,7 +448,7 @@
 			/**
 			 * To prepare placeholder for table before content is loading
 			 */
-			initHeight: function() {
+			initHeight: function () {
 				if (options.layout.height && options.layout.scroll) {
 					var theadHeight = $(datatable.tableHead).find('.m-datatable__row').height();
 					var tfootHeight = $(datatable.tableFoot).find('.m-datatable__row').height();
@@ -497,45 +460,38 @@
 						bodyHeight -= tfootHeight;
 					}
 					$(datatable.tableBody).css('max-height', bodyHeight);
+
+					// set scrollable area fixed height
+					$(datatable.tableBody).find('.m-datatable__lock--scroll').css('height', bodyHeight);
 				}
 			},
 
 			/**
 			 * Setup base DOM (table, thead, tbody, tfoot) and create if not exist.
 			 */
-			setupBaseDOM: function() {
+			setupBaseDOM: function () {
 				// keep original state before mDatatable initialize
 				datatable.initialDatatable = $(datatable).clone();
 
 				// main element
 				if ($(datatable).prop('tagName') === 'TABLE') {
 					// if main init element is <table>, wrap with div
-					datatable.table = $(datatable).
-						removeClass('m-datatable').
-						addClass('m-datatable__table');
+					datatable.table = $(datatable).removeClass('m-datatable').addClass('m-datatable__table');
 					if ($(datatable.table).parents('.m-datatable').length === 0) {
-						datatable.table.wrap($('<div/>').
-							addClass('m-datatable').
-							addClass('m-datatable--' + options.layout.theme));
+						datatable.table.wrap($('<div/>').addClass('m-datatable').addClass('m-datatable--' + options.layout.theme));
 						datatable.wrap = $(datatable.table).parent();
 					}
 				} else {
 					// create table
-					datatable.wrap = $(datatable).
-						addClass('m-datatable').
-						addClass('m-datatable--' + options.layout.theme);
-					datatable.table = $('<table/>').
-						addClass('m-datatable__table').
-						appendTo(datatable);
+					datatable.wrap = $(datatable).addClass('m-datatable').addClass('m-datatable--' + options.layout.theme);
+					datatable.table = $('<table/>').addClass('m-datatable__table').appendTo(datatable);
 				}
 
 				if (typeof options.layout.class !== 'undefined') {
 					$(datatable.wrap).addClass(options.layout.class);
 				}
 
-				$(datatable.table).
-					removeClass('m-datatable--destroyed').
-					css('display', 'block');
+				$(datatable.table).removeClass('m-datatable--destroyed').css('display', 'block');
 
 				// force disable save state
 				if (typeof $(datatable).attr('id') === 'undefined') {
@@ -580,13 +536,13 @@
 			/**
 			 * Set column data before table manipulation.
 			 */
-			setupCellField: function(tableParts) {
+			setupCellField: function (tableParts) {
 				if (typeof tableParts === 'undefined') tableParts = $(datatable.table).children();
 				var columns = options.columns;
-				$.each(tableParts, function(part, tablePart) {
-					$(tablePart).find('.m-datatable__row').each(function(tri, tr) {
+				$.each(tableParts, function (part, tablePart) {
+					$(tablePart).find('.m-datatable__row').each(function (tri, tr) {
 						// prepare data
-						$(tr).find('.m-datatable__cell').each(function(tdi, td) {
+						$(tr).find('.m-datatable__cell').each(function (tdi, td) {
 							if (typeof columns[tdi] !== 'undefined') {
 								$(td).data(columns[tdi]);
 							}
@@ -599,21 +555,21 @@
 			 * Set column template callback
 			 * @param tablePart
 			 */
-			setupTemplateCell: function(tablePart) {
+			setupTemplateCell: function (tablePart) {
 				if (typeof tablePart === 'undefined') tablePart = datatable.tableBody;
 				var columns = options.columns;
-				$(tablePart).find('.m-datatable__row').each(function(tri, tr) {
+				$(tablePart).find('.m-datatable__row').each(function (tri, tr) {
 					// row data object, if any
 					var obj = $(tr).data('obj') || {};
 
 					// @deprecated in v5.0.6
-					obj['getIndex'] = function() {
-						return tri;
-					};
+					// obj['getIndex'] = function() {
+					// 	return tri;
+					// };
 					// @deprecated in v5.0.6
-					obj['getDatatable'] = function() {
-						return datatable;
-					};
+					// obj['getDatatable'] = function() {
+					// 	return datatable;
+					// };
 
 					// @deprecated in v5.0.6
 					var rowCallback = Plugin.getOption('rows.callback');
@@ -628,9 +584,9 @@
 					// if data object is undefined, collect from table
 					if (typeof obj === 'undefined') {
 						obj = {};
-						$(tr).find('.m-datatable__cell').each(function(tdi, td) {
+						$(tr).find('.m-datatable__cell').each(function (tdi, td) {
 							// get column settings by field
-							var column = $.grep(columns, function(n, i) {
+							var column = $.grep(columns, function (n, i) {
 								return $(td).data('field') === n.field;
 							})[0];
 							if (typeof column !== 'undefined') {
@@ -639,9 +595,9 @@
 						});
 					}
 
-					$(tr).find('.m-datatable__cell').each(function(tdi, td) {
+					$(tr).find('.m-datatable__cell').each(function (tdi, td) {
 						// get column settings by field
-						var column = $.grep(columns, function(n, i) {
+						var column = $.grep(columns, function (n, i) {
 							return $(td).data('field') === n.field;
 						})[0];
 						if (typeof column !== 'undefined') {
@@ -656,13 +612,15 @@
 								if (typeof column.template === 'function') {
 									finalValue = column.template(obj, tri, datatable);
 								}
-								var span = $('<span/>').append(finalValue);
+								var span = document.createElement('span');
+								span.innerHTML = finalValue;
 								// insert to cell, wrap with span
 								$(td).html(span);
 
 								// set span overflow
 								if (typeof column.overflow !== 'undefined') {
 									$(span).css('overflow', column.overflow);
+									$(span).css('position', 'relative');
 								}
 							}
 						}
@@ -680,76 +638,61 @@
 			 * Setup extra system column properties
 			 * Note: selector checkbox, subtable toggle
 			 */
-			setupSystemColumn: function() {
+			setupSystemColumn: function () {
 				datatable.dataSet = datatable.dataSet || [];
 				// no records available
 				if (datatable.dataSet.length === 0) return;
 
 				var columns = options.columns;
-				$(datatable.tableBody).
-					find('.m-datatable__row').
-					each(function(tri, tr) {
-						$(tr).find('.m-datatable__cell').each(function(tdi, td) {
-							// get column settings by field
-							var column = $.grep(columns, function(n, i) {
-								return $(td).data('field') === n.field;
-							})[0];
-							if (typeof column !== 'undefined') {
-								var value = $(td).text();
+				$(datatable.tableBody).find('.m-datatable__row').each(function (tri, tr) {
+					$(tr).find('.m-datatable__cell').each(function (tdi, td) {
+						// get column settings by field
+						var column = $.grep(columns, function (n, i) {
+							return $(td).data('field') === n.field;
+						})[0];
+						if (typeof column !== 'undefined') {
+							var value = $(td).text();
 
-								// enable column selector
-								if (typeof column.selector !== 'undefined' &&
-									column.selector !== false) {
-									// check if checkbox exist
-									if ($(td).find('.m-checkbox [type="checkbox"]').length > 0) return;
-									$(td).addClass('m-datatable__cell--check');
-									// append checkbox
-									var chk = $('<label/>').
-										addClass('m-checkbox m-checkbox--single').
-										append($('<input/>').
-											attr('type', 'checkbox').
-											attr('value', value).
-											on('click', function() {
-												if ($(this).is(':checked')) {
-													// add checkbox active row class
-													Plugin.setActive(this);
-												} else {
-													// add checkbox active row class
-													Plugin.setInactive(this);
-												}
-											})).
-										append($('<span/>'));
-
-									// checkbox selector has outline style
-									if (typeof column.selector.class !== 'undefined') {
-										$(chk).addClass(column.selector.class);
+							// enable column selector
+							if (typeof column.selector !== 'undefined' &&
+								column.selector !== false) {
+								// check if checkbox exist
+								if ($(td).find('.m-checkbox [type="checkbox"]').length > 0) return;
+								$(td).addClass('m-datatable__cell--check');
+								// append checkbox
+								var chk = $('<label/>').addClass('m-checkbox m-checkbox--single').append($('<input/>').attr('type', 'checkbox').attr('value', value).on('click', function () {
+									if ($(this).is(':checked')) {
+										// add checkbox active row class
+										Plugin.setActive(this);
+									} else {
+										// add checkbox active row class
+										Plugin.setInactive(this);
 									}
+								})).append($('<span/>'));
 
-									$(td).children().html(chk);
+								// checkbox selector has outline style
+								if (typeof column.selector.class !== 'undefined') {
+									$(chk).addClass(column.selector.class);
 								}
 
-								// enable column subtable toggle
-								if (typeof column.subtable !== 'undefined' && column.subtable) {
-									// check if subtable toggle exist
-									if ($(td).find('.m-datatable__toggle-subtable').length > 0) return;
-									// append subtable toggle
-									$(td).
-										children().
-										html($('<a/>').
-											addClass('m-datatable__toggle-subtable').
-											attr('href', '#').
-											attr('data-value', value).
-											append($('<i/>').
-												addClass(Plugin.getOption('layout.icons.rowDetail.collapse'))));
-								}
+								$(td).children().html(chk);
 							}
-						});
+
+							// enable column subtable toggle
+							if (typeof column.subtable !== 'undefined' && column.subtable) {
+								// check if subtable toggle exist
+								if ($(td).find('.m-datatable__toggle-subtable').length > 0) return;
+								// append subtable toggle
+								$(td).children().html($('<a/>').addClass('m-datatable__toggle-subtable').attr('href', '#').attr('data-value', value).append($('<i/>').addClass(Plugin.getOption('layout.icons.rowDetail.collapse'))));
+							}
+						}
 					});
+				});
 
 				// init checkbox for header/footer
-				var initCheckbox = function(tr) {
+				var initCheckbox = function (tr) {
 					// get column settings by field
-					var column = $.grep(columns, function(n, i) {
+					var column = $.grep(columns, function (n, i) {
 						return typeof n.selector !== 'undefined' && n.selector !== false;
 					})[0];
 
@@ -763,18 +706,13 @@
 
 							// todo; check all, for server pagination
 							// append checkbox
-							var chk = $('<label/>').
-								addClass('m-checkbox m-checkbox--single m-checkbox--all').
-								append($('<input/>').
-									attr('type', 'checkbox').
-									on('click', function() {
-										if ($(this).is(':checked')) {
-											Plugin.setActiveAll(true);
-										} else {
-											Plugin.setActiveAll(false);
-										}
-									})).
-								append($('<span/>'));
+							var chk = $('<label/>').addClass('m-checkbox m-checkbox--single m-checkbox--all').append($('<input/>').attr('type', 'checkbox').on('click', function () {
+								if ($(this).is(':checked')) {
+									Plugin.setActiveAll(true);
+								} else {
+									Plugin.setActiveAll(false);
+								}
+							})).append($('<span/>'));
 
 							// checkbox selector has outline style
 							if (typeof column.selector.class !== 'undefined') {
@@ -797,7 +735,7 @@
 			/**
 			 * Adjust width to match container size
 			 */
-			adjustCellsWidth: function() {
+			adjustCellsWidth: function () {
 				// get table width
 				var containerWidth = $(datatable.tableHead).width();
 
@@ -816,17 +754,14 @@
 						minWidth = Plugin.offset;
 					}
 
-					$(datatable.table).
-						find('.m-datatable__row').
-						find('.m-datatable__cell:visible').
-						each(function(tdi, td) {
-							var width = minWidth;
-							var dataWidth = $(td).data('width');
-							if (typeof dataWidth !== 'undefined') {
-								width = dataWidth;
-							}
-							$(td).children().css('width', width);
-						});
+					$(datatable.table).find('.m-datatable__row').find('.m-datatable__cell:visible').each(function (tdi, td) {
+						var width = minWidth;
+						var dataWidth = $(td).data('width');
+						if (typeof dataWidth !== 'undefined') {
+							width = dataWidth;
+						}
+						$(td).children().css('width', parseInt(width));
+					});
 				}
 
 				return datatable;
@@ -835,13 +770,13 @@
 			/**
 			 * Adjust height to match container size
 			 */
-			adjustCellsHeight: function() {
-				$.each($(datatable.table).children(), function(part, tablePart) {
+			adjustCellsHeight: function () {
+				$.each($(datatable.table).children(), function (part, tablePart) {
 					var totalRows = $(tablePart).find('.m-datatable__row').first().parent().find('.m-datatable__row').length;
 					for (var i = 1; i <= totalRows; i++) {
 						var rows = $(tablePart).find('.m-datatable__row:nth-child(' + i + ')');
 						if ($(rows).length > 0) {
-							var maxHeight = Math.max.apply(null, $(rows).map(function() {
+							var maxHeight = Math.max.apply(null, $(rows).map(function () {
 								return $(this).height();
 							}).get());
 							$(rows).css('height', Math.ceil(parseInt(maxHeight)));
@@ -853,14 +788,14 @@
 			/**
 			 * Setup table DOM and classes
 			 */
-			setupDOM: function(table) {
+			setupDOM: function (table) {
 				// set table classes
 				$(table).find('> thead').addClass('m-datatable__head');
 				$(table).find('> tbody').addClass('m-datatable__body');
 				$(table).find('> tfoot').addClass('m-datatable__foot');
 				$(table).find('tr').addClass('m-datatable__row');
 				$(table).find('tr > th, tr > td').addClass('m-datatable__cell');
-				$(table).find('tr > th, tr > td').each(function(i, td) {
+				$(table).find('tr > th, tr > td').each(function (i, td) {
 					if ($(td).find('span').length === 0) {
 						$(td).wrapInner($('<span/>').css('width', Plugin.offset));
 					}
@@ -871,7 +806,7 @@
 			 * Default scrollbar
 			 * @returns {{tableLocked: null, init: init, onScrolling: onScrolling}}
 			 */
-			scrollbar: function() {
+			scrollbar: function () {
 				var scroll = {
 					scrollable: null,
 					tableLocked: null,
@@ -891,9 +826,18 @@
 						},
 						theme: 'minimal-dark',
 					},
-					init: function() {
-						// destroy previous custom scrollbar
-						Plugin.destroyScroller(scroll.scrollable);
+					init: function () {
+						if (mUtil.isRTL()) {
+							$.fn.extend({
+								scrollRight: function (val) {
+									if (val === undefined) {
+										return this[0].scrollWidth - (this[0].scrollLeft + this[0].clientWidth) + 1;
+									}
+									return this.scrollLeft(this[0].scrollWidth - this[0].clientWidth - val);
+								}
+							});
+						}
+
 						var screen = mUtil.getViewPort().width;
 						// setup scrollable datatable
 						if (options.layout.scroll) {
@@ -907,74 +851,48 @@
 								scroll.scrollHead = $(datatable.tableHead).find('> .m-datatable__lock--scroll > .m-datatable__row');
 								scroll.scrollFoot = $(datatable.tableFoot).find('> .m-datatable__lock--scroll > .m-datatable__row');
 								scroll.tableLocked = $(datatable.tableBody).find('.m-datatable__lock:not(.m-datatable__lock--scroll)');
-								if (screen > mUtil.getBreakpoint('lg')) {
-									scroll.mCustomScrollbar(scrollable);
+								if (Plugin.getOption('layout.customScrollbar') && mUtil.detectIE() != 10 && screen > mUtil.getBreakpoint('lg')) {
+									scroll.initCustomScrollbar(scrollable[0]);
 								} else {
-									scroll.defaultScrollbar(scrollable);
+									scroll.initDefaultScrollbar(scrollable);
 								}
 							} else if ($(datatable.tableBody).find('.m-datatable__row').length > 0) {
 								scroll.scrollHead = $(datatable.tableHead).find('> .m-datatable__row');
 								scroll.scrollFoot = $(datatable.tableFoot).find('> .m-datatable__row');
-								if (screen > mUtil.getBreakpoint('lg')) {
-									scroll.mCustomScrollbar(datatable.tableBody);
+								if (Plugin.getOption('layout.customScrollbar') && mUtil.detectIE() != 10 && screen > mUtil.getBreakpoint('lg')) {
+									scroll.initCustomScrollbar(datatable.tableBody);
 								} else {
-									scroll.defaultScrollbar(datatable.tableBody);
+									scroll.initDefaultScrollbar(datatable.tableBody);
 								}
 							}
 						} else {
-							$(datatable.table).
-								// css('height', 'auto').
-								css('overflow-x', 'auto');
+							$(datatable.table).// css('height', 'auto').
+							css('overflow-x', 'auto');
 						}
 					},
-					defaultScrollbar: function(scrollable) {
-						$(scrollable).
-							css('overflow', 'auto').
-							css('max-height', Plugin.getOption('layout.height')).
-							on('scroll', scroll.onScrolling);
+					initDefaultScrollbar: function (scrollable) {
+						$(scrollable).css('overflow', 'auto').off().on('scroll', scroll.onScrolling);
 					},
-					onScrolling: function(e) {
-						var left = $(this).scrollLeft();
+					onScrolling: function (e) {
 						var top = $(this).scrollTop();
-						$(scroll.scrollHead).css('left', -left);
-						$(scroll.scrollFoot).css('left', -left);
-						$(scroll.tableLocked).each(function(i, table) {
+						if (mUtil.isRTL()) {
+							var right = $(this).scrollRight();
+							$(scroll.scrollHead).css('right', -right);
+							$(scroll.scrollFoot).css('right', -right);
+						} else {
+							var left = $(this).scrollLeft();
+							$(scroll.scrollHead).css('left', -left);
+							$(scroll.scrollFoot).css('left', -left);
+						}
+						$(scroll.tableLocked).each(function (i, table) {
 							$(table).css('top', -top);
 						});
 					},
-					mCustomScrollbar: function(scrollable) {
+					initCustomScrollbar: function (scrollable) {
 						scroll.scrollable = scrollable;
-						var height = Plugin.getOption('layout.height');
-						// vertical and horizontal scrollbar
-						var axis = 'xy';
-						if (height === null) {
-							// horizontal scrollbar
-							axis = 'x';
-						}
-						var mcsOptions = $.extend({}, scroll.mcsOptions, {
-							axis: axis,
-							setHeight: $(datatable.tableBody).height(),
-							callbacks: {
-								whileScrolling: function() {
-									var mcs = this.mcs;
-									$(scroll.scrollHead).css('left', mcs.left);
-									$(scroll.scrollFoot).css('left', mcs.left);
-									$(scroll.tableLocked).each(function(i, table) {
-										$(table).css('top', mcs.top);
-									});
-									// stop hover when scrolling
-									clearTimeout(Plugin.hoverTimer);
-									Plugin.isScrolling = true;
-								},
-							},
-						});
-
-						if (Plugin.getOption('layout.smoothScroll.scrollbarShown') === true) {
-							$(scrollable).attr('data-scrollbar-shown', 'true');
-						}
-
 						// create a new instance for table body with scrollbar
-						Plugin.mCustomScrollbar(scrollable, mcsOptions);
+						Plugin.initScrollbar(scrollable);
+						$(scrollable).off().on('scroll', scroll.onScrolling);
 					},
 				};
 				scroll.init();
@@ -986,42 +904,57 @@
 			 * @param element
 			 * @param options
 			 */
-			mCustomScrollbar: function(element, options) {
+			initScrollbar: function (element, options) {
 				$(datatable.tableBody).css('overflow', '');
-				// check if any custom scrollbar exist in the element
-				Plugin.destroyScroller($(datatable.table).find('.mCustomScrollbar'));
-				$(element).mCustomScrollbar(options);
+				if (mUtil.hasClass(element, 'ps')) {
+					$(element).data('ps').update();
+				} else {
+					var ps = new PerfectScrollbar(element);
+					$(element).data('ps', ps);
+				}
 			},
 
 			/**
 			 * Set column title from options.columns settings
 			 */
-			setHeadTitle: function(tablePart) {
+			setHeadTitle: function (tablePart) {
 				if (typeof tablePart === 'undefined') tablePart = datatable.tableHead;
+				tablePart = $(tablePart)[0];
 				var columns = options.columns;
-				var row = $(tablePart).find('.m-datatable__row');
-				var ths = $(tablePart).find('.m-datatable__cell');
-				if ($(row).length === 0) {
-					row = $('<tr/>').appendTo(tablePart);
+				var row = tablePart.getElementsByTagName('tr')[0];
+				var ths = tablePart.getElementsByTagName('td');
+
+				if (typeof row === 'undefined') {
+					row = document.createElement('tr');
+					tablePart.appendChild(row);
 				}
-				$.each(columns, function(i, column) {
-					var th = $(ths).eq(i);
-					if ($(th).length === 0) {
-						th = $('<th/>').appendTo(row);
+
+				$.each(columns, function (i, column) {
+					var th = ths[i];
+					if (typeof th === 'undefined') {
+						th = document.createElement('th');
+						row.appendChild(th);
 					}
+
 					// set column title
 					if (typeof column['title'] !== 'undefined') {
-						$(th).
-							addClass(column.class).
-							html(column['title']).
-							attr('data-field', column.field).
-							data(column);
+						th.innerHTML = column.title;
+						th.setAttribute('data-field', column.field);
+						mUtil.addClass(th, column.class);
+						$(th).data(column);
 					}
+
+					// set header attr option
+					if (typeof column.attr !== 'undefined') {
+						$.each(column.attr, function (key, val) {
+							th.setAttribute(key, val);
+						});
+					}
+
 					// apply text align to thead/tfoot
 					if (typeof column.textAlign !== 'undefined') {
-						var align = typeof datatable.textAlign[column.textAlign] !==
-						'undefined' ? datatable.textAlign[column.textAlign] : '';
-						$(th).addClass(align);
+						var align = typeof datatable.textAlign[column.textAlign] !== 'undefined' ? datatable.textAlign[column.textAlign] : '';
+						mUtil.addClass(th, align);
 					}
 				});
 				Plugin.setupDOM(tablePart);
@@ -1030,12 +963,10 @@
 			/**
 			 * Initiate to get remote or local data via ajax
 			 */
-			dataRender: function(action) {
-				$(datatable.table).
-					siblings('.m-datatable__pager').
-					removeClass('m-datatable--paging-loaded');
+			dataRender: function (action) {
+				$(datatable.table).siblings('.m-datatable__pager').removeClass('m-datatable--paging-loaded');
 
-				var buildMeta = function() {
+				var buildMeta = function () {
 					datatable.dataSet = datatable.dataSet || [];
 					Plugin.localDataUpdate();
 					// local pagination meta
@@ -1050,13 +981,13 @@
 					return meta;
 				};
 
-				var afterGetData = function(result) {
-					var localPagingCallback = function(ctx, meta) {
+				var afterGetData = function (result) {
+					var localPagingCallback = function (ctx, meta) {
 						if (!$(ctx.pager).hasClass('m-datatable--paging-loaded')) {
 							$(ctx.pager).remove();
 							ctx.init(meta);
 						}
-						$(ctx.pager).off().on('m-datatable--on-goto-page', function(e) {
+						$(ctx.pager).off().on('m-datatable--on-goto-page', function (e) {
 							$(ctx.pager).remove();
 							ctx.init(meta);
 						});
@@ -1098,8 +1029,7 @@
 				// get local datasource
 				if (options.data.type === 'local'
 					// for remote json datasource
-					|| typeof options.data.source.read === 'undefined' &&
-					datatable.dataSet !== null
+					// || typeof options.data.source.read === 'undefined' && datatable.dataSet !== null
 					// for remote datasource, server sorting is disabled and data already received from remote
 					|| options.data.serverSorting === false && action === 'sort'
 					|| options.data.serverFiltering === false && action === 'search'
@@ -1115,7 +1045,7 @@
 			/**
 			 * Process ajax data
 			 */
-			insertData: function() {
+			insertData: function () {
 				datatable.dataSet = datatable.dataSet || [];
 				var params = Plugin.getDataSourceParam();
 
@@ -1129,18 +1059,19 @@
 				}
 
 				// todo; fix performance
-				var tableBody = $('<tbody/>').
-					addClass('m-datatable__body').
-					css('visibility', 'hidden');
+				var tableBody = document.createElement('tbody');
+				tableBody.style.visibility = 'hidden';
 				var colLength = options.columns.length;
 
-				$.each(datatable.dataSet, function(rowIndex, row) {
+				$.each(datatable.dataSet, function (rowIndex, row) {
+					var tr = document.createElement('tr');
+					tr.setAttribute('data-row', rowIndex);
 					// keep data object to row
-					var tr = $('<tr/>').attr('data-row', rowIndex).data('obj', row);
+					$(tr).data('obj', row);
 
 					if (typeof rowProps[rowIndex] !== 'undefined') {
-						$.each(rowProps[rowIndex], function() {
-							$(tr).attr(this.name, this.value);
+						$.each(rowProps[rowIndex], function () {
+							tr.setAttribute(this.name, this.value);
 						});
 					}
 
@@ -1161,26 +1092,27 @@
 							classes.push(align);
 						}
 
-						var classAttr = '';
+						// var classAttr = '';
 						if (typeof column.class !== 'undefined') {
-							classAttr = ' class="' + column.class + '"';
+							classes.push(column.class);
 						}
-						tds[cellIndex++] = '<td' + classAttr + ' data-field="' + column.field + '"';
-						tds[cellIndex++] = ' class="' + classes.join(' ') + '"';
-						tds[cellIndex++] = '>';
-						tds[cellIndex++] = Plugin.getObject(column.field, row);
-						tds[cellIndex++] = '</td>';
+
+						var td = document.createElement('td');
+						mUtil.addClass(td, classes.join(' '));
+						td.setAttribute('data-field', column.field);
+						td.innerHTML = Plugin.getObject(column.field, row);
+						tr.appendChild(td);
 					}
-					$(tr).append(tds.join(''));
-					$(tableBody).append(tr);
+
+					tableBody.appendChild(tr);
 				});
 
 				// display no records message
 				if (datatable.dataSet.length === 0) {
-					Plugin.destroyScroller($(datatable.table).find('.mCustomScrollbar'));
-					$(tableBody).html($('<span/>').
-						addClass('m-datatable--error').
-						html(Plugin.getOption('translate.records.noRecords')));
+					var errorSpan = document.createElement('span');
+					mUtil.addClass(errorSpan, 'm-datatable--error');
+					errorSpan.innerHTML = Plugin.getOption('translate.records.noRecords');
+					tableBody.appendChild(errorSpan);
 					$(datatable.wrap).addClass('m-datatable--error m-datatable--loaded');
 					Plugin.spinnerCallback(false);
 				}
@@ -1196,7 +1128,7 @@
 				Plugin.layoutUpdate();
 			},
 
-			updateTableComponents: function() {
+			updateTableComponents: function () {
 				datatable.tableHead = $(datatable.table).children('thead');
 				datatable.tableBody = $(datatable.table).children('tbody');
 				datatable.tableFoot = $(datatable.table).children('tfoot');
@@ -1205,7 +1137,7 @@
 			/**
 			 * Call ajax for raw JSON data
 			 */
-			getData: function() {
+			getData: function () {
 				Plugin.spinnerCallback(true);
 
 				var ajaxParams = {
@@ -1237,21 +1169,18 @@
 					ajaxParams.data = $.extend(true, ajaxParams.data, data, Plugin.getOption('data.source.read.params'));
 				}
 
-				return $.ajax(ajaxParams).done(function(response, textStatus, jqXHR) {
+				return $.ajax(ajaxParams).done(function (response, textStatus, jqXHR) {
 					datatable.lastResponse = response;
 					// extendible data map callback for custom datasource
 					datatable.dataSet = datatable.originalDataSet = Plugin.dataMapCallback(response);
 					Plugin.setAutoColumns();
 					$(datatable).trigger('m-datatable--on-ajax-done', [datatable.dataSet]);
-				}).fail(function(jqXHR, textStatus, errorThrown) {
-					Plugin.destroyScroller($(datatable.table).find('.mCustomScrollbar'));
+				}).fail(function (jqXHR, textStatus, errorThrown) {
 					$(datatable).trigger('m-datatable--on-ajax-fail', [jqXHR]);
-					$(datatable.tableBody).html($('<span/>').
-						addClass('m-datatable--error').
-						html(Plugin.getOption('translate.records.noRecords')));
+					$(datatable.tableBody).html($('<span/>').addClass('m-datatable--error').html(Plugin.getOption('translate.records.noRecords')));
 					$(datatable.wrap).addClass('m-datatable--error m-datatable--loaded');
 					Plugin.spinnerCallback(false);
-				}).always(function() {
+				}).always(function () {
 				});
 			},
 
@@ -1260,15 +1189,21 @@
 			 * @param meta if null, local pagination, otherwise remote pagination
 			 * @param callback for update data when navigating page
 			 */
-			paging: function(meta, callback) {
+			paging: function (meta, callback) {
 				var pg = {
 					meta: null,
 					pager: null,
 					paginateEvent: null,
 					pagerLayout: {pagination: null, info: null},
 					callback: null,
-					init: function(meta) {
+					init: function (meta) {
 						pg.meta = meta;
+
+						// parse pagination meta to integer
+						pg.meta.page = parseInt(pg.meta.page);
+						pg.meta.pages = parseInt(pg.meta.pages);
+						pg.meta.perpage = parseInt(pg.meta.perpage);
+						pg.meta.total = parseInt(pg.meta.total);
 
 						// todo; if meta object not exist will cause error
 						// always recount total pages
@@ -1312,10 +1247,10 @@
 						pg.pagingBreakpoint.call();
 						$(window).resize(pg.pagingBreakpoint);
 					},
-					serverCallback: function(ctx, meta) {
+					serverCallback: function (ctx, meta) {
 						Plugin.dataRender();
 					},
-					populate: function() {
+					populate: function () {
 						var icons = Plugin.getOption('layout.icons.pagination');
 						var title = Plugin.getOption('translate.toolbar.pagination.items.default');
 						// pager root element
@@ -1325,45 +1260,19 @@
 						pg.pagerLayout['pagination'] = pagerNumber;
 
 						// pager first/previous button
-						$('<li/>').
-							append($('<a/>').
-								attr('title', title.first).
-								addClass('m-datatable__pager-link m-datatable__pager-link--first').
-								append($('<i/>').addClass(icons.first)).
-								on('click', pg.gotoMorePage).
-								attr('data-page', 1)).
-							appendTo(pagerNumber);
-						$('<li/>').
-							append($('<a/>').
-								attr('title', title.prev).
-								addClass('m-datatable__pager-link m-datatable__pager-link--prev').
-								append($('<i/>').addClass(icons.prev)).
-								on('click', pg.gotoMorePage)).
-							appendTo(pagerNumber);
+						$('<li/>').append($('<a/>').attr('title', title.first).addClass('m-datatable__pager-link m-datatable__pager-link--first').append($('<i/>').addClass(icons.first)).on('click', pg.gotoMorePage).attr('data-page', 1)).appendTo(pagerNumber);
+						$('<li/>').append($('<a/>').attr('title', title.prev).addClass('m-datatable__pager-link m-datatable__pager-link--prev').append($('<i/>').addClass(icons.prev)).on('click', pg.gotoMorePage)).appendTo(pagerNumber);
 
 						// more previous pages
-						$('<li/>').
-							append($('<a/>').
-								attr('title', title.more).
-								addClass('m-datatable__pager-link m-datatable__pager-link--more-prev').
-								html($('<i/>').addClass(icons.more)).
-								on('click', pg.gotoMorePage)).
-							appendTo(pagerNumber);
+						$('<li/>').append($('<a/>').attr('title', title.more).addClass('m-datatable__pager-link m-datatable__pager-link--more-prev').html($('<i/>').addClass(icons.more)).on('click', pg.gotoMorePage)).appendTo(pagerNumber);
 
-						$('<li/>').
-							append($('<input/>').
-								attr('type', 'text').
-								addClass('m-pager-input form-control').
-								attr('title', title.input).
-								on('keyup', function() {
-									// on keyup update [data-page]
-									$(this).attr('data-page', Math.abs($(this).val()));
-								}).
-								on('keypress', function(e) {
-									// on keypressed enter button
-									if (e.which === 13) pg.gotoMorePage(e);
-								})).
-							appendTo(pagerNumber);
+						$('<li/>').append($('<input/>').attr('type', 'text').addClass('m-pager-input form-control').attr('title', title.input).on('keyup', function () {
+							// on keyup update [data-page]
+							$(this).attr('data-page', Math.abs($(this).val()));
+						}).on('keypress', function (e) {
+							// on keypressed enter button
+							if (e.which === 13) pg.gotoMorePage(e);
+						})).appendTo(pagerNumber);
 
 						var pagesNumber = Plugin.getOption('toolbar.items.pagination.pages.desktop.pagesNumber');
 						var end = Math.ceil(pg.meta.page / pagesNumber) * pagesNumber;
@@ -1373,102 +1282,59 @@
 						}
 						for (var x = start; x < end; x++) {
 							var pageNumber = x + 1;
-							$('<li/>').
-								append($('<a/>').
-									addClass('m-datatable__pager-link m-datatable__pager-link-number').
-									text(pageNumber).
-									attr('data-page', pageNumber).
-									attr('title', pageNumber).
-									on('click', pg.gotoPage)).
-								appendTo(pagerNumber);
+							$('<li/>').append($('<a/>').addClass('m-datatable__pager-link m-datatable__pager-link-number').text(pageNumber).attr('data-page', pageNumber).attr('title', pageNumber).on('click', pg.gotoPage)).appendTo(pagerNumber);
 						}
 
 						// more next pages
-						$('<li/>').
-							append($('<a/>').
-								attr('title', title.more).
-								addClass('m-datatable__pager-link m-datatable__pager-link--more-next').
-								html($('<i/>').addClass(icons.more)).
-								on('click', pg.gotoMorePage)).
-							appendTo(pagerNumber);
+						$('<li/>').append($('<a/>').attr('title', title.more).addClass('m-datatable__pager-link m-datatable__pager-link--more-next').html($('<i/>').addClass(icons.more)).on('click', pg.gotoMorePage)).appendTo(pagerNumber);
 
 						// pager next/last button
-						$('<li/>').
-							append($('<a/>').
-								attr('title', title.next).
-								addClass('m-datatable__pager-link m-datatable__pager-link--next').
-								append($('<i/>').addClass(icons.next)).
-								on('click', pg.gotoMorePage)).
-							appendTo(pagerNumber);
-						$('<li/>').
-							append($('<a/>').
-								attr('title', title.last).
-								addClass('m-datatable__pager-link m-datatable__pager-link--last').
-								append($('<i/>').addClass(icons.last)).
-								on('click', pg.gotoMorePage).
-								attr('data-page', pg.meta.pages)).
-							appendTo(pagerNumber);
+						$('<li/>').append($('<a/>').attr('title', title.next).addClass('m-datatable__pager-link m-datatable__pager-link--next').append($('<i/>').addClass(icons.next)).on('click', pg.gotoMorePage)).appendTo(pagerNumber);
+						$('<li/>').append($('<a/>').attr('title', title.last).addClass('m-datatable__pager-link m-datatable__pager-link--last').append($('<i/>').addClass(icons.last)).on('click', pg.gotoMorePage).attr('data-page', pg.meta.pages)).appendTo(pagerNumber);
 
 						// page info
 						if (Plugin.getOption('toolbar.items.info')) {
-							pg.pagerLayout['info'] = $('<div/>').
-								addClass('m-datatable__pager-info').
-								append($('<span/>').addClass('m-datatable__pager-detail'));
+							pg.pagerLayout['info'] = $('<div/>').addClass('m-datatable__pager-info').append($('<span/>').addClass('m-datatable__pager-detail'));
 						}
 
-						$.each(Plugin.getOption('toolbar.layout'), function(i, layout) {
+						$.each(Plugin.getOption('toolbar.layout'), function (i, layout) {
 							$(pg.pagerLayout[layout]).appendTo(pg.pager);
 						});
 
 						// page size select
-						var pageSizeSelect = $('<select/>').
-							addClass('selectpicker m-datatable__pager-size').
-							attr('title', Plugin.getOption('translate.toolbar.pagination.items.default.select')).
-							attr('data-width', '70px').
-							val(pg.meta.perpage).
-							on('change', pg.updatePerpage).
-							prependTo(pg.pagerLayout['info']);
+						var pageSizeSelect = $('<select/>').addClass('selectpicker m-datatable__pager-size').attr('title', Plugin.getOption('translate.toolbar.pagination.items.default.select')).attr('data-width', '70px').val(pg.meta.perpage).on('change', pg.updatePerpage).prependTo(pg.pagerLayout['info']);
 
 						var pageSizes = Plugin.getOption('toolbar.items.pagination.pageSizeSelect');
 						// default value here, to fix override option by user
 						if (pageSizes.length == 0) pageSizes = [10, 20, 30, 50, 100];
-						$.each(pageSizes, function(i, size) {
+						$.each(pageSizes, function (i, size) {
 							var display = size;
 							if (size === -1) display = 'All';
-							$('<option/>').
-								attr('value', size).
-								html(display).
-								appendTo(pageSizeSelect);
+							$('<option/>').attr('value', size).html(display).appendTo(pageSizeSelect);
 						});
 
 						// init selectpicker to dropdown
-						$(datatable).ready(function() {
-							$('.selectpicker').
-								selectpicker().
-								siblings('.dropdown-toggle').
-								attr('title', Plugin.getOption(
-									'translate.toolbar.pagination.items.default.select'));
+						$(datatable).ready(function () {
+							$('.selectpicker').selectpicker().siblings('.dropdown-toggle').attr('title', Plugin.getOption(
+								'translate.toolbar.pagination.items.default.select'));
 						});
 
 						pg.paste();
 					},
-					paste: function() {
+					paste: function () {
 						// insert pagination based on placement position, top|bottom
 						$.each($.unique(Plugin.getOption('toolbar.placement')),
-							function(i, position) {
+							function (i, position) {
 								if (position === 'bottom') {
 									$(pg.pager).clone(true).insertAfter(datatable.table);
 								}
 								if (position === 'top') {
 									// pager top need some extra space
-									$(pg.pager).
-										clone(true).
-										addClass('m-datatable__pager--top').
-										insertBefore(datatable.table);
+									$(pg.pager).clone(true).addClass('m-datatable__pager--top').insertBefore(datatable.table);
 								}
 							});
 					},
-					gotoMorePage: function(e) {
+					gotoMorePage: function (e) {
 						e.preventDefault();
 						// $(this) is a link of .m-datatable__pager-link
 
@@ -1484,14 +1350,14 @@
 						pg.openPage(parseInt(page));
 						return false;
 					},
-					gotoPage: function(e) {
+					gotoPage: function (e) {
 						e.preventDefault();
 						// prevent from click same page number
 						if ($(this).hasClass('m-datatable__pager-link--active')) return;
 
 						pg.openPage(parseInt($(this).data('page')));
 					},
-					openPage: function(page) {
+					openPage: function (page) {
 						// currentPage is 1-based index
 						pg.meta.page = parseInt(page);
 
@@ -1501,26 +1367,21 @@
 						// update page callback function
 						$(pg.pager).trigger('m-datatable--on-goto-page', pg.meta);
 					},
-					updatePerpage: function(e) {
+					updatePerpage: function (e) {
 						e.preventDefault();
-						if (Plugin.getOption('layout.height') === null) {
-							// fix white space, when perpage is set from many records to less records
-							$('html, body').animate({scrollTop: $(datatable).position().top});
-						}
+						// if (Plugin.getOption('layout.height') === null) {
+						// fix white space, when perpage is set from many records to less records
+						// $('html, body').animate({scrollTop: $(datatable).position().top});
+						// }
 
-						pg.pager = $(datatable.table).
-							siblings('.m-datatable__pager').
-							removeClass('m-datatable--paging-loaded');
+						pg.pager = $(datatable.table).siblings('.m-datatable__pager').removeClass('m-datatable--paging-loaded');
 
 						// on change select page size
 						if (e.originalEvent) {
 							pg.meta.perpage = parseInt($(this).val());
 						}
 
-						$(pg.pager).
-							find('select.m-datatable__pager-size').
-							val(pg.meta.perpage).
-							attr('data-selected', pg.meta.perpage);
+						$(pg.pager).find('select.m-datatable__pager-size').val(pg.meta.perpage).attr('data-selected', pg.meta.perpage);
 
 						// update datasource params
 						Plugin.setDataSourceParam('pagination', {
@@ -1538,111 +1399,85 @@
 						// update pagination info
 						pg.updateInfo.call();
 					},
-					addPaginateEvent: function(e) {
+					addPaginateEvent: function (e) {
 						// pagination event
-						$(datatable).
-							off(pg.paginateEvent).
-							on(pg.paginateEvent, function(e, meta) {
-								Plugin.spinnerCallback(true);
+						$(datatable).off(pg.paginateEvent).on(pg.paginateEvent, function (e, meta) {
+							Plugin.spinnerCallback(true);
 
-								pg.pager = $(datatable.table).siblings('.m-datatable__pager');
-								var pagerNumber = $(pg.pager).find('.m-datatable__pager-nav');
+							pg.pager = $(datatable.table).siblings('.m-datatable__pager');
+							var pagerNumber = $(pg.pager).find('.m-datatable__pager-nav');
 
-								// set sync active page class
-								$(pagerNumber).
-									find('.m-datatable__pager-link--active').
-									removeClass('m-datatable__pager-link--active');
-								$(pagerNumber).
-									find('.m-datatable__pager-link-number[data-page="' + meta.page + '"]').
-									addClass('m-datatable__pager-link--active');
+							// set sync active page class
+							$(pagerNumber).find('.m-datatable__pager-link--active').removeClass('m-datatable__pager-link--active');
+							$(pagerNumber).find('.m-datatable__pager-link-number[data-page="' + meta.page + '"]').addClass('m-datatable__pager-link--active');
 
-								// set next and previous link page number
-								$(pagerNumber).
-									find('.m-datatable__pager-link--prev').
-									attr('data-page', Math.max(meta.page - 1, 1));
-								$(pagerNumber).
-									find('.m-datatable__pager-link--next').
-									attr('data-page', Math.min(meta.page + 1, meta.pages));
+							// set next and previous link page number
+							$(pagerNumber).find('.m-datatable__pager-link--prev').attr('data-page', Math.max(meta.page - 1, 1));
+							$(pagerNumber).find('.m-datatable__pager-link--next').attr('data-page', Math.min(meta.page + 1, meta.pages));
 
-								// current page input value sync
-								$(pg.pager).each(function() {
-									$(this).
-										find('.m-pager-input[type="text"]').
-										prop('value', meta.page);
-								});
-
-								$(pg.pager).find('.m-datatable__pager-nav').show();
-								if (meta.pages <= 1) {
-									// hide pager if has 1 page
-									$(pg.pager).find('.m-datatable__pager-nav').hide();
-								}
-
-								// update datasource params
-								Plugin.setDataSourceParam('pagination', {
-									page: pg.meta.page,
-									pages: pg.meta.pages,
-									perpage: pg.meta.perpage,
-									total: pg.meta.total,
-								});
-
-								$(pg.pager).
-									find('select.m-datatable__pager-size').
-									val(meta.perpage).
-									attr('data-selected', meta.perpage);
-
-								// clear active rows
-								$(datatable.table).
-									find('.m-checkbox > [type="checkbox"]').
-									prop('checked', false);
-								$(datatable.table).
-									find('.m-datatable__row--active').
-									removeClass('m-datatable__row--active');
-
-								pg.updateInfo.call();
-								pg.pagingBreakpoint.call();
-								// Plugin.resetScroll();
+							// current page input value sync
+							$(pg.pager).each(function () {
+								$(this).find('.m-pager-input[type="text"]').prop('value', meta.page);
 							});
+
+							$(pg.pager).find('.m-datatable__pager-nav').show();
+							if (meta.pages <= 1) {
+								// hide pager if has 1 page
+								$(pg.pager).find('.m-datatable__pager-nav').hide();
+							}
+
+							// update datasource params
+							Plugin.setDataSourceParam('pagination', {
+								page: pg.meta.page,
+								pages: pg.meta.pages,
+								perpage: pg.meta.perpage,
+								total: pg.meta.total,
+							});
+
+							$(pg.pager).find('select.m-datatable__pager-size').val(meta.perpage).attr('data-selected', meta.perpage);
+
+							// clear active rows
+							$(datatable.table).find('.m-checkbox > [type="checkbox"]').prop('checked', false);
+							$(datatable.table).find('.m-datatable__row--active').removeClass('m-datatable__row--active');
+
+							pg.updateInfo.call();
+							pg.pagingBreakpoint.call();
+							// Plugin.resetScroll();
+						});
 					},
-					updateInfo: function() {
+					updateInfo: function () {
 						var start = Math.max(pg.meta.perpage * (pg.meta.page - 1) + 1, 1);
 						var end = Math.min(start + pg.meta.perpage - 1, pg.meta.total);
 						// page info update
-						$(pg.pager).
-							find('.m-datatable__pager-info').
-							find('.m-datatable__pager-detail').
-							html(Plugin.dataPlaceholder(
-								Plugin.getOption('translate.toolbar.pagination.items.info'), {
-									start: start,
-									end: pg.meta.perpage === -1 ? pg.meta.total : end,
-									pageSize: pg.meta.perpage === -1 ||
-									pg.meta.perpage >= pg.meta.total
-										? pg.meta.total
-										: pg.meta.perpage,
-									total: pg.meta.total,
-								}));
+						$(pg.pager).find('.m-datatable__pager-info').find('.m-datatable__pager-detail').html(Plugin.dataPlaceholder(
+							Plugin.getOption('translate.toolbar.pagination.items.info'), {
+								start: start,
+								end: pg.meta.perpage === -1 ? pg.meta.total : end,
+								pageSize: pg.meta.perpage === -1 ||
+								pg.meta.perpage >= pg.meta.total
+									? pg.meta.total
+									: pg.meta.perpage,
+								total: pg.meta.total,
+							}));
 					},
 
 					/**
 					 * Update pagination layout breakpoint
 					 */
-					pagingBreakpoint: function() {
+					pagingBreakpoint: function () {
 						// keep page links reference
-						var pagerNumber = $(datatable.table).
-							siblings('.m-datatable__pager').
-							find('.m-datatable__pager-nav');
+						var pagerNumber = $(datatable.table).siblings('.m-datatable__pager').find('.m-datatable__pager-nav');
 						if ($(pagerNumber).length === 0) return;
 
 						var currentPage = Plugin.getCurrentPage();
-						var pagerInput = $(pagerNumber).
-							find('.m-pager-input').
-							closest('li');
+						var pagerInput = $(pagerNumber).find('.m-pager-input').closest('li');
 
 						// reset
 						$(pagerNumber).find('li').show();
 
 						// pagination update
 						$.each(Plugin.getOption('toolbar.items.pagination.pages'),
-							function(mode, option) {
+							function (mode, option) {
 								if (mUtil.isInResponsiveRange(mode)) {
 									switch (mode) {
 										case 'desktop':
@@ -1657,18 +1492,9 @@
 
 										case 'mobile':
 											$(pagerInput).show();
-											$(pagerNumber).
-												find('.m-datatable__pager-link--more-prev').
-												closest('li').
-												hide();
-											$(pagerNumber).
-												find('.m-datatable__pager-link--more-next').
-												closest('li').
-												hide();
-											$(pagerNumber).
-												find('.m-datatable__pager-link-number').
-												closest('li').
-												hide();
+											$(pagerNumber).find('.m-datatable__pager-link--more-prev').closest('li').hide();
+											$(pagerNumber).find('.m-datatable__pager-link--more-next').closest('li').hide();
+											$(pagerNumber).find('.m-datatable__pager-link-number').closest('li').hide();
 											break;
 									}
 
@@ -1680,14 +1506,10 @@
 					/**
 					 * Update pagination number and button display
 					 */
-					paginationUpdate: function() {
-						var pager = $(datatable.table).
-								siblings('.m-datatable__pager').
-								find('.m-datatable__pager-nav'),
-							pagerMorePrev = $(pager).
-								find('.m-datatable__pager-link--more-prev'),
-							pagerMoreNext = $(pager).
-								find('.m-datatable__pager-link--more-next'),
+					paginationUpdate: function () {
+						var pager = $(datatable.table).siblings('.m-datatable__pager').find('.m-datatable__pager-nav'),
+							pagerMorePrev = $(pager).find('.m-datatable__pager-link--more-prev'),
+							pagerMoreNext = $(pager).find('.m-datatable__pager-link--more-next'),
 							pagerFirst = $(pager).find('.m-datatable__pager-link--first'),
 							pagerPrev = $(pager).find('.m-datatable__pager-link--prev'),
 							pagerNext = $(pager).find('.m-datatable__pager-link--next'),
@@ -1698,7 +1520,7 @@
 						// get page before of first visible
 						var morePrevPage = Math.max($(pagerNumber).first().data('page') - 1,
 							1);
-						$(pagerMorePrev).each(function(i, prev) {
+						$(pagerMorePrev).each(function (i, prev) {
 							$(prev).attr('data-page', morePrevPage);
 						});
 						// show/hide <li>
@@ -1711,7 +1533,7 @@
 						// get page after of last visible
 						var moreNextPage = Math.min($(pagerNumber).last().data('page') + 1,
 							pg.meta.pages);
-						$(pagerMoreNext).each(function(i, prev) {
+						$(pagerMoreNext).each(function (i, prev) {
 							$(pagerMoreNext).attr('data-page', moreNextPage).show();
 						});
 
@@ -1726,34 +1548,18 @@
 
 						// begin/end of pages
 						if (pg.meta.page === 1) {
-							$(pagerFirst).
-								attr('disabled', true).
-								addClass('m-datatable__pager-link--disabled');
-							$(pagerPrev).
-								attr('disabled', true).
-								addClass('m-datatable__pager-link--disabled');
+							$(pagerFirst).attr('disabled', true).addClass('m-datatable__pager-link--disabled');
+							$(pagerPrev).attr('disabled', true).addClass('m-datatable__pager-link--disabled');
 						} else {
-							$(pagerFirst).
-								removeAttr('disabled').
-								removeClass('m-datatable__pager-link--disabled');
-							$(pagerPrev).
-								removeAttr('disabled').
-								removeClass('m-datatable__pager-link--disabled');
+							$(pagerFirst).removeAttr('disabled').removeClass('m-datatable__pager-link--disabled');
+							$(pagerPrev).removeAttr('disabled').removeClass('m-datatable__pager-link--disabled');
 						}
 						if (pg.meta.page === pg.meta.pages) {
-							$(pagerNext).
-								attr('disabled', true).
-								addClass('m-datatable__pager-link--disabled');
-							$(pagerLast).
-								attr('disabled', true).
-								addClass('m-datatable__pager-link--disabled');
+							$(pagerNext).attr('disabled', true).addClass('m-datatable__pager-link--disabled');
+							$(pagerLast).attr('disabled', true).addClass('m-datatable__pager-link--disabled');
 						} else {
-							$(pagerNext).
-								removeAttr('disabled').
-								removeClass('m-datatable__pager-link--disabled');
-							$(pagerLast).
-								removeAttr('disabled').
-								removeClass('m-datatable__pager-link--disabled');
+							$(pagerNext).removeAttr('disabled').removeClass('m-datatable__pager-link--disabled');
+							$(pagerLast).removeAttr('disabled').removeClass('m-datatable__pager-link--disabled');
 						}
 
 						// display more buttons
@@ -1769,15 +1575,16 @@
 			},
 
 			/**
-			 * Hide/show table cell defined by options[columns][i][responsive][visible/hidden]
+			 * Hide/show table cell defined by
+			 * options[columns][i][responsive][visible/hidden]
 			 */
-			columnHide: function() {
+			columnHide: function () {
 				var screen = mUtil.getViewPort().width;
 				// foreach columns setting
-				$.each(options.columns, function(i, column) {
+				$.each(options.columns, function (i, column) {
 					if (typeof column.responsive !== 'undefined') {
 						var field = column.field;
-						var tds = $.grep($(datatable.table).find('.m-datatable__cell'), function(n, i) {
+						var tds = $.grep($(datatable.table).find('.m-datatable__cell'), function (n, i) {
 							return field === $(n).data('field');
 						});
 						if (mUtil.getBreakpoint(column.responsive.hidden) >= screen) {
@@ -1797,7 +1604,7 @@
 			/**
 			 * Setup sub datatable
 			 */
-			setupSubDatatable: function() {
+			setupSubDatatable: function () {
 				var subTableCallback = Plugin.getOption('detail.content');
 				if (typeof subTableCallback !== 'function') return;
 
@@ -1809,7 +1616,7 @@
 				options.columns[0]['subtable'] = true;
 
 				// toggle on open sub table
-				var toggleSubTable = function(e) {
+				var toggleSubTable = function (e) {
 					e.preventDefault();
 					// get parent row of this subtable
 					var parentRow = $(this).closest('.m-datatable__row');
@@ -1818,12 +1625,7 @@
 					var subTableRow = $(parentRow).next('.m-datatable__row-subtable');
 					if ($(subTableRow).length === 0) {
 						// prepare DOM for sub table, each <tr> as parent and add <tr> as child table
-						subTableRow = $('<tr/>').
-							addClass('m-datatable__row-subtable m-datatable__row-loading').
-							hide().
-							append($('<td/>').
-								addClass('m-datatable__subtable').
-								attr('colspan', Plugin.getTotalColumns()));
+						subTableRow = $('<tr/>').addClass('m-datatable__row-subtable m-datatable__row-loading').hide().append($('<td/>').addClass('m-datatable__subtable').attr('colspan', Plugin.getTotalColumns()));
 						$(parentRow).after(subTableRow);
 						// add class to even row
 						if ($(parentRow).hasClass('m-datatable__row--even')) {
@@ -1836,10 +1638,7 @@
 					var subTable = $(subTableRow).find('.m-datatable__subtable');
 
 					// get id from first column of parent row
-					var primaryKey = $(this).
-						closest('[data-field]:first-child').
-						find('.m-datatable__toggle-subtable').
-						data('value');
+					var primaryKey = $(this).closest('[data-field]:first-child').find('.m-datatable__toggle-subtable').data('value');
 
 					var icon = $(this).find('i').removeAttr('class');
 
@@ -1862,7 +1661,8 @@
 					// prevent duplicate datatable init
 					if ($(subTable).find('.m-datatable').length === 0) {
 						// get data by primary id
-						$.map(datatable.dataSet, function(n, i) {
+						$.map(datatable.dataSet, function (n, i) {
+							// primary id must be at the first column, otherwise e.data will be undefined
 							if (primaryKey === n[options.columns[0].field]) {
 								e.data = n;
 								return true;
@@ -1879,7 +1679,7 @@
 						// run callback with event
 						subTableCallback(e);
 
-						$(subTable).children('.m-datatable').on('m-datatable--on-init', function(e) {
+						$(subTable).children('.m-datatable').on('m-datatable--on-init', function (e) {
 							$(subTableRow).removeClass('m-datatable__row-loading');
 						});
 						if (Plugin.getOption('data.type') === 'local') {
@@ -1889,34 +1689,24 @@
 				};
 
 				var columns = options.columns;
-				$(datatable.tableBody).
-					find('.m-datatable__row').
-					each(function(tri, tr) {
-						$(tr).find('.m-datatable__cell').each(function(tdi, td) {
-							// get column settings by field
-							var column = $.grep(columns, function(n, i) {
-								return $(td).data('field') === n.field;
-							})[0];
-							if (typeof column !== 'undefined') {
-								var value = $(td).text();
-								// enable column subtable toggle
-								if (typeof column.subtable !== 'undefined' && column.subtable) {
-									// check if subtable toggle exist
-									if ($(td).find('.m-datatable__toggle-subtable').length > 0) return;
-									// append subtable toggle
-									$(td).html($('<a/>').
-										addClass('m-datatable__toggle-subtable').
-										attr('href', '#').
-										attr('data-value', value).
-										attr('title', Plugin.getOption('detail.title')).
-										on('click', toggleSubTable).
-										append($('<i/>').
-											css('width', $(td).data('width')).
-											addClass(Plugin.getOption('layout.icons.rowDetail.collapse'))));
-								}
+				$(datatable.tableBody).find('.m-datatable__row').each(function (tri, tr) {
+					$(tr).find('.m-datatable__cell').each(function (tdi, td) {
+						// get column settings by field
+						var column = $.grep(columns, function (n, i) {
+							return $(td).data('field') === n.field;
+						})[0];
+						if (typeof column !== 'undefined') {
+							var value = $(td).text();
+							// enable column subtable toggle
+							if (typeof column.subtable !== 'undefined' && column.subtable) {
+								// check if subtable toggle exist
+								if ($(td).find('.m-datatable__toggle-subtable').length > 0) return;
+								// append subtable toggle
+								$(td).html($('<a/>').addClass('m-datatable__toggle-subtable').attr('href', '#').attr('data-value', value).attr('title', Plugin.getOption('detail.title')).on('click', toggleSubTable).append($('<i/>').css('width', $(td).data('width')).addClass(Plugin.getOption('layout.icons.rowDetail.collapse'))));
 							}
-						});
+						}
 					});
+				});
 
 				// $(datatable.tableHead).find('.m-datatable__row').first()
 			},
@@ -1924,7 +1714,7 @@
 			/**
 			 * Datasource mapping callback
 			 */
-			dataMapCallback: function(raw) {
+			dataMapCallback: function (raw) {
 				// static dataset array
 				var dataSet = raw;
 				// dataset mapping callback
@@ -1932,7 +1722,7 @@
 					return Plugin.getOption('data.source.read.map')(raw);
 				} else {
 					// default data mapping fallback
-					if (typeof raw.data !== 'undefined') {
+					if (typeof raw !== 'undefined' && typeof raw.data !== 'undefined') {
 						dataSet = raw.data;
 					}
 				}
@@ -1944,7 +1734,7 @@
 			 * BlockUI spinner callback
 			 * @param block
 			 */
-			spinnerCallback: function(block) {
+			spinnerCallback: function (block) {
 				if (block) {
 					if (!Plugin.isSpinning) {
 						// get spinner options
@@ -1973,21 +1763,20 @@
 			 * @param column
 			 * @returns {*|Array.<T>|{sort, field}|{asc, desc}}
 			 */
-			sortCallback: function(data, sort, column) {
+			sortCallback: function (data, sort, column) {
 				var type = column['type'] || 'string';
 				var format = column['format'] || '';
 				var field = column['field'];
 
-				if (type === 'date' && typeof moment === 'undefined') {
-					throw new Error('Moment.js is required.');
-				}
-
-				return $(data).sort(function(a, b) {
+				return $(data).sort(function (a, b) {
 					var aField = a[field];
 					var bField = b[field];
 
 					switch (type) {
 						case 'date':
+							if (typeof moment === 'undefined') {
+								throw new Error('Moment.js is required.');
+							}
 							var diff = moment(aField, format).diff(moment(bField, format));
 							if (sort === 'asc') {
 								return diff > 0 ? 1 : diff < 0 ? -1 : 0;
@@ -2029,7 +1818,7 @@
 			 * @param text
 			 * @param obj
 			 */
-			log: function(text, obj) {
+			log: function (text, obj) {
 				if (typeof obj === 'undefined') obj = '';
 				if (datatable.debug) {
 					console.log(text, obj);
@@ -2039,11 +1828,11 @@
 			/**
 			 * Auto hide columnds overflow in row
 			 */
-			autoHide: function() {
+			autoHide: function () {
 				$(datatable.table).find('.m-datatable__cell').show();
-				$(datatable.tableBody).each(function() {
+				$(datatable.tableBody).each(function () {
 					while ($(this)[0].offsetWidth < $(this)[0].scrollWidth) {
-						$(datatable.table).find('.m-datatable__row').each(function(i) {
+						$(datatable.table).find('.m-datatable__row').each(function (i) {
 							var cell = $(this).find('.m-datatable__cell').not(':hidden').last();
 							$(cell).hide();
 						});
@@ -2051,69 +1840,45 @@
 					}
 				});
 
-				var toggleHiddenColumns = function(e) {
+				var toggleHiddenColumns = function (e) {
 					e.preventDefault();
 
 					var row = $(this).closest('.m-datatable__row');
 					var detailRow = $(row).next();
 
 					if (!$(detailRow).hasClass('m-datatable__row-detail')) {
-						$(this).find('i').
-							removeClass(Plugin.getOption('layout.icons.rowDetail.collapse')).
-							addClass(Plugin.getOption('layout.icons.rowDetail.expand'));
+						$(this).find('i').removeClass(Plugin.getOption('layout.icons.rowDetail.collapse')).addClass(Plugin.getOption('layout.icons.rowDetail.expand'));
 
 						var hidden = $(row).find('.m-datatable__cell:hidden').clone().show();
 
 						detailRow = $('<tr/>').addClass('m-datatable__row-detail').insertAfter(row);
-						var detailRowTd = $('<td/>').
-							addClass('m-datatable__detail').
-							attr('colspan', Plugin.getTotalColumns()).appendTo(detailRow);
+						var detailRowTd = $('<td/>').addClass('m-datatable__detail').attr('colspan', Plugin.getTotalColumns()).appendTo(detailRow);
 
 						var detailSubTable = $('<table/>');
-						$(hidden).each(function() {
+						$(hidden).each(function () {
 							var field = $(this).data('field');
-							var column = $.grep(options.columns, function(n, i) {
+							var column = $.grep(options.columns, function (n, i) {
 								return field === n.field;
 							})[0];
-							$(detailSubTable).
-								append($('<tr class="m-datatable__row"></tr>').
-									append($('<td class="m-datatable__cell"></td>').
-										append($('<span/>').
-											css('width', Plugin.offset).
-											append(column.title))).
-									append(this));
+							$(detailSubTable).append($('<tr class="m-datatable__row"></tr>').append($('<td class="m-datatable__cell"></td>').append($('<span/>').css('width', Plugin.offset).append(column.title))).append(this));
 						});
 						$(detailRowTd).append(detailSubTable);
 
 					} else {
-						$(this).find('i').
-							removeClass(Plugin.getOption('layout.icons.rowDetail.expand')).
-							addClass(Plugin.getOption('layout.icons.rowDetail.collapse'));
+						$(this).find('i').removeClass(Plugin.getOption('layout.icons.rowDetail.expand')).addClass(Plugin.getOption('layout.icons.rowDetail.collapse'));
 						$(detailRow).remove();
 					}
 				};
 
 				// toggle show hidden columns
-				$(datatable.tableBody).find('.m-datatable__row').each(function() {
-					$(this).prepend($('<td/>').addClass('m-datatable__cell m-datatable__toggle--detail').
-						append($('<a/>').
-							addClass('m-datatable__toggle-detail').
-							attr('href', '#').
-							on('click', toggleHiddenColumns).
-							append($('<i/>').
-								css('width', '21px').// maintain width for both icons expand and collapse
-								addClass(Plugin.getOption('layout.icons.rowDetail.collapse')))));
+				$(datatable.tableBody).find('.m-datatable__row').each(function () {
+					$(this).prepend($('<td/>').addClass('m-datatable__cell m-datatable__toggle--detail').append($('<a/>').addClass('m-datatable__toggle-detail').attr('href', '').on('click', toggleHiddenColumns).append($('<i/>').css('width', '21px').// maintain width for both icons expand and collapse
+					addClass(Plugin.getOption('layout.icons.rowDetail.collapse')))));
 
 					// check if subtable toggle exist
 					if ($(datatable.tableHead).find('.m-datatable__toggle-detail').length === 0) {
-						$(datatable.tableHead).
-							find('.m-datatable__row').
-							first().
-							prepend('<th class="m-datatable__cell m-datatable__toggle-detail"><span style="width: 21px"></span></th>');
-						$(datatable.tableFoot).
-							find('.m-datatable__row').
-							first().
-							prepend('<th class="m-datatable__cell m-datatable__toggle-detail"><span style="width: 21px"></span></th>');
+						$(datatable.tableHead).find('.m-datatable__row').first().prepend('<th class="m-datatable__cell m-datatable__toggle-detail"><span style="width: 21px"></span></th>');
+						$(datatable.tableFoot).find('.m-datatable__row').first().prepend('<th class="m-datatable__cell m-datatable__toggle-detail"><span style="width: 21px"></span></th>');
 					} else {
 						$(datatable.tableHead).find('.m-datatable__toggle-detail').find('span').css('width', '21px');
 					}
@@ -2123,8 +1888,8 @@
 			/**
 			 * todo; implement hover column
 			 */
-			hoverColumn: function() {
-				$(datatable.tableBody).on('mouseenter', '.m-datatable__cell', function() {
+			hoverColumn: function () {
+				$(datatable.tableBody).on('mouseenter', '.m-datatable__cell', function () {
 					var colIdx = $(Plugin.cell(this).nodes()).index();
 					$(Plugin.cells().nodes()).removeClass('m-datatable__cell--hover');
 					$(Plugin.column(colIdx).nodes()).addClass('m-datatable__cell--hover');
@@ -2134,10 +1899,10 @@
 			/**
 			 * To enable auto columns features for remote data source
 			 */
-			setAutoColumns: function() {
+			setAutoColumns: function () {
 				if (Plugin.getOption('data.autoColumns')) {
-					$.each(datatable.dataSet[0], function(k, v) {
-						var found = $.grep(options.columns, function(n, i) {
+					$.each(datatable.dataSet[0], function (k, v) {
+						var found = $.grep(options.columns, function (n, i) {
 							return k === n.field;
 						});
 						if (found.length === 0) {
@@ -2160,30 +1925,17 @@
 			/**
 			 * Check if table is a locked colums table
 			 */
-			isLocked: function() {
-				return $(datatable.wrap).hasClass('m-datatable--lock') || false;
+			isLocked: function () {
+				return mUtil.hasClass(datatable.wrap[0], 'm-datatable--lock') || false;
 			},
 
 			/**
-			 * Insert html into table content, take count mCustomScrollbar DOM to prevent replace
-			 * @param html
-			 * @param tablePart
-			 */
-			replaceTableContent: function(html, tablePart) {
-				if (typeof tablePart === 'undefined') tablePart = datatable.tableBody;
-				if ($(tablePart).hasClass('mCustomScrollbar')) {
-					$(tablePart).find('.mCSB_container').html(html);
-				} else {
-					$(tablePart).html(html);
-				}
-			},
-
-			/**
-			 * Get total extra space of an element for width calculation, including padding, margin, border
+			 * Get total extra space of an element for width calculation, including
+			 * padding, margin, border
 			 * @param element
 			 * @returns {number}
 			 */
-			getExtraSpace: function(element) {
+			getExtraSpace: function (element) {
 				var padding = parseInt($(element).css('paddingRight')) +
 					parseInt($(element).css('paddingLeft'));
 				var margin = parseInt($(element).css('marginRight')) +
@@ -2199,9 +1951,9 @@
 			 * @param data
 			 * @returns {*}
 			 */
-			dataPlaceholder: function(template, data) {
+			dataPlaceholder: function (template, data) {
 				var result = template;
-				$.each(data, function(key, val) {
+				$.each(data, function (key, val) {
 					result = result.replace('{{' + key + '}}', val);
 				});
 				return result;
@@ -2213,7 +1965,7 @@
 			 * @param suffix
 			 * @returns {*}
 			 */
-			getTableId: function(suffix) {
+			getTableId: function (suffix) {
 				if (typeof suffix === 'undefined') suffix = '';
 				var id = $(datatable).attr('id');
 				if (typeof id === 'undefined') {
@@ -2225,7 +1977,7 @@
 			/**
 			 * Get table prefix with depth number
 			 */
-			getTablePrefix: function(suffix) {
+			getTablePrefix: function (suffix) {
 				if (typeof suffix !== 'undefined') suffix = '-' + suffix;
 				return Plugin.getTableId() + '-' + Plugin.getDepth() + suffix;
 			},
@@ -2234,7 +1986,7 @@
 			 * Get current table depth of sub table
 			 * @returns {number}
 			 */
-			getDepth: function() {
+			getDepth: function () {
 				var depth = 0;
 				var table = datatable.table;
 				do {
@@ -2249,7 +2001,7 @@
 			 * @param key
 			 * @param value
 			 */
-			stateKeep: function(key, value) {
+			stateKeep: function (key, value) {
 				key = Plugin.getTablePrefix(key);
 				if (Plugin.getOption('data.saveState') === false) return;
 				if (Plugin.getOption('data.saveState.webstorage') && localStorage) {
@@ -2265,7 +2017,7 @@
 			 * @param key
 			 * @param defValue
 			 */
-			stateGet: function(key, defValue) {
+			stateGet: function (key, defValue) {
 				key = Plugin.getTablePrefix(key);
 				if (Plugin.getOption('data.saveState') === false) return;
 				var value = null;
@@ -2284,7 +2036,7 @@
 			 * @param key
 			 * @param value
 			 */
-			stateUpdate: function(key, value) {
+			stateUpdate: function (key, value) {
 				var ori = Plugin.stateGet(key);
 				if (typeof ori === 'undefined' || ori === null) ori = {};
 				Plugin.stateKeep(key, $.extend({}, ori, value));
@@ -2294,7 +2046,7 @@
 			 * Remove state item
 			 * @param key
 			 */
-			stateRemove: function(key) {
+			stateRemove: function (key) {
 				key = Plugin.getTablePrefix(key);
 				if (localStorage) {
 					localStorage.removeItem(key);
@@ -2305,12 +2057,9 @@
 			/**
 			 * Get total columns.
 			 */
-			getTotalColumns: function(tablePart) {
+			getTotalColumns: function (tablePart) {
 				if (typeof tablePart === 'undefined') tablePart = datatable.tableBody;
-				return $(tablePart).
-					find('.m-datatable__row').
-					first().
-					find('.m-datatable__cell').length;
+				return $(tablePart).find('.m-datatable__row').first().find('.m-datatable__cell').length;
 			},
 
 			/**
@@ -2322,7 +2071,7 @@
 			 * @param tdOnly Optional. Default true
 			 * @returns {*}
 			 */
-			getOneRow: function(tablePart, row, tdOnly) {
+			getOneRow: function (tablePart, row, tdOnly) {
 				if (typeof tdOnly === 'undefined') tdOnly = true;
 				// get list of <tr>
 				var result = $(tablePart).find('.m-datatable__row:not(.m-datatable__row-detail):nth-child(' + row + ')');
@@ -2338,12 +2087,12 @@
 			 * @param element
 			 * @returns {boolean}
 			 */
-			hasOverflowY: function(element) {
+			hasOverflowY: function (element) {
 				var children = $(element).find('.m-datatable__row');
 				var maxHeight = 0;
 
 				if (children.length > 0) {
-					$(children).each(function(tdi, td) {
+					$(children).each(function (tdi, td) {
 						maxHeight += Math.floor($(td).innerHeight());
 					});
 
@@ -2358,9 +2107,10 @@
 			 * todo; Not in use.
 			 * @param header Header sort clicked
 			 * @param sort asc|desc. Optional. Default asc
-			 * @param int Boolean. Optional. Comparison value parse to integer. Default false
+			 * @param int Boolean. Optional. Comparison value parse to integer.
+			 *     Default false
 			 */
-			sortColumn: function(header, sort, int) {
+			sortColumn: function (header, sort, int) {
 				if (typeof sort === 'undefined') sort = 'asc'; // desc
 				if (typeof int === 'undefined') int = false;
 
@@ -2368,13 +2118,11 @@
 				var rows = $(datatable.tableBody).find('.m-datatable__row');
 				var hIndex = $(header).closest('.m-datatable__lock').index();
 				if (hIndex !== -1) {
-					rows = $(datatable.tableBody).
-						find('.m-datatable__lock:nth-child(' + (hIndex + 1) + ')').
-						find('.m-datatable__row');
+					rows = $(datatable.tableBody).find('.m-datatable__lock:nth-child(' + (hIndex + 1) + ')').find('.m-datatable__row');
 				}
 
 				var container = $(rows).parent();
-				$(rows).sort(function(a, b) {
+				$(rows).sort(function (a, b) {
 					var tda = $(a).find('td:nth-child(' + column + ')').text();
 					var tdb = $(b).find('td:nth-child(' + column + ')').text();
 
@@ -2395,27 +2143,21 @@
 			/**
 			 * Perform sort remote and local
 			 */
-			sorting: function() {
+			sorting: function () {
 				var sortObj = {
-					init: function() {
+					init: function () {
 						if (options.sortable) {
-							$(datatable.tableHead).
-								find('.m-datatable__cell:not(.m-datatable__cell--check)').
-								addClass('m-datatable__cell--sort').
-								off('click').
-								on('click', sortObj.sortClick);
+							$(datatable.tableHead).find('.m-datatable__cell:not(.m-datatable__cell--check)').addClass('m-datatable__cell--sort').off('click').on('click', sortObj.sortClick);
 							// first init
 							sortObj.setIcon();
 						}
 					},
-					setIcon: function() {
+					setIcon: function () {
 						var meta = Plugin.getDataSourceParam('sort');
 						if ($.isEmptyObject(meta)) return;
 
 						// sort icon beside column header
-						var td = $(datatable.tableHead).
-							find('.m-datatable__cell[data-field="' + meta.field + '"]').
-							attr('data-sort', meta.sort);
+						var td = $(datatable.tableHead).find('.m-datatable__cell[data-field="' + meta.field + '"]').attr('data-sort', meta.sort);
 						var sorting = $(td).find('span');
 						var icon = $(sorting).find('i');
 
@@ -2427,7 +2169,7 @@
 							$(sorting).append($('<i/>').addClass(icons[meta.sort]));
 						}
 					},
-					sortClick: function(e) {
+					sortClick: function (e) {
 						var meta = Plugin.getDataSourceParam('sort');
 						var field = $(this).data('field');
 						var column = Plugin.getColumnByField(field);
@@ -2435,9 +2177,7 @@
 						if (typeof column.sortable !== 'undefined' &&
 							column.sortable === false) return;
 
-						$(datatable.tableHead).
-							find('.m-datatable__cell > span > i').
-							remove();
+						$(datatable.tableHead).find('.m-datatable__cell > span > i').remove();
 
 						if (options.sortable) {
 							Plugin.spinnerCallback(true);
@@ -2458,7 +2198,7 @@
 
 							sortObj.setIcon();
 
-							setTimeout(function() {
+							setTimeout(function () {
 								Plugin.dataRender('sort');
 								$(datatable).trigger('m-datatable--on-sort', meta);
 							}, 300);
@@ -2473,7 +2213,7 @@
 			 * Call this method, before using dataSet variable.
 			 * @returns {*|null}
 			 */
-			localDataUpdate: function() {
+			localDataUpdate: function () {
 				// todo; fix twice execution
 				var params = Plugin.getDataSourceParam();
 				if (typeof datatable.originalDataSet === 'undefined') {
@@ -2497,26 +2237,36 @@
 				if (typeof params.query === 'object' && !Plugin.getOption('data.serverFiltering')) {
 					params.query = params.query || {};
 
+					var nestedSearch = function (obj) {
+						for (var field in obj) {
+							if (!obj.hasOwnProperty(field)) continue;
+							if (typeof obj[field] === 'string') {
+								if (obj[field].toLowerCase() == search || obj[field].toLowerCase().indexOf(search) !== -1) {
+									return true;
+								}
+							}
+							else if (typeof obj[field] === 'number') {
+								if (obj[field] === search) {
+									return true;
+								}
+							}
+							else if (typeof obj[field] === 'object') {
+								return nestedSearch(obj[field]);
+							}
+						}
+						return false;
+					};
+
 					var search = $(Plugin.getOption('search.input')).val();
 					if (typeof search !== 'undefined' && search !== '') {
 						search = search.toLowerCase();
-						datatable.dataSet = $.grep(datatable.dataSet, function(obj) {
-							for (var field in obj) {
-								if (!obj.hasOwnProperty(field)) continue;
-								if (typeof obj[field] === 'string') {
-									if (obj[field].toLowerCase().indexOf(search) > -1) {
-										return true;
-									}
-								}
-							}
-							return false;
-						});
+						datatable.dataSet = $.grep(datatable.dataSet, nestedSearch);
 						// remove generalSearch as we don't need this for next columns filter
 						delete params.query[Plugin.getGeneralSearchKey()];
 					}
 
 					// remove empty element from array
-					$.each(params.query, function(k, v) {
+					$.each(params.query, function (k, v) {
 						if (v === '') {
 							delete params.query[k];
 						}
@@ -2526,7 +2276,7 @@
 					datatable.dataSet = Plugin.filterArray(datatable.dataSet, params.query);
 
 					// reset array index
-					datatable.dataSet = datatable.dataSet.filter(function() {
+					datatable.dataSet = datatable.dataSet.filter(function () {
 						return true;
 					});
 				}
@@ -2541,7 +2291,7 @@
 			 * @param operator
 			 * @returns {*}
 			 */
-			filterArray: function(list, args, operator) {
+			filterArray: function (list, args, operator) {
 				if (typeof list !== 'object') {
 					return [];
 				}
@@ -2561,17 +2311,19 @@
 				var count = Object.keys(args).length;
 				var filtered = [];
 
-				$.each(list, function(key, obj) {
+				$.each(list, function (key, obj) {
 					var to_match = obj;
 
 					var matched = 0;
-					$.each(args, function(m_key, m_value) {
+					$.each(args, function (m_key, m_value) {
 						m_value = m_value instanceof Array ? m_value : [m_value];
 						if (to_match.hasOwnProperty(m_key)) {
-							to_match[m_key] = to_match[m_key].toString();
-							if ($.inArray(to_match[m_key], m_value) !== -1) {
-								matched++;
-							}
+							var lhs = to_match[m_key].toString().toLowerCase();
+							m_value.forEach(function (item, index) {
+								if (item.toString().toLowerCase() == lhs || lhs.indexOf(item.toString().toLowerCase()) !== -1) {
+									matched++;
+								}
+							});
 						}
 					});
 
@@ -2590,9 +2342,13 @@
 			/**
 			 * Reset lock column scroll to 0 when resize
 			 */
-			resetScroll: function() {
+			resetScroll: function () {
 				if (typeof options.detail === 'undefined' && Plugin.getDepth() === 1) {
-					$(datatable.table).find('.m-datatable__row').css('left', 0);
+					if (mUtil.isRTL()) {
+						$(datatable.table).find('.m-datatable__row').css('right', 0);
+					} else {
+						$(datatable.table).find('.m-datatable__row').css('left', 0);
+					}
 					$(datatable.table).find('.m-datatable__lock').css('top', 0);
 					$(datatable.tableBody).scrollTop(0);
 				}
@@ -2603,10 +2359,10 @@
 			 * @param field
 			 * @returns {boolean}
 			 */
-			getColumnByField: function(field) {
+			getColumnByField: function (field) {
 				if (typeof field === 'undefined') return;
 				var result;
-				$.each(options.columns, function(i, column) {
+				$.each(options.columns, function (i, column) {
 					if (field === column.field) {
 						result = column;
 						return false;
@@ -2618,9 +2374,9 @@
 			/**
 			 * Get default sort column
 			 */
-			getDefaultSortColumn: function() {
+			getDefaultSortColumn: function () {
 				var result;
-				$.each(options.columns, function(i, column) {
+				$.each(options.columns, function (i, column) {
 					if (typeof column.sortable !== 'undefined'
 						&& $.inArray(column.sortable, ['asc', 'desc']) !== -1) {
 						result = {sort: column.sortable, field: column.field};
@@ -2634,9 +2390,10 @@
 			 * Helper to get element dimensions, when the element is hidden
 			 * @param element
 			 * @param includeMargin
-			 * @returns {{width: number, height: number, innerWidth: number, innerHeight: number, outerWidth: number, outerHeight: number}}
+			 * @returns {{width: number, height: number, innerWidth: number,
+			 *     innerHeight: number, outerWidth: number, outerHeight: number}}
 			 */
-			getHiddenDimensions: function(element, includeMargin) {
+			getHiddenDimensions: function (element, includeMargin) {
 				var props = {
 						position: 'absolute',
 						visibility: 'hidden',
@@ -2656,7 +2413,7 @@
 					: false;
 
 				var oldProps = [];
-				hiddenParents.each(function() {
+				hiddenParents.each(function () {
 					var old = {};
 
 					for (var name in props) {
@@ -2674,7 +2431,7 @@
 				dim.innerHeight = $(element).innerHeight();
 				dim.outerHeight = $(element).outerHeight(includeMargin);
 
-				hiddenParents.each(function(i) {
+				hiddenParents.each(function (i) {
 					var old = oldProps[i];
 					for (var name in props) {
 						this.style[name] = old[name];
@@ -2684,7 +2441,7 @@
 				return dim;
 			},
 
-			getGeneralSearchKey: function() {
+			getGeneralSearchKey: function () {
 				var searchInput = $(Plugin.getOption('search.input'));
 				return $(searchInput).prop('name') || $(searchInput).prop('id');
 			},
@@ -2695,8 +2452,8 @@
 			 * @param object Object to iterate
 			 * @returns {*}
 			 */
-			getObject: function(path, object) {
-				return path.split('.').reduce(function(obj, i) {
+			getObject: function (path, object) {
+				return path.split('.').reduce(function (obj, i) {
 					return obj !== null && typeof obj[i] !== 'undefined' ? obj[i] : null;
 				}, object);
 			},
@@ -2708,7 +2465,7 @@
 			 * @param value
 			 * @returns {*}
 			 */
-			extendObj: function(obj, path, value) {
+			extendObj: function (obj, path, value) {
 				var levels = path.split('.'),
 					i = 0;
 
@@ -2733,6 +2490,16 @@
 				return obj;
 			},
 
+			rowEvenOdd: function () {
+				// row even class
+				$(datatable.tableBody).find('.m-datatable__row').removeClass('m-datatable__row--even');
+				if ($(datatable.wrap).hasClass('m-datatable--subtable')) {
+					$(datatable.tableBody).find('.m-datatable__row:not(.m-datatable__row-detail):even').addClass('m-datatable__row--even');
+				} else {
+					$(datatable.tableBody).find('.m-datatable__row:nth-child(even)').addClass('m-datatable__row--even');
+				}
+			},
+
 			/********************
 			 ** PUBLIC API METHODS
 			 ********************/
@@ -2744,7 +2511,7 @@
 			 * Redraw datatable by recalculating its DOM elements, etc.
 			 * @returns {jQuery}
 			 */
-			redraw: function() {
+			redraw: function () {
 				Plugin.adjustCellsWidth.call();
 				if (Plugin.isLocked()) {
 					// fix hiding cell width issue
@@ -2762,7 +2529,7 @@
 			 * Shortcode to reload
 			 * @returns {jQuery}
 			 */
-			load: function() {
+			load: function () {
 				Plugin.reload();
 				return datatable;
 			},
@@ -2771,14 +2538,14 @@
 			 * Datasource reload
 			 * @returns {jQuery}
 			 */
-			reload: function() {
-				var delay = (function() {
-					return function(callback, ms) {
+			reload: function () {
+				var delay = (function () {
+					return function (callback, ms) {
 						clearTimeout(Plugin.timer);
 						Plugin.timer = setTimeout(callback, ms);
 					};
 				})();
-				delay(function() {
+				delay(function () {
 					// local only. remote pagination will skip this block
 					if (!options.data.serverFiltering) {
 						Plugin.localDataUpdate();
@@ -2794,9 +2561,9 @@
 			 * @param id
 			 * @returns {jQuery}
 			 */
-			getRecord: function(id) {
+			getRecord: function (id) {
 				if (typeof datatable.tableBody === 'undefined') datatable.tableBody = $(datatable.table).children('tbody');
-				$(datatable.tableBody).find('.m-datatable__cell:first-child').each(function(i, cell) {
+				$(datatable.tableBody).find('.m-datatable__cell:first-child').each(function (i, cell) {
 					if (id == $(cell).text()) {
 						var rowNumber = $(cell).closest('.m-datatable__row').index() + 1;
 						datatable.API.record = datatable.API.value = Plugin.getOneRow(datatable.tableBody, rowNumber);
@@ -2812,17 +2579,18 @@
 			 * @param columnName
 			 * @returns {jQuery}
 			 */
-			getColumn: function(columnName) {
+			getColumn: function (columnName) {
 				Plugin.setSelectedRecords();
 				datatable.API.value = $(datatable.API.record).find('[data-field="' + columnName + '"]');
 				return datatable;
 			},
 
 			/**
-			 * Destroy datatable to original DOM state before datatable was initialized
+			 * Destroy datatable to original DOM state before datatable was
+			 * initialized
 			 * @returns {jQuery}
 			 */
-			destroy: function() {
+			destroy: function () {
 				$(datatable).parent().find('.m-datatable__pager').remove();
 				var initialDatatable = $(datatable.initialDatatable).addClass('m-datatable--destroyed').show();
 				$(datatable).replaceWith(initialDatatable);
@@ -2838,7 +2606,7 @@
 			 * @param field
 			 * @param sort
 			 */
-			sort: function(field, sort) {
+			sort: function (field, sort) {
 				// toggle sort
 				sort = typeof sort === 'undefined' ? 'asc' : sort;
 
@@ -2848,12 +2616,10 @@
 				var meta = {field: field, sort: sort};
 				Plugin.setDataSourceParam('sort', meta);
 
-				setTimeout(function() {
+				setTimeout(function () {
 					Plugin.dataRender('sort');
 					$(datatable).trigger('m-datatable--on-sort', meta);
-					$(datatable.tableHead).
-						find('.m-datatable__cell > span > i').
-						remove();
+					$(datatable.tableHead).find('.m-datatable__cell > span > i').remove();
 				}, 300);
 
 				return datatable;
@@ -2864,7 +2630,7 @@
 			 * Get current selected column value
 			 * @returns {jQuery}
 			 */
-			getValue: function() {
+			getValue: function () {
 				return $(datatable.API.value).text();
 			},
 
@@ -2872,30 +2638,23 @@
 			 * Set checkbox active
 			 * @param cell JQuery selector or checkbox ID
 			 */
-			setActive: function(cell) {
+			setActive: function (cell) {
 				if (typeof cell === 'string') {
 					// set by checkbox id
-					cell = $(datatable.tableBody).
-						find('.m-checkbox--single > [type="checkbox"][value="' + cell + '"]');
+					cell = $(datatable.tableBody).find('.m-checkbox--single > [type="checkbox"][value="' + cell + '"]');
 				}
 
 				$(cell).prop('checked', true);
 
 				// normal table
-				var row = $(cell).
-					closest('.m-datatable__row').
-					addClass('m-datatable__row--active');
+				var row = $(cell).closest('.m-datatable__row').addClass('m-datatable__row--active');
 
 				var index = $(row).index() + 1;
 				// lock table
-				$(row).
-					closest('.m-datatable__lock').
-					parent().
-					find('.m-datatable__row:nth-child(' + index + ')').
-					addClass('m-datatable__row--active');
+				$(row).closest('.m-datatable__lock').parent().find('.m-datatable__row:nth-child(' + index + ')').addClass('m-datatable__row--active');
 
 				var ids = [];
-				$(row).each(function(i, td) {
+				$(row).each(function (i, td) {
 					var id = $(td).find('.m-checkbox--single:not(.m-checkbox--all) > [type="checkbox"]').val();
 					if (typeof id !== 'undefined') {
 						ids.push(id);
@@ -2909,30 +2668,23 @@
 			 * Set checkbox inactive
 			 * @param cell JQuery selector or checkbox ID
 			 */
-			setInactive: function(cell) {
+			setInactive: function (cell) {
 				if (typeof cell === 'string') {
 					// set by checkbox id
-					cell = $(datatable.tableBody).
-						find('.m-checkbox--single > [type="checkbox"][value="' + cell + '"]');
+					cell = $(datatable.tableBody).find('.m-checkbox--single > [type="checkbox"][value="' + cell + '"]');
 				}
 
 				$(cell).prop('checked', false);
 
 				// normal table
-				var row = $(cell).
-					closest('.m-datatable__row').
-					removeClass('m-datatable__row--active');
+				var row = $(cell).closest('.m-datatable__row').removeClass('m-datatable__row--active');
 				var index = $(row).index() + 1;
 
 				// lock table
-				$(row).
-					closest('.m-datatable__lock').
-					parent().
-					find('.m-datatable__row:nth-child(' + index + ')').
-					removeClass('m-datatable__row--active');
+				$(row).closest('.m-datatable__lock').parent().find('.m-datatable__row:nth-child(' + index + ')').removeClass('m-datatable__row--active');
 
 				var ids = [];
-				$(row).each(function(i, td) {
+				$(row).each(function (i, td) {
 					var id = $(td).find('.m-checkbox--single:not(.m-checkbox--all) > [type="checkbox"]').val();
 					if (typeof id !== 'undefined') {
 						ids.push(id);
@@ -2946,10 +2698,9 @@
 			 * Set all checkboxes active or inactive
 			 * @param active
 			 */
-			setActiveAll: function(active) {
+			setActiveAll: function (active) {
 				// todo; check if child table also will set active?
-				var checkboxes = $(datatable.table).find('.m-datatable__body .m-datatable__row').
-					find('.m-datatable__cell .m-checkbox [type="checkbox"]');
+				var checkboxes = $(datatable.table).find('.m-datatable__body .m-datatable__row').find('.m-datatable__cell--check .m-checkbox [type="checkbox"]');
 				if (active) {
 					Plugin.setActive(checkboxes);
 				} else {
@@ -2962,7 +2713,7 @@
 			 * Get selected rows which are active
 			 * @returns {jQuery}
 			 */
-			setSelectedRecords: function() {
+			setSelectedRecords: function () {
 				datatable.API.record = $(datatable.tableBody).find('.m-datatable__row--active');
 				return datatable;
 			},
@@ -2971,7 +2722,7 @@
 			 * Get selected records
 			 * @returns {null}
 			 */
-			getSelectedRecords: function() {
+			getSelectedRecords: function () {
 				// support old method
 				Plugin.setSelectedRecords();
 				datatable.API.record = datatable.rows('.m-datatable__row--active').nodes();
@@ -2983,7 +2734,7 @@
 			 * @param path String Dot notation path in string
 			 * @returns {*}
 			 */
-			getOption: function(path) {
+			getOption: function (path) {
 				return Plugin.getObject(path, options);
 			},
 
@@ -2992,7 +2743,7 @@
 			 * @param path
 			 * @param object
 			 */
-			setOption: function(path, object) {
+			setOption: function (path, object) {
 				options = Plugin.extendObj(options, path, object);
 			},
 
@@ -3001,16 +2752,16 @@
 			 * @param value
 			 * @param columns. Optional list of columns to be filtered.
 			 */
-			search: function(value, columns) {
+			search: function (value, columns) {
 				if (typeof columns !== 'undefined') columns = $.makeArray(columns);
-				var delay = (function() {
-					return function(callback, ms) {
+				var delay = (function () {
+					return function (callback, ms) {
 						clearTimeout(Plugin.timer);
 						Plugin.timer = setTimeout(callback, ms);
 					};
 				})();
 
-				delay(function() {
+				delay(function () {
 					// get query parameters
 					var query = Plugin.getDataSourceQuery();
 
@@ -3022,11 +2773,11 @@
 
 					// search by columns, support multiple columns
 					if (typeof columns === 'object') {
-						$.each(columns, function(k, column) {
+						$.each(columns, function (k, column) {
 							query[column] = value;
 						});
 						// remove empty element from arrays
-						$.each(query, function(k, v) {
+						$.each(query, function (k, v) {
 							if (v === '' || $.isEmptyObject(v)) {
 								delete query[k];
 							}
@@ -3044,11 +2795,11 @@
 			},
 
 			/**
-			 * Set datasource params
+			 * Set datasource paramsextractextract
 			 * @param param
 			 * @param value
 			 */
-			setDataSourceParam: function(param, value) {
+			setDataSourceParam: function (param, value) {
 				datatable.API.params = $.extend({}, {
 					pagination: {page: 1, perpage: Plugin.getOption('data.pageSize')},
 					sort: Plugin.getDefaultSortColumn(),
@@ -3064,7 +2815,7 @@
 			 * Get datasource params
 			 * @param param
 			 */
-			getDataSourceParam: function(param) {
+			getDataSourceParam: function (param) {
 				datatable.API.params = $.extend({}, {
 					pagination: {page: 1, perpage: Plugin.getOption('data.pageSize')},
 					sort: Plugin.getDefaultSortColumn(),
@@ -3082,7 +2833,7 @@
 			 * Shortcode to datatable.getDataSourceParam('query');
 			 * @returns {*}
 			 */
-			getDataSourceQuery: function() {
+			getDataSourceQuery: function () {
 				return Plugin.getDataSourceParam('query') || {};
 			},
 
@@ -3090,7 +2841,7 @@
 			 * Shortcode to datatable.setDataSourceParam('query', query);
 			 * @param query
 			 */
-			setDataSourceQuery: function(query) {
+			setDataSourceQuery: function (query) {
 				Plugin.setDataSourceParam('query', query);
 			},
 
@@ -3098,31 +2849,22 @@
 			 * Get current page number
 			 * @returns {number}
 			 */
-			getCurrentPage: function() {
-				return $(datatable.table).
-					siblings('.m-datatable__pager').
-					last().
-					find('.m-datatable__pager-nav').
-					find('.m-datatable__pager-link.m-datatable__pager-link--active').
-					data('page') || 1;
+			getCurrentPage: function () {
+				return $(datatable.table).siblings('.m-datatable__pager').last().find('.m-datatable__pager-nav').find('.m-datatable__pager-link.m-datatable__pager-link--active').data('page') || 1;
 			},
 
 			/**
 			 * Get selected dropdown page size
 			 * @returns {*|number}
 			 */
-			getPageSize: function() {
-				return $(datatable.table).
-					siblings('.m-datatable__pager').
-					last().
-					find('select.m-datatable__pager-size').
-					val() || 10;
+			getPageSize: function () {
+				return $(datatable.table).siblings('.m-datatable__pager').last().find('select.m-datatable__pager-size').val() || 10;
 			},
 
 			/**
 			 * Get total rows
 			 */
-			getTotalRows: function() {
+			getTotalRows: function () {
 				return datatable.API.params.pagination.total;
 			},
 
@@ -3130,7 +2872,7 @@
 			 * Get full dataset in grid
 			 * @returns {*|null|Array}
 			 */
-			getDataSet: function() {
+			getDataSet: function () {
 				return datatable.originalDataSet;
 			},
 
@@ -3139,16 +2881,16 @@
 			 * Hide column by column's field name
 			 * @param fieldName
 			 */
-			hideColumn: function(fieldName) {
+			hideColumn: function (fieldName) {
 				// add hide option for this column
-				$.map(options.columns, function(column) {
+				$.map(options.columns, function (column) {
 					if (fieldName === column.field) {
 						column.responsive = {hidden: 'xl'};
 					}
 					return column;
 				});
 				// hide current displayed column
-				var tds = $.grep($(datatable.table).find('.m-datatable__cell'), function(n, i) {
+				var tds = $.grep($(datatable.table).find('.m-datatable__cell'), function (n, i) {
 					return fieldName === $(n).data('field');
 				});
 				$(tds).hide();
@@ -3159,44 +2901,27 @@
 			 * Show column by column's field name
 			 * @param fieldName
 			 */
-			showColumn: function(fieldName) {
+			showColumn: function (fieldName) {
 				// add hide option for this column
-				$.map(options.columns, function(column) {
+				$.map(options.columns, function (column) {
 					if (fieldName === column.field) {
 						delete column.responsive;
 					}
 					return column;
 				});
 				// hide current displayed column
-				var tds = $.grep($(datatable.table).find('.m-datatable__cell'), function(n, i) {
+				var tds = $.grep($(datatable.table).find('.m-datatable__cell'), function (n, i) {
 					return fieldName === $(n).data('field');
 				});
 				$(tds).show();
 			},
-
-			destroyScroller: function(element) {
-				if (typeof element === 'undefined') element = datatable.tableBody;
-				$(element).each(function() {
-					if ($(this).hasClass('mCustomScrollbar')) {
-						try {
-							mApp.destroyScroller($(this));
-						} catch (e) {
-							console.log(e);
-						}
-					}
-				});
-			},
-
-			/**
-			 * NEW API
-			 */
 
 			nodeTr: [],
 			nodeTd: [],
 			nodeCols: [],
 			recentNode: [],
 
-			table: function() {
+			table: function () {
 				return datatable.table;
 			},
 
@@ -3205,7 +2930,7 @@
 			 * @param selector
 			 * @returns {jQuery}
 			 */
-			row: function(selector) {
+			row: function (selector) {
 				Plugin.rows(selector);
 				Plugin.nodeTr = Plugin.recentNode = $(Plugin.nodeTr).first();
 				return datatable;
@@ -3216,8 +2941,12 @@
 			 * @param selector
 			 * @returns {jQuery}
 			 */
-			rows: function(selector) {
-				Plugin.nodeTr = Plugin.recentNode = $(datatable.tableBody).find(selector).filter('.m-datatable__row');
+			rows: function (selector) {
+				if (Plugin.isLocked()) {
+					Plugin.nodeTr = Plugin.recentNode = $(datatable.tableBody).children().first().find(selector).filter('.m-datatable__row');
+				} else {
+					Plugin.nodeTr = Plugin.recentNode = $(datatable.tableBody).find(selector).filter('.m-datatable__row');
+				}
 				return datatable;
 			},
 
@@ -3226,8 +2955,12 @@
 			 * @param index zero-based index
 			 * @returns {jQuery}
 			 */
-			column: function(index) {
-				Plugin.nodeCols = Plugin.recentNode = $(datatable.tableBody).find('.m-datatable__cell:nth-child(' + (index + 1) + ')');
+			column: function (index) {
+				if (Plugin.isLocked()) {
+					Plugin.nodeCols = Plugin.recentNode = $(datatable.tableBody).children().first().find('.m-datatable__cell:nth-child(' + (index + 1) + ')');
+				} else {
+					Plugin.nodeCols = Plugin.recentNode = $(datatable.tableBody).find('.m-datatable__cell:nth-child(' + (index + 1) + ')');
+				}
 				return datatable;
 			},
 
@@ -3236,7 +2969,7 @@
 			 * @param selector
 			 * @returns {jQuery}
 			 */
-			columns: function(selector) {
+			columns: function (selector) {
 				var context = datatable.table;
 				if (Plugin.nodeTr === Plugin.recentNode) {
 					context = Plugin.nodeTr;
@@ -3250,13 +2983,13 @@
 				return datatable;
 			},
 
-			cell: function(selector) {
+			cell: function (selector) {
 				Plugin.cells(selector);
 				Plugin.nodeTd = Plugin.recentNode = $(Plugin.nodeTd).first();
 				return datatable;
 			},
 
-			cells: function(selector) {
+			cells: function (selector) {
 				var cells = $(datatable.tableBody).find('.m-datatable__cell');
 				if (typeof selector !== 'undefined') {
 					cells = $(cells).filter(selector);
@@ -3269,7 +3002,7 @@
 			 * Delete the selected row from the table
 			 * @returns {jQuery}
 			 */
-			remove: function() {
+			remove: function () {
 				if ($(Plugin.nodeTr.length) && Plugin.nodeTr === Plugin.recentNode) {
 					$(Plugin.nodeTr).remove();
 				}
@@ -3280,7 +3013,7 @@
 			/**
 			 * Show or hide the columns or rows
 			 */
-			visible: function(bool) {
+			visible: function (bool) {
 				if ($(Plugin.recentNode.length)) {
 					var locked = Plugin.lockEnabledColumns();
 					if (Plugin.recentNode === Plugin.nodeCols) {
@@ -3317,7 +3050,7 @@
 			 * Get the the DOM element for the selected rows or columns
 			 * @returns {Array}
 			 */
-			nodes: function() {
+			nodes: function () {
 				return Plugin.recentNode;
 			},
 
@@ -3325,7 +3058,7 @@
 			 * will be implemented soon
 			 * @returns {jQuery}
 			 */
-			dataset: function() {
+			dataset: function () {
 				return datatable;
 			},
 
@@ -3334,7 +3067,7 @@
 		/**
 		 * Public API methods can be used directly by datatable
 		 */
-		$.each(Plugin, function(funcName, func) {
+		$.each(Plugin, function (funcName, func) {
 			datatable[funcName] = func;
 		});
 
@@ -3411,11 +3144,7 @@
 			minHeight: 300,
 			footer: false, // display/hide footer
 			header: true, // display/hide header
-
-			// datatable custom scroll params
-			smoothScroll: {
-				scrollbarShown: true,
-			},
+			customScrollbar: true, // set false to disable custom scrollbar
 
 			// datatable spinner
 			spinner: {
@@ -3468,11 +3197,14 @@
 
 		rows: {
 			// deprecated
-			callback: function() {},
+			callback: function () {
+			},
 			// call before row template
-			beforeTemplate: function() {},
+			beforeTemplate: function () {
+			},
 			// call after row template
-			afterTemplate: function() {},
+			afterTemplate: function () {
+			},
 			// auto hide columns, if rows overflow. work on non locked columns
 			autoHide: false,
 		},

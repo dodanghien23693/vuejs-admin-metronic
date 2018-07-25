@@ -10,6 +10,7 @@ var CalendarBasic = function() {
             var TOMORROW = todayDate.clone().add(1, 'day').format('YYYY-MM-DD');
 
             $('#m_calendar').fullCalendar({
+                isRTL: mUtil.isRTL(),
                 header: {
                     left: 'prev,next today',
                     center: 'title',

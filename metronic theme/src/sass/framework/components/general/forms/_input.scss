@@ -22,6 +22,12 @@
             }
         }
 
+        @include border-radius(0);
+
+        @include rounded {
+            @include border-radius(array-get($m--forms, input, layout, self, border-radius));
+        }
+
         &.m-input--square {
             @include border-radius(0);
         }

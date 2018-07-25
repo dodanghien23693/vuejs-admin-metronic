@@ -6,11 +6,17 @@
 @mixin m-build-component--sweetalert-base() {
 	body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown), 
 	html.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown) {
-		overflow-y: auto;
+		overflow: auto;
+
+		@include hack-ie8-11 {
+			overflow: visible;
+		}
 	}
 
 	.swal2-popup {	   	
-		@include border-radius( array-get($m--border-radius, general) );
+		@include rounded {
+			@include border-radius( array-get($m--border-radius, general) );
+		}
 		padding: 3rem;
 
 		.swal2-title {
@@ -26,6 +32,12 @@
 
 		.btn {
 			margin: 15px 5px 0;
+		}
+
+		.swal2-styled {
+			&:focus {
+				box-shadow: none;
+			}
 		}
 	}
 }

@@ -54,25 +54,19 @@ $m-config-aside: (
 			),
 			// fixed mode
 			fixed: (
-				zindex: 100,
+				zindex: 98,
 				scroller: (
 					right: 5px,
 					color: (
-						dark:(
-							default: darken(#2c2e3e, 5%),
-							drag: darken(#2c2e3e, 8%)
-						),
-						light:(
-							default: darken(#f8f8fb, 3%),
-							drag: darken(#f8f8fb, 6%)
-						)
+						dark: lighten(#2c2e3e, 24%),
+						light: darken(#ffffff, 15%)
 					)
 				)
 			),		
 			// minimize mode
 			minimize: (
 				width: $m-aside-left-width-minimize,
-				transition:	none
+				transition:	width 0.2s ease
 			),					
 			// hidden mode
 			hide: (

@@ -41,13 +41,15 @@
 	}
 
 	@include desktop {		
+		//== Minimize
 		.m-aside-left--minimize {
 			.m-aside-left {
 				width: array-get($layout, self, minimize, width);
-				@include transition(array-get($layout, self, minimize, transition));
+				transition: array-get($layout, self, minimize, transition);
 			}
 		}
 		
+		//== Fixed
 		.m-aside-left--fixed {
 			// aside left
 			.m-aside-left {
@@ -59,23 +61,18 @@
 				z-index: array-get($layout, self, fixed, zindex);
 				@include fix-fixed-position-lags();		
 
-				.mCSB_scrollTools {
-					right: array-get($layout, self, fixed, scroller, right);
+				//== Fixed aside custom scroller
+				&.m-aside-left--skin-dark {
+					.ps {
+						@include m-set-component--scrollable-skin( array-get($layout, self, fixed, scroller, color, dark) );
+					}
 				}
 
-				.mCustomScrollBox,
-				.mCSB_container {
-					overflow: visible !important;
-				}
-
-				//== Custome custom scroller
-				&.m-aside-left--skin-dark {					
-					@include m-component--scrollable-skin(array-get($layout, self, fixed, scroller, color, dark, default) , array-get($layout, self, fixed, scroller, color, dark, drag));
-				}
-
-				&.m-aside-left--skin-light {					
-					@include m-component--scrollable-skin(array-get($layout, self, fixed, scroller, color, light, default) , array-get($layout, self, fixed, scroller, color, light, drag));
-				}
+				&.m-aside-left--skin-light {
+					.ps {
+						@include m-set-component--scrollable-skin( array-get($layout, self, fixed, scroller, color, light) );
+					}
+				}								
 			}
 
 			&.m-page--wide {
@@ -140,6 +137,21 @@
 						margin-left: -($m-aside-left-width-minimize);
 					}
 				}
+			}
+		}	
+
+		//== Fixed and minimized aside hover
+		.m-aside-left--fixed.m-aside-left--minimize-hover {
+			transition: array-get($layout, self, minimize, transition);
+
+			.m-aside-left {
+				width: array-get($layout, self, default, width);
+				transition: array-get($layout, self, minimize, transition);
+			}
+
+			.m-body {
+				transition: array-get($layout, self, minimize, transition);
+				padding-left: array-get($layout, self, minimize, width);
 			}
 		}	
 	}

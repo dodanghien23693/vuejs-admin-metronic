@@ -9,7 +9,9 @@
 	.m-accordion {	
 		.m-accordion__item {	
 			overflow: hidden;	
-			@include border-radius( $m-accordion-border );
+			@include rounded {
+				border-radius: $m-accordion-border;
+			}
 
 			.m-accordion__item-head {
 				display: table;
@@ -48,11 +50,10 @@
 	                }
 	            }          
 
-
-				@include transition( array-get($m--transition, general) );
+				transition: array-get($m--transition, general);
 
 				&:hover {			
-					@include transition( array-get($m--transition, general) );			 
+					transition: array-get($m--transition, general);			 
 					cursor: pointer;
 				}	
 			}
@@ -90,17 +91,17 @@
 			}
 
 			.m-accordion__item:not(:first-child):not(:last-child) {
-				@include border-radius( 0 );
+				border-radius: 0;
 			}
 
 			.m-accordion__item:last-child {
-				@include border-top-left-radius( 0 );
-				@include border-top-right-radius( 0 );
+				border-top-left-radius: 0;
+				border-top-right-radius: 0;
 			}
 
 			.m-accordion__item:first-child {
-				@include border-bottom-left-radius( 0 );
-				@include border-bottom-right-radius( 0 );
+				border-bottom-left-radius: 0;
+				border-bottom-right-radius: 0;
 			}				
 		} 
 
@@ -190,17 +191,23 @@
 					.m-accordion__item-mode {						 
 						color: get-color($skin, regular, '-----');						 
 					}
-				}								 	
+				}	
 
 				.m-accordion__item-body {
 					border-top: 1px solid get-color($skin, panel);
+				}							 	
+
+				.m-accordion__item-head.collapsed + .m-accordion__item-body {
+					border-top: 0;
 				}			 
 			}	
 		}	
 
 		//== Solid Skin
 		&.m-accordion--solid {
-			.m-accordion__item {	
+			.m-accordion__item {
+				background-color: get-color($skin, panel, '--');
+					
 				.m-accordion__item-head {
 					&.collapsed {
 						background-color: get-color($skin, panel, '--');
@@ -211,6 +218,10 @@
 						background-color: get-color($skin, panel, '-');
 					}
 				}
+
+				.m-accordion__item-body {
+					background-color: #fff !important; 
+				}	
 			}
 		}
 
@@ -252,9 +263,11 @@
 	.m-accordion {		
 		@each $name, $color in $m--state-colors {		
 			.m-accordion__item--#{$name} {
-				border: 1px solid array-get($color, base) !important;
+				border: 1px solid array-get($color, base) !important;				 		
+				background-color: array-get($color, base) !important;
 
-				.m-accordion__item-head {
+				.m-accordion__item-head {	
+
 					//== Open state
 					&,
 					&:hover {
@@ -262,7 +275,7 @@
 					}
 					
 					.m-accordion__item-mode {						
-						color: array-get($color, inverse) !important;						
+						color: array-get($color, inverse) !important;												
 					}					
 
 					//== Default state					
@@ -277,6 +290,10 @@
 					> span {
 						color: array-get($color, inverse) !important;						 
 					}			
+				}
+
+				.m-accordion__item-body {
+					background-color: #fff !important; 
 				}			
 			}					 			 
 		}

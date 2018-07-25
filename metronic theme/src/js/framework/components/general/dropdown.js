@@ -92,7 +92,7 @@ var mDropdown = function(elementId, options) {
             }
 
             if (the.options.toggle == 'hover') {    
-                mUtil.addEvent(element, 'mouseout', Plugin.hide);
+                mUtil.addEvent(element, 'mouseout', Plugin.hideMouseout);
             } 
 
             // set zindex
@@ -162,6 +162,9 @@ var mDropdown = function(elementId, options) {
             element.focus();
             element.setAttribute('aria-expanded', 'true');
             the.open = true;
+
+            //== Update scrollers
+            mUtil.scrollersUpdate(element);
 
             Plugin.eventTrigger('afterShow');
 
@@ -238,7 +241,7 @@ var mDropdown = function(elementId, options) {
                 return the;
             }
 
-            if (the.options.toggle == 'hover') {
+            if (mUtil.isDesktopDevice() && the.options.toggle == 'hover') {
                 Plugin.hideHovered(force);
             } else {
                 Plugin.hideClicked();
@@ -251,6 +254,15 @@ var mDropdown = function(elementId, options) {
             }
 
             return the;
+        },
+
+        /**
+         * Hide on mouseout
+         */
+        hideMouseout: function() {
+            if (mUtil.isDesktopDevice()) {
+                Plugin.hide();
+            }
         },
 
         /**
@@ -280,6 +292,7 @@ var mDropdown = function(elementId, options) {
                     
                     mUtil.css(the.layout.arrow, 'right', 'auto');
                     mUtil.css(the.layout.arrow, 'left', pos + 'px');
+                    
                     mUtil.css(the.layout.arrow, 'margin-left', 'auto');
                     mUtil.css(the.layout.arrow, 'margin-right', 'auto');
                 } else if (mUtil.hasClass(the.layout.arrow, 'm-dropdown__arrow--adjust')) {
@@ -289,11 +302,21 @@ var mDropdown = function(elementId, options) {
                     }
 
                     if (alignment == 'right') {
-                        mUtil.css(the.layout.arrow, 'left', 'auto');
-                        mUtil.css(the.layout.arrow, 'right', pos + 'px');
+                        if (mUtil.isRTL()) {
+                            mUtil.css(the.layout.arrow, 'right', 'auto');
+                            mUtil.css(the.layout.arrow, 'left', pos + 'px');
+                        } else {
+                            mUtil.css(the.layout.arrow, 'left', 'auto');
+                            mUtil.css(the.layout.arrow, 'right', pos + 'px');
+                        }
                     } else {
-                        mUtil.css(the.layout.arrow, 'right', 'auto');
-                        mUtil.css(the.layout.arrow, 'left', pos + 'px');
+                        if (mUtil.isRTL()) {
+                            mUtil.css(the.layout.arrow, 'left', 'auto');
+                            mUtil.css(the.layout.arrow, 'right', pos + 'px');
+                        } else {
+                            mUtil.css(the.layout.arrow, 'right', 'auto');
+                            mUtil.css(the.layout.arrow, 'left', pos + 'px');
+                        }                       
                     }
                 }
             }
@@ -303,11 +326,13 @@ var mDropdown = function(elementId, options) {
          * Get zindex
          */
         setZindex: function() {
-            var oldZindex = mUtil.css(the.layout.wrapper, 'z-index');
+            var zIndex = 101; //mUtil.css(the.layout.wrapper, 'z-index');
             var newZindex = mUtil.getHighestZindex(element);
-            if (newZindex > oldZindex) {
-                mUtil.css(the.layout.wrapper, 'z-index', zindex);
+            if (newZindex >= zIndex) {
+                zIndex = newZindex + 1;
             }
+            
+            mUtil.css(the.layout.wrapper, 'z-index', zIndex);
         },
 
         /**
@@ -460,7 +485,11 @@ mUtil.on(document, '[m-dropdown-toggle="click"] .m-dropdown__toggle', 'click', f
 });
 
 mUtil.on(document, '[m-dropdown-toggle="hover"] .m-dropdown__toggle', 'click', function(e) {
-    if (mUtil.isMobileDevice()) {
+    if (mUtil.isDesktopDevice()) {
+        if (mUtil.attr(this, 'href') == '#') {
+            e.preventDefault();
+        }
+    } else if (mUtil.isMobileDevice()) {
         var element = this.closest('.m-dropdown');
         var dropdown;
 

@@ -12,16 +12,11 @@ var mMenu = function(elementId, options) {
     }
 
     //== Default options
-    var defaultOptions = {        
-        // autoscroll on accordion submenu tog
-        autoscroll: {
-            speed: 1200
-        },
-
+    var defaultOptions = {       
         // accordion submenu mode
         accordion: {
             slideSpeed: 200, // accordion toggle slide speed in milliseconds
-            autoScroll: true, // enable auto scrolling(focus) to the clicked menu item
+            autoScroll: false, // enable auto scrolling(focus) to the clicked menu item
             autoScrollSpeed: 1200,
             expandAll: true // allow having multiple expanded accordions in the menu
         },
@@ -91,9 +86,10 @@ var mMenu = function(elementId, options) {
          * @returns {mMenu}
          */
         build: function() {
+            //== General accordion submenu toggle
             the.eventHandlers['event_1'] = mUtil.on( element, '.m-menu__toggle', 'click', Plugin.handleSubmenuAccordion);
 
-            // dropdown mode(hoverable)
+            //== Dropdown mode(hoverable)
             if (Plugin.getSubmenuMode() === 'dropdown' || Plugin.isConditionalSubmenuDropdown()) {
                 // dropdown submenu - hover toggle
                 the.eventHandlers['event_2'] = mUtil.on( element, '[m-menu-submenu-toggle="hover"]', 'mouseover', Plugin.handleSubmenuDrodownHoverEnter);
@@ -104,7 +100,13 @@ var mMenu = function(elementId, options) {
                 the.eventHandlers['event_5'] = mUtil.on( element, '[m-menu-submenu-toggle="tab"] > .m-menu__toggle, [m-menu-submenu-toggle="tab"] > .m-menu__link .m-menu__toggle', 'click', Plugin.handleSubmenuDropdownTabClick);
             }
 
+            //== General link click
             the.eventHandlers['event_6'] = mUtil.on(element, '.m-menu__item:not(.m-menu__item--submenu) > .m-menu__link:not(.m-menu__toggle):not(.m-menu__link--toggle-skip)', 'click', Plugin.handleLinkClick);
+
+            //== Init scrollable menu
+            if (the.options.scroll && the.options.scroll.height) {
+                Plugin.scrollerInit();
+            }
         },
 
         /**
@@ -126,11 +128,43 @@ var mMenu = function(elementId, options) {
         },
 
         /**
+         * Init scroll menu
+         *
+        */
+        scrollerInit: function() {
+            if ( the.options.scroll && the.options.scroll.height ) {
+                mUtil.scrollerInit(element, {disableForMobile: true, resetHeightOnDestroy: true, handleWindowResize: true, height: the.options.scroll.height});
+            }            
+        },
+
+        /**
+         * Update scroll menu
+        */
+        scrollerUpdate: function() {
+            if ( the.options.scroll && the.options.scroll.height ) {
+                mUtil.scrollerUpdate(element);
+            }
+        },
+
+        /**
+         * Scroll top
+        */
+        scrollerTop: function() {
+            if ( the.options.scroll && the.options.scroll.height ) {
+                mUtil.scrollerTop(element);
+            }
+        },
+
+        /**
          * Get submenu mode for current breakpoint and menu state
          * @returns {mMenu}
          */
-        getSubmenuMode: function() {
+        getSubmenuMode: function(el) {
             if ( mUtil.isInResponsiveRange('desktop') ) {
+                if (el && mUtil.hasAttr(el, 'm-menu-submenu-toggle')) {
+                    return mUtil.attr(el, 'm-menu-submenu-toggle');
+                }
+
                 if ( mUtil.isset(the.options.submenu, 'desktop.state.body') ) {
                     if ( mUtil.hasClass(body, the.options.submenu.desktop.state.body) ) {
                         return the.options.submenu.desktop.state.mode;
@@ -170,7 +204,7 @@ var mMenu = function(elementId, options) {
                 e.preventDefault();
             };
 
-            if ( Plugin.getSubmenuMode() === 'dropdown' || Plugin.isConditionalSubmenuDropdown() ) {
+            if ( Plugin.getSubmenuMode(this) === 'dropdown' || Plugin.isConditionalSubmenuDropdown() ) {
                 Plugin.handleSubmenuDropdownClose(e, this);
             }
         },
@@ -180,7 +214,7 @@ var mMenu = function(elementId, options) {
          * @returns {mMenu}
          */
         handleSubmenuDrodownHoverEnter: function(e) {
-            if ( Plugin.getSubmenuMode() === 'accordion' ) {
+            if ( Plugin.getSubmenuMode(this) === 'accordion' ) {
                 return;
             }
 
@@ -209,7 +243,7 @@ var mMenu = function(elementId, options) {
                 return;
             }
 
-            if ( Plugin.getSubmenuMode() === 'accordion' ) {
+            if ( Plugin.getSubmenuMode(this) === 'accordion' ) {
                 return;
             }
 
@@ -231,7 +265,7 @@ var mMenu = function(elementId, options) {
          * @returns {mMenu}
          */
         handleSubmenuDropdownClick: function(e) {
-            if ( Plugin.getSubmenuMode() === 'accordion' ) {
+            if ( Plugin.getSubmenuMode(this) === 'accordion' ) {
                 return;
             }
  
@@ -257,7 +291,7 @@ var mMenu = function(elementId, options) {
          * @returns {mMenu}
          */
         handleSubmenuDropdownTabClick: function(e) {
-            if (Plugin.getSubmenuMode() === 'accordion') {
+            if (Plugin.getSubmenuMode(this) === 'accordion') {
                 return;
             }
 
@@ -281,7 +315,7 @@ var mMenu = function(elementId, options) {
          */
         handleSubmenuDropdownClose: function(e, el) {
             // exit if its not submenu dropdown mode
-            if (Plugin.getSubmenuMode() === 'accordion') {
+            if (Plugin.getSubmenuMode(el) === 'accordion') {
                 return;
             }
 
@@ -304,7 +338,7 @@ var mMenu = function(elementId, options) {
             var query;
             var item = el ? el : this;
 
-            if ( Plugin.getSubmenuMode() === 'dropdown' && (query = item.closest('.m-menu__item') ) ) {
+            if ( Plugin.getSubmenuMode(el) === 'dropdown' && (query = item.closest('.m-menu__item') ) ) {
                 if (query.getAttribute('m-menu-submenu-mode') != 'accordion' ) {
                     e.preventDefault();
                     return;
@@ -335,6 +369,7 @@ var mMenu = function(elementId, options) {
                                 var submenu_ = mUtil.child(el_, '.m-menu__submenu');
                                 if ( submenu_ ) {
                                     mUtil.slideUp(submenu_, speed, function() {
+                                        Plugin.scrollerUpdate();
                                         mUtil.removeClass(el_, 'm-menu__item--open');
                                     });                    
                                 }
@@ -344,6 +379,9 @@ var mMenu = function(elementId, options) {
 
                     mUtil.slideDown(submenu, speed, function() {
                         Plugin.scrollToItem(item);
+                        Plugin.scrollerUpdate();
+                        
+                        Plugin.eventTrigger('submenuToggle', submenu);
                     });
                 
                     mUtil.addClass(li, 'm-menu__item--open');
@@ -351,6 +389,7 @@ var mMenu = function(elementId, options) {
                 } else {
                     mUtil.slideUp(submenu, speed, function() {
                         Plugin.scrollToItem(item);
+                        Plugin.eventTrigger('submenuToggle', submenu);
                     });
 
                     mUtil.removeClass(li, 'm-menu__item--open');       
@@ -365,7 +404,7 @@ var mMenu = function(elementId, options) {
         scrollToItem: function(item) {
             // handle auto scroll for accordion submenus
             if ( mUtil.isInResponsiveRange('desktop') && the.options.accordion.autoScroll && element.getAttribute('m-menu-scrollable') !== '1' ) {
-                mUtil.scrollToCenter(item, the.options.accordion.autoScrollSpeed);
+                mUtil.scrollTo(item, the.options.accordion.autoScrollSpeed);
             }
         },
 
@@ -420,7 +459,6 @@ var mMenu = function(elementId, options) {
             }
         },
 
-
         /**
          * Handles submenu slide toggle
          * @returns {mMenu}
@@ -450,7 +488,7 @@ var mMenu = function(elementId, options) {
             var arrow = mUtil.child( submenu, '.m-menu__arrow.m-menu__arrow--adjust');
             var subnav = mUtil.child( submenu, '.m-menu__subnav');
 
-            if ( arrow ) {
+            if ( arrow ) { 
                 var pos = 0; 
                 var link = mUtil.child(item, '.m-menu__link');
 
@@ -458,23 +496,40 @@ var mMenu = function(elementId, options) {
                     if ( mUtil.hasClass(submenu, 'm-menu__submenu--right')) {
                         pos = mUtil.outerWidth(item) / 2;
                         if (mUtil.hasClass(submenu, 'm-menu__submenu--pull')) {
-                            pos = pos + Math.abs( parseFloat(mUtil.css(submenu, 'margin-right')) );
+                            if (mUtil.isRTL()) {
+                                pos = pos + Math.abs( parseFloat(mUtil.css(submenu, 'margin-left')) );
+                            } else {
+                                pos = pos + Math.abs( parseFloat(mUtil.css(submenu, 'margin-right')) );
+                            }
                         }
                         pos = parseInt(mUtil.css(submenu, 'width')) - pos;
                     } else if ( mUtil.hasClass(submenu, 'm-menu__submenu--left') ) {
                         pos = mUtil.outerWidth(item) / 2;
                         if ( mUtil.hasClass(submenu, 'm-menu__submenu--pull')) {
-                            pos = pos + Math.abs( parseFloat(mUtil.css(submenu, 'margin-left')) );
+                            if (mUtil.isRTL()) {
+                                pos = pos + Math.abs( parseFloat(mUtil.css(submenu, 'margin-right')) );
+                            } else {
+                                pos = pos + Math.abs( parseFloat(mUtil.css(submenu, 'margin-left')) );
+                            }
                         }
+                    }
+
+                    if (mUtil.isRTL()) {
+                        mUtil.css(arrow, 'right', pos + 'px');  
+                    } else {
+                        mUtil.css(arrow, 'left', pos + 'px');  
                     }
                 } else {
                     if ( mUtil.hasClass(submenu, 'm-menu__submenu--center') || mUtil.hasClass(submenu, 'm-menu__submenu--full') ) {
                         pos = mUtil.offset(item).left - ((mUtil.getViewPort().width - parseInt(mUtil.css(submenu, 'width'))) / 2);
                         pos = pos + (mUtil.outerWidth(item) / 2);
+
+                        mUtil.css(arrow, 'left', pos + 'px');
+                        if (mUtil.isRTL()) {
+                            mUtil.css(arrow, 'right', 'auto');
+                        }                        
                     }
                 }
-
-                mUtil.css(arrow, 'left', pos + 'px');  
             }
         },
 
@@ -627,6 +682,19 @@ var mMenu = function(elementId, options) {
         defaultOptions = options;
     };
 
+    /**
+     * Set active menu item
+     */
+    the.scrollerUpdate = function() {
+        return Plugin.scrollerUpdate();
+    };
+
+    /**
+     * Set active menu item
+     */
+    the.scrollerTop = function() {
+        return Plugin.scrollerTop();
+    };
 
     /**
      * Set active menu item
@@ -656,8 +724,8 @@ var mMenu = function(elementId, options) {
     /**
      * Get submenu mode
      */
-    the.getSubmenuMode = function() {
-        return Plugin.getSubmenuMode();
+    the.getSubmenuMode = function(el) {
+        return Plugin.getSubmenuMode(el);
     };
 
     /**

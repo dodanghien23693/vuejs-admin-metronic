@@ -66,6 +66,7 @@ var mWizard = function(elementId, options) {
             //== Variables
             the.events = [];
             the.currentStep = 1;
+            the.stopped = false;
             the.totalSteps = the.steps.length;
 
             //== Init current step
@@ -135,7 +136,7 @@ var mWizard = function(elementId, options) {
          */
         goTo: function(number) {
             //== Skip if this step is already shown
-            if (number === the.currentStep) {
+            if (number === the.currentStep || number > the.totalSteps || number < 0) {
                 return;
             }
 
@@ -154,17 +155,26 @@ var mWizard = function(elementId, options) {
             } else {
                 callback = Plugin.eventTrigger('beforePrev');
             }
+            
+            //== Skip if stopped
+            if (the.stopped === true) {
+                the.stopped = false;
+                return;
+            }
 
             //== Continue if no exit
             if (callback !== false) {
-                //== Set current step
+                //== Before change
+                Plugin.eventTrigger('beforeChange');
+
+                //== Set current step 
                 the.currentStep = number;
 
                 //== Update UI
                 Plugin.updateUI();
 
                 //== Trigger change event
-                Plugin.eventTrigger('change')
+                Plugin.eventTrigger('change');
             }
 
             //== After next and prev events
@@ -175,6 +185,29 @@ var mWizard = function(elementId, options) {
             }
 
             return the;
+        },
+
+        /**
+         * Set step class
+         */
+        setStepClass: function() {
+            if (Plugin.isLastStep()) {
+                mUtil.addClass(element, 'm-wizard--step-last');
+            } else {
+                mUtil.removeClass(element, 'm-wizard--step-last');
+            }
+
+            if (Plugin.isFirstStep()) {
+                mUtil.addClass(element, 'm-wizard--step-first');
+            } else {
+                mUtil.removeClass(element, 'm-wizard--step-first');
+            }
+
+            if (Plugin.isBetweenStep()) {
+                mUtil.addClass(element, 'm-wizard--step-between');
+            } else {
+                mUtil.removeClass(element, 'm-wizard--step-between');
+            }
         },
 
         updateUI: function(argument) {
@@ -200,6 +233,20 @@ var mWizard = function(elementId, options) {
         },
 
         /**
+         * Cancel
+         */
+        stop: function() {
+            the.stopped = true;
+        },
+
+        /**
+         * Resume
+         */
+        start: function() {
+            the.stopped = false;
+        },
+
+        /**
          * Check last step
          */
         isLastStep: function() {
@@ -218,29 +265,6 @@ var mWizard = function(elementId, options) {
          */
         isBetweenStep: function() {
             return Plugin.isLastStep() === false && Plugin.isFirstStep() === false;
-        },
-
-        /**
-         * Set step class
-         */
-        setStepClass: function() {
-            if (Plugin.isLastStep()) {
-                mUtil.addClass(element, 'm-wizard--step-last');
-            } else {
-                mUtil.removeClass(element, 'm-wizard--step-last');
-            }
-
-            if (Plugin.isFirstStep()) {
-                mUtil.addClass(element, 'm-wizard--step-first');
-            } else {
-                mUtil.removeClass(element, 'm-wizard--step-first');
-            }
-
-            if (Plugin.isBetweenStep()) {
-                mUtil.addClass(element, 'm-wizard--step-between');
-            } else {
-                mUtil.removeClass(element, 'm-wizard--step-between');
-            }
         },
 
         /**
@@ -401,6 +425,20 @@ var mWizard = function(elementId, options) {
      */
     the.goLast = function() {
         return Plugin.goLast();
+    };
+
+    /**
+     * Cancel step 
+     */
+    the.stop = function() {
+        return Plugin.stop();
+    };
+
+    /**
+     * Resume step 
+     */
+    the.start = function() {
+        return Plugin.start();
     };
 
     /**

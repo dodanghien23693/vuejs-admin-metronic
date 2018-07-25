@@ -7,7 +7,9 @@
 //== Component Base
 @mixin m-build-component--dropzone-base() {
     .m-dropzone {
-        @include border-radius(array-get($m--border-radius, general));
+        @include rounded {
+            @include border-radius(array-get($m--border-radius, general));
+        }
         padding: 20px;
         text-align: center;
         cursor: pointer;
@@ -25,8 +27,10 @@
 
         .dz-preview {
         	.dz-image {
-        		@include border-radius(6px);
-        	}
+                @include rounded {
+        		  @include border-radius(6px);
+        	    }
+            }
         }
     }
 }

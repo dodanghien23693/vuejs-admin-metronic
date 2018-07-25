@@ -12,14 +12,18 @@
 			//== Progress
 			.m-wizard__progress {				
 				.progress {				
-					@include border-radius(0.71rem);
+					@include rounded {
+						@include border-radius(0.71rem);
+					}
 					height: 0.71rem;	
 					position: relative;			
 					overflow: visible;	 
   					 
 					.progress-bar {	
 						position: relative;	
-						@include border-radius(0.71rem);
+						@include rounded {
+							@include border-radius(0.71rem);
+						}
 
 						&:after {
 							content: '';

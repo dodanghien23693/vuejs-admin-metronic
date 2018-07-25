@@ -5,7 +5,6 @@
 //== Example(reduce font size from 14px to 13px globally for desktop mode only)
 
 //== The body element font settings
-/**
 $m--root-font: (
     size: (
         desktop: 13px,
@@ -18,7 +17,55 @@ $m--root-font: (
         dark: #efefef
     )
 );
-*/
 
+//== UI State Colors
+//== Brand state color
 $m--brand-color: #716aca;
 $m--brand-inverse-color: #ffffff;
+
+//== Other state colors
+$m--state-colors: (
+    // metronic states
+    brand: (
+        base: $m--brand-color,
+        inverse: $m--brand-inverse-color
+    ),
+    metal: (
+        base: #c4c5d6,
+        inverse: #ffffff
+    ),  
+    light: (
+        base: #ffffff,
+        inverse: #282a3c 
+    ),
+    accent: (
+        base: #00c5dc,
+        inverse: #ffffff 
+    ),
+    focus: (
+        base: #9816f4,
+        inverse: #ffffff 
+    ),
+
+    // bootstrap states
+    primary: (
+        base: #5867dd,
+        inverse: #ffffff
+    ),
+    success: (
+        base: #34bfa3,
+        inverse: #ffffff
+    ),
+    info: (
+        base: #36a3f7,
+        inverse: #ffffff
+    ),
+    warning: (
+        base: #ffb822,
+        inverse: #111111
+    ),
+    danger: (
+        base: #f4516c,
+        inverse: #ffffff
+    )    
+);

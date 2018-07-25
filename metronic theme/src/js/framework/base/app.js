@@ -25,7 +25,8 @@ var mApp = function() {
         var skin = el.data('skin') ? 'm-tooltip--skin-' + el.data('skin') : '';
         var width = el.data('width') == 'auto' ? 'm-tooltop--auto-width' : '';
         var triggerValue = el.data('trigger') ? el.data('trigger') : 'hover';
-            
+        var placement = el.data('placement') ? el.data('placement') : 'left';
+                    
         el.tooltip({
             trigger: triggerValue,
             template: '<div class="m-tooltip ' + skin + ' ' + width + ' tooltip" role="tooltip">\
@@ -111,37 +112,16 @@ var mApp = function() {
     /**
     * Initializes scrollable contents
     */
-    var initScrollables = function() {
+    var initScrollers = function() {
         $('[data-scrollable="true"]').each(function(){
-            var maxHeight;
-            var height;
             var el = $(this);
-
-            if (mUtil.isInResponsiveRange('tablet-and-mobile')) {
-                if (el.data('mobile-max-height')) {
-                    maxHeight = el.data('mobile-max-height');
+            mUtil.scrollerInit(this, {disableForMobile: true, handleWindowResize: true, height: function() {
+                if (mUtil.isInResponsiveRange('tablet-and-mobile') && el.data('mobile-height')) {
+                    return el.data('mobile-height');
                 } else {
-                    maxHeight = el.data('max-height');
+                    return el.data('height');
                 }
-
-                if (el.data('mobile-height')) {
-                    height = el.data('mobile-height');
-                } else {
-                    height = el.data('height');
-                }
-            } else {
-                maxHeight = el.data('max-height');
-                height = el.data('max-height');
-            }
-
-            if (maxHeight) {
-                el.css('max-height', maxHeight);
-            }
-            if (height) {
-                el.css('height', height);
-            }
-
-            mApp.initScroller(el, {});
+            }});
         });
     }
 
@@ -233,7 +213,7 @@ var mApp = function() {
         */
         initComponents: function() {
             hideTouchWarning();
-            initScrollables();
+            initScrollers();
             initTooltips();
             initPopovers();
             initAlerts();
@@ -302,143 +282,6 @@ var mApp = function() {
         // function to init portlets
         initPortlets: function() {
             initPortlets();
-        },
-
-        /**
-        * Scrolls to an element with animation
-        * @param {object} el jQuery element object
-        * @param {number} offset Offset to element scroll position
-        */
-        scrollTo: function(target, offset) {
-            el = $(target);
-
-            var pos = (el && el.length > 0) ? el.offset().top : 0;
-            pos = pos + (offset ? offset : 0);
-
-            jQuery('html,body').animate({
-                scrollTop: pos
-            }, 'slow');
-        },
-
-        /**
-        * Scrolls until element is centered in the viewport 
-        * @param {object} el jQuery element object
-        */
-        // wrJangoer function to scroll(focus) to an element
-        scrollToViewport: function(el) {
-            var elOffset = $(el).offset().top;
-            var elHeight = el.height();
-            var windowHeight = mUtil.getViewPort().height;
-            var offset = elOffset - ((windowHeight / 2) - (elHeight / 2));
-
-            jQuery('html,body').animate({
-                scrollTop: offset
-            }, 'slow');
-        },
-
-        /**
-        * Scrolls to the top of the page
-        */
-        // function to scroll to the top
-        scrollTop: function() {
-            mApp.scrollTo();
-        },
-
-        /**
-        * Initializes scrollable content using mCustomScrollbar plugin
-        * @param {object} el jQuery element object
-        * @param {object} options mCustomScrollbar plugin options(refer: http://manos.malihu.gr/jquery-custom-content-scroller/)
-        */
-        initScroller: function(el, options, doNotDestroy) {
-            if (mUtil.isMobileDevice()) {
-                el.css('overflow', 'auto');
-            } else {
-                if (doNotDestroy !== true) {
-                     mApp.destroyScroller(el); 
-                }               
-                el.mCustomScrollbar({
-                    scrollInertia: 0,
-                    autoDraggerLength: true,
-                    autoHideScrollbar: true,
-                    autoExpandScrollbar: false,
-                    alwaysShowScrollbar: 0,
-                    axis: el.data('axis') ? el.data('axis') : 'y',
-                    mouseWheel: {
-                        scrollAmount: 120,
-                        preventDefault: true
-                    },
-                    setHeight: (options.height ? options.height : ''),
-                    theme:"minimal-dark"
-                });
-            }           
-        },
-
-        /**
-        * Destroys scrollable content's mCustomScrollbar plugin instance
-        * @param {object} el jQuery element object
-        */
-        destroyScroller: function(el) {
-            el.mCustomScrollbar("destroy");
-            el.removeClass('mCS_destroyed');
-        },
-
-        /**
-        * Shows bootstrap alert
-        * @param {object} options
-        * @returns {string} ID attribute of the created alert
-        */
-        alert: function(options) {
-            options = $.extend(true, {
-                container: "", // alerts parent container(by default placed after the page breadcrumbs)
-                place: "append", // "append" or "prepend" in container 
-                type: 'success', // alert's type
-                message: "", // alert's message
-                close: true, // make alert closable
-                reset: true, // close all previouse alerts first
-                focus: true, // auto scroll to the alert after shown
-                closeInSeconds: 0, // auto close after defined seconds
-                icon: "" // put icon before the message
-            }, options);
-
-            var id = mUtil.getUniqueID("App_alert");
-
-            var html = '<div id="' + id + '" class="custom-alerts alert alert-' + options.type + ' fade in">' + (options.close ? '<button type="button" class="close" data-dismiss="alert" aria-hidden="true"></button>' : '') + (options.icon !== "" ? '<i class="fa-lg fa fa-' + options.icon + '"></i>  ' : '') + options.message + '</div>';
-
-            if (options.reset) {
-                $('.custom-alerts').remove();
-            }
-
-            if (!options.container) {
-                if ($('.page-fixed-main-content').size() === 1) {
-                    $('.page-fixed-main-content').prepend(html);
-                } else if (($('body').hasClass("page-container-bg-solid") || $('body').hasClass("page-content-white")) && $('.page-head').size() === 0) {
-                    $('.page-title').after(html);
-                } else {
-                    if ($('.page-bar').size() > 0) {
-                        $('.page-bar').after(html);
-                    } else {
-                        $('.page-breadcrumb, .breadcrumbs').after(html);
-                    }
-                }
-            } else {
-                if (options.place == "append") {
-                    $(options.container).append(html);
-                } else {
-                    $(options.container).prepend(html);
-                }
-            }
-
-            if (options.focus) {
-                mApp.scrollTo($('#' + id));
-            }
-
-            if (options.closeInSeconds > 0) {
-                setTimeout(function() {
-                    $('#' + id).remove();
-                }, options.closeInSeconds * 1000);
-            }
-
-            return id;
         },
 
         /**
@@ -515,9 +358,9 @@ var mApp = function() {
                     zIndex: '10'
                 },
                 onUnblock: function() {
-                    if (el) {
-                        el.css('position', '');
-                        el.css('zoom', '');
+                    if (el && el[0]) {
+                        mUtil.css(el[0], 'position', '');
+                        mUtil.css(el[0], 'zoom', '');
                     }                    
                 }
             };

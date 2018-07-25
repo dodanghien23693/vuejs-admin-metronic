@@ -1,0 +1,39 @@
+//
+//** Aside Menus
+// Build left aside menu
+
+@include m-generate--menu-ver( $m-config-menu-aside );
+
+//== Desktop Mode
+@include desktop {
+
+	.m-aside-menu {
+		.m-menu__nav {
+			> .m-menu__item {				
+				&.m-menu__item--expanded,
+				&.m-menu__item--active {
+					> .m-menu__link  {
+						> .m-menu__item-here {
+							position: absolute;
+							right: 0;
+							top: 0;
+							display: block;
+							width: 0;
+							height: 0;
+							border-style: solid;
+							border-width: array-get($m-config-menu-aside, build, layout, default, item, link, self, height)/2 10px array-get($m-config-menu-aside, build, layout, default, item, link, self, height)/2 0;
+
+							.m-content--skin-light & {
+								border-color:  transparent array-get($m-config-base, body, content, bg-color, light) transparent transparent !important;
+							}
+
+							.m-content--skin-light2 & {
+								border-color:  transparent array-get($m-config-base, body, content, bg-color, light2) transparent transparent !important;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

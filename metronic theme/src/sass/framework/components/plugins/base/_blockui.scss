@@ -7,7 +7,9 @@
 @mixin m-build-component--blockui-base() {
     // Spinner markup
     .m-blockui {
-        @include border-radius(array-get($m--border-radius, general));
+        @include rounded {
+            @include border-radius(array-get($m--border-radius, general));
+        }
         display: table;
         table-layout: fixed;
 

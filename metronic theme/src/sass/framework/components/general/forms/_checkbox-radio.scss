@@ -36,7 +36,9 @@
         }
 
         > span {
-            @include border-radius(3px);
+            @include rounded {
+                @include border-radius(3px);
+            }
             background: none;
             position: absolute;
             top: 1px;
@@ -140,8 +142,8 @@
                 margin-top: -6px;                
                 width: 5px;
                 height: 10px;
-                border-width: 0 2px 2px 0 !important;
-                transform: rotate(45deg);
+                border-width: 0 2px 2px 0#{'/*rtl:ignore*/'} !important;
+                transform: rotate(45deg)#{'/*rtl:ignore*/'};
             }
         }
 

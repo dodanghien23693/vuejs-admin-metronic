@@ -17,7 +17,7 @@
 	.m-dropoff--on & {
 		display: block;
 		@include opacity(1);
-		@include animation('m-dropoff-fade-in .3s linear 1');
+		animation: m-dropoff-fade-in .3s linear 1;
 	}
 }
 

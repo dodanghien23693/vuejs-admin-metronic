@@ -20,10 +20,14 @@
 
 				.progress {					
 					height: 0.36rem;
-					@include border-radius(0.71rem);	 
+					@include rounded {
+						@include border-radius(0.71rem);	 
+					}
 
-					.progress-bar {						 
-						@include border-radius(0.71rem);
+					.progress-bar {						
+						@include rounded { 
+							@include border-radius(0.71rem);
+						}
 					}																			 	
 				}
 			} 

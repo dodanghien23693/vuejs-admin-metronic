@@ -242,6 +242,9 @@ var Dashboard = function() {
         });
 
         // For the sake of the example we update the chart every time it's created with a delay of 8 seconds
+        return;
+        
+        /*
         chart.on('created', function() {
             if (window.__anim21278907124) {
                 clearTimeout(window.__anim21278907124);
@@ -249,6 +252,7 @@ var Dashboard = function() {
             }
             window.__anim21278907124 = setTimeout(chart.update.bind(chart), 15000);
         });
+        */
     }
 
     //== Sales Stats.
@@ -1300,7 +1304,7 @@ var Dashboard = function() {
             var title = '';
             var range = '';
 
-            if ((end - start) < 100) {
+            if ((end - start) < 100 || label == 'Today') {
                 title = 'Today:';
                 range = start.format('MMM D');
             } else if (label == 'Yesterday') {
@@ -1315,6 +1319,7 @@ var Dashboard = function() {
         }
 
         picker.daterangepicker({
+            direction: mUtil.isRTL(),
             startDate: start,
             endDate: end,
             opens: 'left',
@@ -1460,9 +1465,8 @@ var Dashboard = function() {
                 title: "Actions",
                 sortable: false,
                 overflow: 'visible',
-                template: function(row) {
-                    var dropup = (row.getDatatable().getPageSize() - row.getIndex()) <= 4 ? 'dropup' : '';
-
+                template: function(row, index, datatable) {
+                    var dropup = (datatable.getPageSize() - index) <= 4 ? 'dropup' : '';
                     return '\
                         <div class="dropdown ' + dropup + '">\
                             <a href="#" class="btn m-btn m-btn--hover-accent m-btn--icon m-btn--icon-only m-btn--pill" data-toggle="dropdown">\
@@ -1498,6 +1502,7 @@ var Dashboard = function() {
         var TOMORROW = todayDate.clone().add(1, 'day').format('YYYY-MM-DD');
 
         $('#m_calendar').fullCalendar({
+            isRTL: mUtil.isRTL(),
             header: {
                 left: 'prev,next today',
                 center: 'title',
@@ -1652,12 +1657,14 @@ var Dashboard = function() {
         });
 
         $owl2.owlCarousel({   
+            rtl: mUtil.isRTL(),
             items: 1,            
             animateIn: 'fadeIn(100)',            
             loop: true,                                              
         });
  
         $owl1.owlCarousel({
+            rtl: mUtil.isRTL(),
             center: true,
             loop: true,
             items: 2,             
@@ -1680,21 +1687,21 @@ var Dashboard = function() {
                         value: 32,
                         className: 'custom',
                         meta: {
-                            color: mApp.getColor('brand')
+                            color: mApp.getColor('accent')
                         }
                     },
                     {
                         value: 32,
                         className: 'custom',
                         meta: {
-                            color: mApp.getColor('accent')
+                            color: mApp.getColor('warning')
                         }
                     },
                     {
                         value: 36,
                         className: 'custom',
                         meta: {
-                            color: mApp.getColor('warning')
+                            color: mApp.getColor('brand')
                         }
                     }
                 ],
@@ -2051,6 +2058,7 @@ var Dashboard = function() {
             trendsStats();
             trendsStats2();
             latestTrendsMap();
+            revenueChange();
             supportTickets();
             supportTickets2();
             activitiesChart();

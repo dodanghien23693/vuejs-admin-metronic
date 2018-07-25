@@ -7,14 +7,14 @@
 //== Component Base
 @mixin m-build-component--option-base() {
     .m-option  {
-        display: table;
-        width: 100%;
+        display: flex;       
         padding: 1.4em;         
-        @include border-radius( 6px );
 
-        .m-option__control {
-        	display: table-cell;
-        	vertical-align: top; 
+        @include rounded {
+            @include border-radius( 6px );
+        }
+        
+        .m-option__control {        	  
         	width: 2.7rem;
             padding-top: 0.1rem;      	
 
@@ -23,23 +23,18 @@
         	}
         }
 
-        .m-option__label {
-        	display: table-cell;
+        .m-option__label {        	 
+            width: 100%;
 
         	.m-option__head {
-        		display: table;
-        		width: 100%;         		    		
+        		display: flex;
+                justify-content: space-between;                
 
-        		.m-option__title {
-        			display: table-cell;
-        			vertical-align: top;
-        			width: 100%; 
+        		.m-option__title {          			  
         			font-size: get-font-size(regular, '+');       			
         		}
 
-        		.m-option__focus {
-        			display: table-cell;
-        			vertical-align: top; 
+        		.m-option__focus {        			
         			font-size: get-font-size(regular, '+');
     				font-weight: get-font-weight(boldest);   				      			
         		}
@@ -55,7 +50,8 @@
         &.m-option--plain {     
             padding: 0; 
             margin-top: -0.2rem;
-            margin-bottom: 2rem;       
+            margin-bottom: 2rem; 
+            align-items: center;      
 
             .m-option__control {                        
                 vertical-align: middle;                                               
@@ -66,9 +62,7 @@
                 }
             }
 
-            .m-option__label {                            
-                vertical-align: middle;
-
+            .m-option__label {
                 .m-option__head {  
                     .m-option__title {
                                                            

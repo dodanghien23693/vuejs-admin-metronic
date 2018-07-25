@@ -1,0 +1,24 @@
+//
+//** "Datatable.net" Component
+//
+
+//==== Component Mixins ====//
+
+
+
+//== Component Base
+@mixin m-build-component--datatable-net-base() {
+	.dt-bootstrap4 {
+		.dropdown {
+			.dropdown-menu.dropdown-menu-right {
+				/*rtl:ignore*/
+				margin-left: 65px;
+			}
+		}
+	}
+}
+
+//==== Generate Component ====//
+
+//== Component Base
+@include m-build-component--datatable-net-base();

@@ -1,0 +1,282 @@
+//
+//** "User Login - 6" Snippet
+//
+
+//== Snippet Base
+@mixin m-build-snippet--login-6-base() {
+    //== Login Base
+    .m-login.m-login--6 {          
+        
+        //== Page Aside
+    	.m-login__aside {
+    	    width: 605px; 
+            padding: 3.64rem 3.35rem 3.64rem 3.64rem;
+
+            .m-grid__item {                
+
+                .m-grid__item {
+                    > span {
+                        display: block;
+                    }
+
+                    .m-login__title {
+                        color: #ffffff;
+                        font-size: 2rem;
+                        font-weight: get-font-weight(bolder);  
+                        line-height: 2;                      
+                    }     
+
+                    .m-login__subtitle {                      
+                        font-size: 1.2rem;
+                        font-weight: 200;
+                        margin-top: 3rem;
+                        color: #BCACF1;
+                        font-weight: get-font-weight(bolder); 
+                    }              
+                }
+
+                .m-login__info {   
+                    display: flex;
+                    justify-content: space-between;
+
+                    .m-login__section {                 
+                        > a {
+                            text-decoration: none;
+                            color: #fff;
+                            margin-right: 2rem;
+                            display: inline-block; 
+
+                            &:last-child {
+                                margin-right: 0;
+                            }
+
+                            &:hover {                                 
+                                &:after {
+                                    border-bottom: 1px solid #fff !important;    
+                                    @include opacity(0.6);                                
+                                } 
+                            }                             
+                        }  
+                    } 
+
+                    .m-login__section:first-child {
+                        > a {
+                            color: #BEAFF1;
+                        }                        
+                    }     
+                }
+            }
+        }  
+
+        //== Page Wrapper
+        .m-login__wrapper { 
+           padding: 3rem 3rem;
+
+           //== Head
+            .m-login__head {                               
+                right: 3.5rem;
+                position: absolute;
+                font-size: get-font-size(regular, '+');
+                font-weight: get-font-weight(bolder);
+                color: #888A94;
+
+                > span {
+                    color: #a9a5b6;
+                    padding-right: 0.5rem;
+                }
+            } 
+
+            //== Body
+            .m-login__body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100%;
+
+
+                //== Signin
+                .m-login__signin {
+                    max-width: 100%;
+                    width: 450px;
+
+                    .m-login__title {
+                        display: block;
+                        text-align: center;
+                        margin-bottom: 5rem;
+                        text-decoration: none;
+
+                        > h3 {
+                            font-size: 2rem;
+                            color: #67666e;
+                        }
+                    }
+
+                    //== Form
+                    .m-login__form {
+                        margin: 4rem auto;                      
+
+                        .m-form__group {
+                            margin: 0;
+                            padding: 0;                   
+                            margin: 0 auto;
+
+                            .form-control {                        
+                                border-radius: 40px;
+                                border: none;                         
+                                padding: 1.5rem 2.14rem;         
+                                margin-top: 1.3rem;  
+                                background-color: #F7F7F9;  
+
+                                &:hover {
+                                    background-color: #F4F5F8;
+                                }  
+
+                                &:focus {
+                                    background-color: #F4F5F8;                               
+                                }                                                                                     
+                                                                    
+                                &.m-login__form-input--last {
+                                    border: 0;
+                                }                            
+                            }                     
+                        }                       
+                    } 
+
+                    //== Action
+                    .m-login__action {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin: 3rem 0;
+
+                        > a {                             
+                            text-decoration: none;
+                            display: inline-block; 
+
+                            &:first-child {
+                                margin-left: 2.14rem;
+                                color: #aba9b4;
+                            }
+
+                            .btn {
+                                padding: 1.3rem 3.43rem;
+                            }                                                 
+                        }
+                    }
+
+                    //== Divider
+                    .m-login__form-divider {
+                        margin: 2rem 0;
+
+                        &:not(:first-child):not(:last-child) {
+                            font-weight: get-font-weight(bolder);  
+                            color: #b5b2c3;  
+                            font-size: 1.2rem;                       
+                        }
+                    }            
+
+                    //== Options
+                    .m-login__options {
+                        display: flex;
+                        justify-content: center;
+                        justify-content: space-between;
+                        max-width: 100%;
+
+                        > a {                            
+                            text-decoration: none;                              
+                            flex: 1;
+                            justify-content: center;
+                            align-items: center;  
+                            display: flex;
+
+                            > span {
+                                padding: 0.35rem;
+                            } 
+
+                            &:not(:first-child):not(:last-child) {
+                                margin: 0 1.5rem;                     
+                            }                                                                                          
+                        } 
+                    }
+                } 
+            }               
+        }        
+    }
+
+    @include desktop {
+        .m-login.m-login--6 {    
+            .m-login__aside {
+                flex: 1;                          
+            }             
+        }
+    }
+
+    @include minimal-desktop() {
+        .m-login.m-login--6 {    
+            .m-login__aside {
+                width: 450px; 
+            }                            
+        }
+    }
+
+    @include tablet-and-mobile() {
+        .m-login.m-login--6 {     
+
+            .m-login__aside {
+                width: 100%;
+                height: auto; 
+                padding: 5rem 2rem;
+
+                .m-grid__item  {
+
+                    .m-login__logo {
+                        margin-bottom: 2.5rem;
+                    }
+                    .m-login__info {
+                        margin-top: 2rem;
+                    }
+
+                    .m-grid__item {
+
+                        .m-login__subtitle {                           
+                            margin: 2rem 0;                            
+                        }    
+                    }
+                }            
+            }  
+
+            .m-login__wrapper{                  
+                padding: 3rem 2rem; 
+
+                .m-login__head {
+                    padding-left: 2rem;
+                    right: 2rem;    
+                }  
+
+
+                .m-login__body {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center; 
+                    margin-top: 5rem; 
+                      
+
+                    .m-login__signin {
+                        .m-login__options {    
+                            > a {                         
+                                &:not(:first-child):not(:last-child) {
+                                    margin: 0 0.8rem;                     
+                                }
+                            }                                                                                              
+                        }
+                    }
+                }                          
+            }            
+        }
+    }     
+}
+
+//== Build Component Base
+@include m-build-snippet--login-6-base();
+
+ 

@@ -10,18 +10,18 @@
 
     .m-form  {
         //== Form group
+        .form-control-label,
+        label {
+            font-weight: get-font-weight(bold);
+            font-size: get-font-size(regular);
+
+            &.col-form-label {
+                padding-top: array-get($m--forms, input, layout, self, size, default, padding, y); 
+                //padding-bottom: array-get($m--forms, input, layout, self, size, default, padding, y); 
+            }
+        }
+
     	.m-form__group {
-            .form-control-label,
-    		label {
-    			font-weight: get-font-weight(bold);
-                font-size: get-font-size(regular);
-
-                &.col-form-label {
-                    padding-top: array-get($m--forms, input, layout, self, size, default, padding, y); 
-                    //padding-bottom: array-get($m--forms, input, layout, self, size, default, padding, y); 
-                }
-    		}
-
             margin-bottom: 0;    		
             padding-top: 15px;
             padding-bottom: 15px;
@@ -163,12 +163,6 @@
             }
         }
 
-        //== Form section
-        .m-form__section {
-            font-size: get-font-size(regular, '++');
-            font-weight: get-font-weight(bolder);
-        }
-
         //== Form actions
         .m-form__actions {
             @include clearfix();
@@ -249,6 +243,16 @@
             margin-top: 0.2rem;
             font-size: get-font-size(regular, '-');
         }
+
+        //== Filter
+        .m-form__filtration {
+            margin: 0 0 30px 0;
+        }
+
+        //== Group actions
+        .m-form__group-action {
+            margin: 0 0 30px 0;
+        }
     }
 }
 
@@ -257,17 +261,15 @@
     $skin: get-default-skin();
 
     .m-form {
-    	.m-form__group {
-            .form-control-label,
-            .col-form-label,
-    		> label {
-    			color: get-color($skin, regular, '+');
-    		}
-
-            .m-form__control-static {
-                color: get-color($skin, regular, '-');
-            }
+        .form-control-label,
+        .col-form-label,
+    	.m-form__group > label {
+    		color: get-color($skin, regular, '+');
     	}
+
+        .m-form__control-static {
+            color: get-color($skin, regular, '-');
+        }
 
         &.m-form--group-seperator {
             .m-form__group {

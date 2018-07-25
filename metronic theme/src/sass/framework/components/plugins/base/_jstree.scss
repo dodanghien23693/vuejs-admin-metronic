@@ -25,9 +25,10 @@
         }
     } 
 
+
     .jstree-open > .jstree-anchor > .fa-folder:before {
         margin-left: 2px;
-        content: "\f07c"; 
+        content: "\f07c";   
     }
 
     .jstree-open > .jstree-anchor > .la-folder:before {
@@ -35,9 +36,17 @@
         content: "\f200"; 
     }
 
+    .jstree-default.jstree-rtl .jstree-node {
+        background-position: 100% 1px#{'/*rtl:ignore*/'} !important;
+    }
+
     .jstree-default.jstree-rtl .jstree-last {
-        background: transparent;
+        background: transparent #{'/*rtl:ignore*/'};
         background-repeat: no-repeat;
+    }
+
+    .jstree-rtl .jstree-anchor {
+        padding: 0 4px 0 8px#{'/*rtl:ignore*/'};
     }
 
     // context menu

@@ -26,25 +26,22 @@
 }
 
 @mixin m--build-smooth-arrow-horizontal($direction, $size) {
-    position: absolute;
+    position: relative;
 	line-height: 0;
     display: inline-block;
     overflow: hidden;
     width: array-get($m-smooth-arrows, size, $size, $direction, width);
     height: array-get($m-smooth-arrows, size, $size, $direction, font-size);
-    
     @include icon(array-get($m-smooth-arrows, icon, $direction));
     
-    position: relative;
-    
     @if $direction == 'right' {
-        left: 0;
-        margin-left: -(array-get($m-smooth-arrows, size, $size, $direction, offset));  
+        left: 0#{'/*rtl:ignore*/'};
+        margin-left: -(array-get($m-smooth-arrows, size, $size, $direction, offset))#{'/*rtl:ignore*/'};  
     } @else {
-        left: auto;
-        right: 0;
-        margin-left: auto;
-        margin-right: -(array-get($m-smooth-arrows, size, $size, $direction, offset));  
+        left: auto#{'/*rtl:ignore*/'};
+        right: 0#{'/*rtl:ignore*/'};
+        margin-left: auto#{'/*rtl:ignore*/'};
+        margin-right: -(array-get($m-smooth-arrows, size, $size, $direction, offset))#{'/*rtl:ignore*/'};  
     } 
 
     &:before {               
@@ -57,31 +54,31 @@
 
 @mixin m--build-classic-arrow($direction, $size) {
     display: inline-block;
-    width: 0; 
+    width: $size; 
     height: 0; 
     position: absolute;
     border: 0;
 
     @if $direction == 'top' {
-        border-left: $size solid transparent;
-        border-right: $size solid transparent;      
+        border-left: $size solid transparent#{'/*rtl:ignore*/'};
+        border-right: $size solid transparent#{'/*rtl:ignore*/'};      
         border-bottom: $size solid black;
     }
 
     @if $direction == 'bottom' {
-        border-left: $size solid transparent;
-        border-right: $size solid transparent;      
+        border-left: $size solid transparent#{'/*rtl:ignore*/'};
+        border-right: $size solid transparent#{'/*rtl:ignore*/'};      
         border-top: $size solid black;
     }
 
     @if $direction == 'right' {
-        border-right: $size solid black;
+        border-right: $size solid black#{'/*rtl:ignore*/'};
         border-top: $size solid transparent;      
         border-bottom: $size solid transparent;
     }
 
     @if $direction == 'left' {
-        border-left: $size solid black;
+        border-left: $size solid black#{'/*rtl:ignore*/'};
         border-top: $size solid transparent;      
         border-bottom: $size solid transparent;
     }
@@ -97,10 +94,10 @@
     }
 
     @if $direction == 'right' {
-        border-right-color: $color;
+        border-right-color: $color#{'/*rtl:ignore*/'};
     }
 
     @if $direction == 'left' {
-        border-left-color: $color;
+        border-left-color: $color#{'/*rtl:ignore*/'};
     }
 }

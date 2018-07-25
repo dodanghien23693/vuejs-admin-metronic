@@ -26,8 +26,7 @@
                             font-weight: get-font-weight(boldest); 
                         } 
 
-                        &:last-child {  
-                            font-size: get-font-size(regular, '-');                           
+                        &:last-child {                                                       
                             font-weight: get-font-weight(bolder); 
                         } 
                     }                                      

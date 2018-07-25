@@ -1,0 +1,149 @@
+//== Portlets
+.m-portlet {
+	//== Angular source code previewer
+    &.m-portlet--ngviewer {
+        .m-portlet__body { 
+            padding: 0;
+
+            .m-portlet__code {
+                display: none;
+
+                &.m-portlet__code--show {
+                    display: block;
+                }
+            }
+                
+            .m-portlet__preview {
+                padding: array-get($m--portlet, layout, self, space) array-get($m--portlet, layout, self, space);
+            }
+        }    
+
+        .m-portlet__code-copy {
+        	position: absolute;
+        	right: 0;
+        	top: 10px;
+        	
+        	i {
+        		font-size: 2rem;
+        	}
+
+        	&:hover {
+        		i {
+        			text-decoration: none;
+        		}
+        	}
+        }  
+    }  
+
+    //== Portlet progress bar
+    .m-portlet__progress-bar__wrapper {
+        height: 5px;
+    }
+
+    .m-portlet__progress-bar {
+        height: 5px;
+    }
+}
+
+//== Buttons
+.mat-fab,
+.mat-mini-fab,
+.mat-button,
+.mat-raised-button,
+.mat-stroked-button,
+.mat-icon-button {
+    outline: none !important;
+}
+
+//== Datatables
+.mat-table__wrapper {
+    width: 100%;
+    overflow-x: auto;
+    
+    mat-table {
+        min-width: 1000px;
+    
+        .email-cell {
+            word-wrap: normal;
+            width: 180px;
+            flex: auto;
+        }
+    }
+}
+
+.mat-table__bottom {
+    display: flex;
+    align-items: center;
+    justify-content:  flex-end;
+}
+
+//== Dialog
+.m-mat-dialog-container__wrapper .mat-dialog-container {
+    padding: 0;
+    overflow-x: hidden;
+
+    .m-portlet {
+        margin-bottom: 0;
+    }
+
+    .alert {
+        border-radius: 0 !important;
+        width: 1032px;
+    }
+}
+
+//== Form controls
+.mat-column-select {
+    overflow: initial;
+}
+.mat-column-checkbox {
+    flex: 0 0 70px;
+}
+
+.mat-column-vinCode {
+    flex: 1 0 60px;
+}
+
+.example-radio-group {
+    display: inline-flex;
+    flex-direction: column;
+}
+  
+.example-radio-button {
+    margin: 5px;
+}
+
+//== Tabs
+.demo-tab-group {
+    border: 1px solid #e8e8e8;
+  }
+  
+.demo-tab-content {
+    padding: 16px;
+}
+
+//== Panels
+.example-panel-Suspended {
+    .mat-select-content {
+        background: rgba(255, 0, 0, 0.5);
+    }
+}
+  
+.example-panel-Active {
+    .mat-select-content {
+        background:  rgba(0, 255, 0, 0.5);
+    }
+}
+
+//== Others
+.m-list-timeline {
+    width: 400px;
+}
+
+.example-full-width {
+    width: 100%;
+}
+
+.material-icons {
+    font-size: 18px;
+}

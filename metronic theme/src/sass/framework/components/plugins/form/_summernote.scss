@@ -11,7 +11,9 @@
     }   
 
     .note-editor {
-        @include border-radius(array-get($m--border-radius, general));
+        @include rounded {
+            @include border-radius(array-get($m--border-radius, general));
+        }
 
         .note-toolbar-wrapper {
             position: relative;
@@ -30,8 +32,10 @@
         .panel-heading.note-toolbar {
             padding: 5px 10px 10px 10px;
             
-            @include border-top-left-radius(array-get($m--border-radius, general));
-            @include border-top-right-radius(array-get($m--border-radius, general));
+            @include rounded {
+                @include border-top-left-radius(array-get($m--border-radius, general));
+                @include border-top-right-radius(array-get($m--border-radius, general));
+            }
 
             .btn {
                 outline: none !important;

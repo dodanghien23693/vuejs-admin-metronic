@@ -2,50 +2,79 @@
 //** Global Helper Classes
 //
 
-@for $i from 1 through 20 {
-	$num: $i * 5;
+//== Margin & padding helpers
 
-	.m--margin-#{$num} {
-		margin: #{$num}px !important;
+@mixin m-margin-and-padding($mode) {
+	@if $mode == general {
+		$mode: '';
+	} @else {
+		$mode: "-" + $mode;
 	}
 
-	.m--margin-top-#{$num} {
-		margin-top: #{$num}px !important;
-	}
+	@for $i from 1 through 20 {
+		$num: $i * 5;
 
-	.m--margin-bottom-#{$num} {
-		margin-bottom: #{$num}px !important;
-	}
+		.m--margin-#{$num}#{$mode} {
+			margin: #{$num}px !important;
+		}
 
-	.m--margin-left-#{$num} {
-		margin-left: #{$num}px !important;
-	}
+		.m--margin-top-#{$num}#{$mode} {
+			margin-top: #{$num}px !important;
+		}
 
-	.m--margin-right-#{$num} {
-		margin-right: #{$num}px !important;
-	}
+		.m--margin-bottom-#{$num}#{$mode} {
+			margin-bottom: #{$num}px !important;
+		}
 
-	.m--padding-#{$num} {
-		padding: #{$num}px !important;
-	}
+		.m--margin-left-#{$num}#{$mode} {
+			margin-left: #{$num}px !important;
+		}
 
-	.m--padding-top-#{$num} {
-		padding-top: #{$num}px !important;
-	}
+		.m--margin-right-#{$num}#{$mode} {
+			margin-right: #{$num}px !important;
+		}
 
-	.m--padding-bottom-#{$num} {
-		padding-bottom: #{$num}px !important;
-	}
+		.m--padding-#{$num}#{$mode} {
+			padding: #{$num}px !important;
+		}
 
-	.m--padding-left-#{$num} {
-		padding-left: #{$num}px !important;
-	}
+		.m--padding-top-#{$num}#{$mode} {
+			padding-top: #{$num}px !important;
+		}
 
-	.m--padding-right-#{$num} {
-		padding-right: #{$num}px !important;
+		.m--padding-bottom-#{$num}#{$mode} {
+			padding-bottom: #{$num}px !important;
+		}
+
+		.m--padding-left-#{$num}#{$mode} {
+			padding-left: #{$num}px !important;
+		}
+
+		.m--padding-right-#{$num}#{$mode} {
+			padding-right: #{$num}px !important;
+		}
 	}
 }
 
+@include m-margin-and-padding(general);
+
+@include desktop {
+	@include m-margin-and-padding(desktop);
+}
+
+@include tablet {
+	@include m-margin-and-padding(tablet);
+}
+
+@include tablet-and-mobile {
+	@include m-margin-and-padding(tablet-and-mobile);
+}
+
+@include mobile {
+	@include m-margin-and-padding(mobile);
+}
+
+//== General helpers
 
 .m--full-height {
 	height: 100%;
@@ -125,7 +154,7 @@
 }
 
 .m--img-rounded {
-	@include border-radius(50%);
+	border-radius: 50%;
 }
 
 .m--block-inline {

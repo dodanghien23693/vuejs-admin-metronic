@@ -85,6 +85,8 @@
 
 						//== Row checkbox
 						&.m-datatable__cell--check {
+							text-align: center;
+							
 							> span {
 								overflow: visible;
 
@@ -121,6 +123,8 @@
 
 							.dropdown-menu.dropdown-menu-right {
 								margin-right: -0.8rem;
+								/*rtl:ignore*/
+								margin-left: 65px;
 							}
 
 							.dropdown-menu.dropdown-menu-left {
@@ -247,6 +251,7 @@
 				> .m-datatable__foot {
 					visibility: visible;
 					display: block;
+					position: relative;
 
 					.m-datatable__row {
 						display: table;
@@ -350,6 +355,11 @@
 						vertical-align: middle;
 						padding: 0.5rem;
 						@include border-radius(50%);
+
+						@include not-rounded {
+							@include border-radius(0);
+						}
+
 						text-align: center;
 						position: relative;
 						@include vertical-horizontal-center-flexbox();
@@ -373,7 +383,10 @@
 						height: $page-size;
 						width: 3.5rem;
 						text-align: center;
-						@include border-radius(15px, '!important');
+
+						@include rounded {
+							@include border-radius(15px, '!important');
+						}
 					}
 				}
 			}
@@ -389,6 +402,10 @@
 						@include border-radius(20px, '!important');
 						height: $page-size;
 						padding: 0.45rem 1rem;
+
+						@include not-rounded {
+							@include border-radius(0, '!important');
+						}
 					}
 
 					.dropdown-menu.inner > li.selected > a span.check-mark {
@@ -498,6 +515,10 @@
 					&.m-datatable__lock--right {
 						@include shadow($lock-shadow);
 					}
+
+					&.m-datatable__lock--scroll {
+						position: relative;
+					}
 				}
 
 				.m-datatable__row {
@@ -558,6 +579,10 @@
 					background: $scrollbar_color;
 					@include opacity(0.7);
 					@include transition(all 0.3s ease);
+
+					@include not-rounded {
+                    	@include border-radius(0 !important);
+                	}
 				}
 
 				// on drag
@@ -565,6 +590,10 @@
 					background: $scrollbar_on_drag_color;
 					@include opacity(1);
 					@include transition(all 0.3s ease);
+
+					@include not-rounded {
+                    	@include border-radius(0 !important);
+                	}
 				}
 			}
 		}
@@ -633,13 +662,13 @@
 
 					.btn.dropdown-toggle:focus,
 					.btn.dropdown-toggle:hover,
-					&.show > .btn.dropdown-toggle {
+					 &.show > .btn.dropdown-toggle {
 						border: 0 !important;
-						color: $page-info-hover-font;
+						color: $page-info-hover-font !important;
 						background: $page-info-hover;
 
 						i {
-							color: $page-info-hover-font;
+							color: $page-info-hover-font !important;
 						}  
 					}
 

@@ -4,72 +4,55 @@ var mQuickSidebar = function() {
     var topbarAsideContent = topbarAside.find('.m-quick-sidebar__content');
 
     var initMessages = function() {
-        var messenger = $('#m_quick_sidebar_tabs_messenger');  
+        var messages = mUtil.find( mUtil.get('m_quick_sidebar_tabs_messenger'),  '.m-messenger__messages'); 
+        var form = $('#m_quick_sidebar_tabs_messenger .m-messenger__form');
 
-        if (messenger.length === 0) {
-            return;
-        }
+        mUtil.scrollerInit(messages, {
+            disableForMobile: true, 
+            resetHeightOnDestroy: false, 
+            handleWindowResize: true, 
+            height: function() {
+                var height = topbarAside.outerHeight(true) - 
+                    topbarAsideTabs.outerHeight(true) - 
+                    form.outerHeight(true) - 120;
 
-        var messengerMessages = messenger.find('.m-messenger__messages');
-
-        var init = function() {
-            var height = topbarAside.outerHeight(true) - 
-                topbarAsideTabs.outerHeight(true) - 
-                messenger.find('.m-messenger__form').outerHeight(true) - 120;
-            
-            // init messages scrollable content
-            messengerMessages.css('height', height);
-            mApp.initScroller(messengerMessages, {});
-        }
-
-        init();        
-        
-        // reinit on window resize
-        mUtil.addResizeHandler(init);
+                return height;                    
+            }
+        });
     }
 
     var initSettings = function() { 
-        var settings = $('#m_quick_sidebar_tabs_settings');
+        var settings = mUtil.find( mUtil.get('m_quick_sidebar_tabs_settings'),  '.m-list-settings'); 
 
-        if (settings.length === 0) {
+        if (!settings) {
             return;
         }
 
-        // init dropdown tabbable content
-        var init = function() {
-            var height = mUtil.getViewPort().height - topbarAsideTabs.outerHeight(true) - 60;
-
-            // init settings scrollable content
-            settings.css('height', height);
-            mApp.initScroller(settings, {});
-        }
-
-        init();
-
-        // reinit on window resize
-        mUtil.addResizeHandler(init);
+        mUtil.scrollerInit(settings, {
+            disableForMobile: true, 
+            resetHeightOnDestroy: false, 
+            handleWindowResize: true, 
+            height: function() {
+                return mUtil.getViewPort().height - topbarAsideTabs.outerHeight(true) - 60;            
+            }
+        });
     }
 
     var initLogs = function() {
-        // init dropdown tabbable content
-        var logs = $('#m_quick_sidebar_tabs_logs');
+        var logs = mUtil.find( mUtil.get('m_quick_sidebar_tabs_logs'),  '.m-list-timeline'); 
 
-        if (logs.length === 0) {
+        if (!logs) {
             return;
         }
 
-        var init = function() {
-            var height = mUtil.getViewPort().height - topbarAsideTabs.outerHeight(true) - 60;
-
-            // init settings scrollable content
-            logs.css('height', height);
-            mApp.initScroller(logs, {});
-        }
-
-        init();
-
-        // reinit on window resize
-        mUtil.addResizeHandler(init);
+        mUtil.scrollerInit(logs, {
+            disableForMobile: true, 
+            resetHeightOnDestroy: false, 
+            handleWindowResize: true, 
+            height: function() {
+                return mUtil.getViewPort().height - topbarAsideTabs.outerHeight(true) - 60;            
+            }
+        });
     }
 
     var initOffcanvasTabs = function() {

@@ -7,7 +7,14 @@
 //== Component Base
 @mixin m-build-component--markdown-base() {
     .md-editor {
-        @include border-radius(array-get($m--border-radius, general));
+        @include rounded {
+            @include border-radius(array-get($m--border-radius, general));
+        }
+
+        @include not-rounded {
+            @include border-radius(0 !important);
+        }
+
         outline: none !important;
 
         .md-footer, 
@@ -16,8 +23,14 @@
         }
 
         .md-header {
-            @include border-top-left-radius(array-get($m--border-radius, general));
-            @include border-top-right-radius(array-get($m--border-radius, general));
+            @include rounded {
+                @include border-top-left-radius(array-get($m--border-radius, general));
+                @include border-top-right-radius(array-get($m--border-radius, general));
+            }
+
+            @include not-rounded {
+                @include border-radius(0 !important);
+            }
 
             .btn-group {
                 margin-right: 10px;
@@ -27,12 +40,20 @@
         .md-footer {
             @include border-bottom-left-radius(array-get($m--border-radius, general));
             @include border-bottom-right-radius(array-get($m--border-radius, general));
+
+            @include not-rounded {
+                @include border-radius(0 !important);
+            }
         }
 
         > textarea {
             padding: 10px 10px;
             @include border-bottom-left-radius(array-get($m--border-radius, general));
             @include border-bottom-right-radius(array-get($m--border-radius, general));
+
+            @include not-rounded {
+                @include border-radius(0 !important);
+            }
         }
     }
 }

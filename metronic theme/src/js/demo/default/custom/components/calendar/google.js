@@ -5,6 +5,7 @@ var CalendarGoogle = function() {
         init: function() {
 
             $('#m_calendar').fullCalendar({
+                isRTL: mUtil.isRTL(),
                 header: {
                     left: 'prev,next today',
                     center: 'title',

@@ -29,23 +29,23 @@ $m--layout-breakpoints: (
 )!default;
 
 //== Global arrow style
-$m--arrow-style: 'smooth'; // supported options: smooth, classic
+$m--arrow-style: 'smooth' !default; // supported options: smooth, classic
 
 //== Default skin
-$m--default-skin: 'light'; // supported option: light. the dark option will be added in the future when a new demo with dark skin is released.
+$m--default-skin: 'light' !default; // supported option: light. the dark option will be added in the future when a new demo with dark skin is released.
 
 //== Global rounded border mode
-$m--rounded: true;   // access to this value calling rounded() in SASS code
+$m--rounded: true !default;   // access to this value calling rounded() in SASS code
 
 //== Force cursor with pointer for button tags globally
-$m--btn-force-hover-pointer: true;
+$m--btn-force-hover-pointer: true !default;
 
 //== Border Radius
 $m--border-radius: (
     general: 4px,
     dropdown: 4px,
     scrollbar: 2px
-);
+) !default;
 
 //== Core icon codes(lineawesome icons: https://icons8.com/line-awesome)
 $m--icon-codes: (
@@ -56,10 +56,13 @@ $m--icon-codes: (
     right: '\f112',
     plus: '\f2c2',
     minus: '\f28e'
-);
+) !default;
 
 //== Modal Z-index
-$m--modal-zindex: 1050;
+$m--modal-zindex: 1050 !default;
+
+//== General dropdown Z-index
+$m--dropdown-zindex: 101 !default;
 
 //== Transition
 $m--transition: (
@@ -69,7 +72,7 @@ $m--transition: (
     )
 )!default;
 
-//== UI State Color
+//== UI State Colors
 $m--brand-color: #716aca !default;
 $m--brand-inverse-color: #ffffff !default; 
 
@@ -122,9 +125,9 @@ $m--state-colors: (
 //== The body element font settings
 $m--root-font: (
     size: (
-        desktop: 14px,
-        tablet: 13px,
-        mobile: 13px
+        desktop: 13px,
+        tablet: 12px,
+        mobile: 12px
     ), 
     weight: 300, 
     color: (

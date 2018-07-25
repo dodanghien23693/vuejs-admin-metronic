@@ -55,16 +55,14 @@
 }
 
 //== Component Skin
-@mixin m-build-component--nav-skin($skin) {
-    @include component-skin(nav, $skin) { 
+@mixin m-build-component--nav-skin() {
+    $skin: light;
+
+    .nav {
         &.nav-pills,
         &.nav-tabs {
             .nav-link {
                 color: get-color($skin, regular, '-');
-
-                &.active {
-
-                }
 
                 &.m-nav-link--icon {
                     i {
@@ -82,20 +80,17 @@
             }
         }
 
-        &.nav-pills {
-            .nav-link {
-                &.active {
-                    color: $nav-pills-active-link-color;
+        &.nav-pills {            
+            .nav-item.dropdown.show > .nav-link,
+            .nav-link.active {
+                color: $nav-pills-active-link-color;
 
-                    i {
-                        color: darken($nav-pills-active-link-color, 6%);
-                    }
+                i {
+                    color: darken($nav-pills-active-link-color, 6%);
                 }
             }
         }
-    }
-
-    @include component-skin(nav, $skin) { 
+    
         @each $name, $color in $m--state-colors {
             &.nav-pills.nav-pills--#{$name} {
                 .nav-link {
@@ -130,4 +125,4 @@
 @include m-build-component--nav-base();
 
 //== Component Skin - Light
-@include m-build-component--nav-skin(light);
+@include m-build-component--nav-skin();

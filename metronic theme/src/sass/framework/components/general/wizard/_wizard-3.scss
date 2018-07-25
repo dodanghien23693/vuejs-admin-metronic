@@ -17,13 +17,17 @@
 				height: 0.71rem;	 
 
 				.progress { 
-					@include border-radius(0.71rem);
+					@include rounded {
+						@include border-radius(0.71rem);
+					}
 					height: 0.71rem;	
 					position: relative;					 	
 
 					.progress-bar {
 						position: absolute;	
-						@include border-radius(0.71rem);
+						@include rounded {
+							@include border-radius(0.71rem);
+						}
 						height: 0.71rem;						 
 					}
 				}			

@@ -9,6 +9,9 @@
     .datepicker  {
     	width: 265px;
     	padding: 10px;
+        @include not-rounded {
+            @include border-radius(0);
+        }
 
     	&.datepicker-orient-top {
     		margin-top: 8px;
@@ -21,7 +24,12 @@
     	td, th {
     		width: 35px;
     		height: 35px;
-    		@include border-radius(3px);
+            @include rounded {
+    		    @include border-radius(3px);
+            }
+            @include not-rounded {
+                @include border-radius(0);
+            }
     		font-weight: get-font-weight(regular);
     	}
 
@@ -70,7 +78,9 @@
     		tr > th {
     			&.today,
     			&.clear {
-    				@include border-radius(3px);
+                    @include rounded {
+    				        @include border-radius(3px);
+                    }
     				font-weight: get-font-weight(bolder);  
     			}
     		}
@@ -81,6 +91,13 @@
     	.input-group-addon {
     		min-width: 44px;
    		}
+
+        input {
+            @include not-rounded {
+                @include border-radius(0 !important);
+            }
+            text-align: left;
+        }
    	}
 }
 

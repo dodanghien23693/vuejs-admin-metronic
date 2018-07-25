@@ -5,6 +5,8 @@
 //== Mixins
 @mixin m-build-component--toastr-base() {
     .toast {
+        background-position: 15px center #{'/*rtl:calc(100% - 15px) center*/'} !important;
+
     	.toast-close-button {
 			@include m-generate-close-icon();
        		

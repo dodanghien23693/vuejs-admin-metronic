@@ -15,7 +15,7 @@ $m-config-header: (
 		),
 		// Fixed mode
 		fixed: (		 
-			zindex: 101,
+			zindex: 99,
 			hidable: (			
 				transition-hide: all 0.3s ease 0.5s,
 				transition-show: all 0.3s ease, 
@@ -215,6 +215,9 @@ $m-config-header: (
 	search: (
 		// self
 		self: (
+			padding: (
+				mobile: 0 10px
+			),
 			transition-time: 0.4s,
 			width: (
 				desktop: (
@@ -262,7 +265,7 @@ $m-config-header: (
 				),
 				padding: (
 					desktop: 0 0 0 10px,
-					mobile: 0 0 0 10px
+					mobile: 0 0 0 0
 				),
 				font-size: (
 					desktop: 1rem,

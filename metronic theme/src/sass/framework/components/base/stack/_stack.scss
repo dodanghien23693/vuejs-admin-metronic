@@ -28,18 +28,18 @@
 
 @mixin m--build-stack-flex($mode) {
 	.m-stack.m-stack--flex-#{$mode} {	
-		@include flexbox();
-		@include flexbox-direction(column);
+		display: flex;
+		flex-direction: column;
 		
 		&.m-stack--ver {
 			> .m-stack__item.m-stack__item--first {
 				display: block;
-				@include flexbox-order(1);
+				order: 1;
 			}
 
 			> .m-stack__item.m-stack__item--last {	
 				display: block;
-				@include flexbox-order(2);
+				order: 2;
 			}
 		}
 	}
@@ -49,6 +49,10 @@
 	.m-stack.m-stack--#{$mode} {	
 		display: table;
 		table-layout: fixed;
+
+		&.m-stack--fluid {
+			table-layout: auto;
+		}
 
 		&.m-stack--inline {
 			width: auto;

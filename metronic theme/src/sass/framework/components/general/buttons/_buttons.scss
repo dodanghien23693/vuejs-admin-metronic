@@ -9,7 +9,7 @@ $m-pill-radius: 60px;
     // base button
     .btn {                
         font-family: array-get($m--font-families, regular);
-        @include shadow(none !important);
+        box-shadow: none !important;
 
         // icon
         > i {
@@ -21,22 +21,27 @@ $m-pill-radius: 60px;
         &:hover,
         &.active,
         &:focus {
-            @include shadow(none);
+            box-shadow: none;
         }
 
         // force cursor: pointer for button tags
         @if ($m--btn-force-hover-pointer == true) {
             cursor: pointer;
         }
+
+        border-radius: 0;
+        @include rounded {
+            border-radius: array-get($m--buttons, layout, self, border-radius);
+        }
         
         // pill style
         &.m-btn--pill {
-            @include border-radius($m-pill-radius);
+            border-radius: $m-pill-radius;
         }
 
         // square style
         &.m-btn--square {
-            @include border-radius(0, '!important');
+            border-radius: 0 !important;
         }
 
         // secondary button air style
@@ -57,6 +62,7 @@ $m-pill-radius: 60px;
                 padding-left: 2 * array-get($m--buttons, layout, default, sm, self, padding, x);
                 padding-right: 2 * array-get($m--buttons, layout, default, sm, self, padding, x);
             }
+        
             &.btn-lg {
                 padding-left: 2 * array-get($m--buttons, layout, default, lg, self, padding, x);
                 padding-right: 2 * array-get($m--buttons, layout, default, lg, self, padding, x);
@@ -112,6 +118,15 @@ $m-pill-radius: 60px;
 
         &.m-btn--sm {
             font-size: get-font-size(regular, '-');
+        }
+
+        &.m-btn--md {
+            padding: 1rem 2rem;
+
+            &.dropdown-toggle {
+                padding-left: 1.25rem;
+                padding-right: 1.25rem;
+            }
         }
     }
 
@@ -173,13 +188,13 @@ $m-pill-radius: 60px;
                 position: absolute;
                 top: 50%;
                 left: 50%;
-                @include transform(translate(-50%, -50%));
+                transform: translate(-50%, -50%);
             }           
 
             @include icons-size( array-get($m--buttons, layout, default, default, icon, font-size) );
 
             &.th-btn-pill { 
-                @include border-radius(100%);
+                border-radius: 100%;
             }
 
             &.btn-lg {
@@ -256,7 +271,7 @@ $m-pill-radius: 60px;
         &:focus,
         &:active {
             outline: none;
-            @include shadow(none);
+            box-shadow: none;
         }
     }
 
@@ -270,41 +285,41 @@ $m-pill-radius: 60px;
         &.m-btn-group--pill:not(.btn-group-vertical) {
             .btn {
                 &:first-child {
-                    @include border-radius($m-pill-radius 0 0 $m-pill-radius);
+                    border-radius: $m-pill-radius 0 0 $m-pill-radius;
                 }
 
                 &:last-child {
-                    @include border-radius(0 $m-pill-radius $m-pill-radius 0);
+                    border-radius: 0 $m-pill-radius $m-pill-radius 0;
                 }
 
                 // pill mode
                 &.m-btn--pill-last {
-                    @include border-radius(0 $m-pill-radius $m-pill-radius 0);
+                    border-radius: 0 $m-pill-radius $m-pill-radius 0;
                 }
 
                 &.m-btn--pill-first {
-                    @include border-radius($m-pill-radius 0 0 $m-pill-radius); 
+                    border-radius: $m-pill-radius 0 0 $m-pill-radius; 
                 }
             }
         }
 
         &.m-btn-group--air {
-            @include border-radius(0.25rem);
+            border-radius: 0.25rem;
         }
 
         &.m-btn-group--air.m-btn-group--pill {
-            @include border-radius($m-pill-radius);
+            border-radius: $m-pill-radius;
         }
     }
 
     // vertical button group
     .btn-group-vertical {
         .m-btn--pill-last {
-            @include border-radius(0 0 $m-pill-radius $m-pill-radius);
+            border-radius: 0 0 $m-pill-radius $m-pill-radius;
         }
 
         .m-btn--pill-first {
-            @include border-radius($m-pill-radius $m-pill-radius 0 0); 
+            border-radius: $m-pill-radius $m-pill-radius 0 0; 
         }
     }
 
@@ -313,12 +328,12 @@ $m-pill-radius: 60px;
         &.btn-outline-#{$name}.m-btn--air,
         &.btn-#{$name}.m-btn--air,
         &.m-btn--gradient-from-#{$name}.m-btn--air {
-            @include shadow(0px 5px 10px 2px rgba(array-get($color, base), 0.19), !important);
+            box-shadow: 0px 5px 10px 2px rgba(array-get($color, base), 0.19) !important;
 
             &.focus,
             &:focus,
             &:hover {
-                @include shadow(0px 5px 10px 2px rgba(array-get($color, base), 0.36), !important);
+                box-shadow: 0px 5px 10px 2px rgba(array-get($color, base), 0.36) !important;
             }   
         }
 
@@ -331,7 +346,38 @@ $m-pill-radius: 60px;
                 color: array-get($color, inverse);
             } 
         }
+
+        &.btn + .btn.dropdown-toggle {
+            position: relative;
+
+            &:before {
+                display: block;
+                content: ' ';
+                border-left: 1px solid array-get($color, inverse);
+                position: absolute;
+                top: 3px;
+                left: -1px;
+                bottom: 3px;
+                opacity: 0.3;
+            }
+
+            &:hover,
+            &:focus,
+            &.active {
+                &:before {
+                    display: none;
+                }
+            }
+        }
     }  
+
+    // Button outline fix
+    button{ 
+        &:active,
+        &:focus {
+            outline: none !important;
+        }
+    }
 }
 
 //== Component Skin
@@ -368,13 +414,13 @@ $m-pill-radius: 60px;
         &.m-btn--air {
             &.btn-default,
             &.btn-secondary {
-                @include shadow( array-get($m--buttons, skins, $skin, air, box-shadow, default), !important );
+                box-shadow: array-get($m--buttons, skins, $skin, air, box-shadow, default) !important;
                 border-color: #ffffff !important;
                 
                 &.focus,
                 &:focus,
                 &:hover:not(:disabled):not(.active) {
-                    @include shadow( array-get($m--buttons, skins, $skin, air, box-shadow, hover), !important );
+                    box-shadow: array-get($m--buttons, skins, $skin, air, box-shadow, hover) !important;
                     background: get-brand-color() !important;
                     color: get-brand-inverse-color(inverse) !important;
                     border-color: get-brand-color() !important;
@@ -390,10 +436,8 @@ $m-pill-radius: 60px;
         @each $name, $color in $m--state-colors {
             // standart buttons  
             &.m-btn--hover-#{$name} {
-
                 &:not(.btn-secondary):not(.btn-outline-light) {
                     background: none;
-
                     color: get-color($skin, regular);
 
                     i {
@@ -465,7 +509,7 @@ $m-pill-radius: 60px;
     // air button group
     .btn-group {
         &.m-btn-group--air {
-            @include shadow( array-get($m--buttons, skins, $skin, air, box-shadow, default), !important );
+            box-shadow: array-get($m--buttons, skins, $skin, air, box-shadow, default) !important;
             
             .btn-default,
             .btn-secondary {
@@ -475,7 +519,7 @@ $m-pill-radius: 60px;
                 &:focus,
                 &:hover:not(:disabled) {
                     background: #ffffff !important;
-                    @include shadow( array-get($m--buttons, skins, $skin, air, box-shadow, default), !important );
+                    box-shadow: array-get($m--buttons, skins, $skin, air, box-shadow, default) !important;
                 }            
             }
         }

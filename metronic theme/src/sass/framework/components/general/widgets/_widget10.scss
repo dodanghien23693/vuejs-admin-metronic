@@ -13,7 +13,9 @@
             position: relative;
 
             canvas {
-                @include border-radius(8px);
+                @include rounded {
+                    @include border-radius(8px);
+                }
             } 
         }
 

@@ -7,21 +7,39 @@
 //== Component Base
 @mixin m-build-component--touchspin-base() {
    	.bootstrap-touchspin {
-        @include border-top-left-radius(array-get($m--forms, input, layout, self, size, default, border-radius));
-        @include border-bottom-left-radius(array-get($m--forms, input, layout, self, size, default, border-radius));
+        @include rounded {
+            @include border-top-left-radius(array-get($m--forms, input, layout, self, size, default, border-radius));
+            @include border-bottom-left-radius(array-get($m--forms, input, layout, self, size, default, border-radius));
+        }
+
+        @include not-rounded {
+            @include border-radius(0 !important);
+        }
 
         .form-control.bootstrap-touchspin-vertical-btn {
-            @include border-top-left-radius(array-get($m--forms, input, layout, self, size, default, border-radius), '!important');
-            @include border-bottom-left-radius(array-get($m--forms, input, layout, self, size, default, border-radius), '!important');
+            @include rounded {
+                @include border-top-left-radius(array-get($m--forms, input, layout, self, size, default, border-radius), '!important');
+                @include border-bottom-left-radius(array-get($m--forms, input, layout, self, size, default, border-radius), '!important');
+            }
+
+            @include not-rounded {
+                @include border-radius(0 !important);
+            }
         }
 
    		.input-group-btn-vertical {
             width: auto;
-            display: inline-block;
+            display: flex;
+            flex-direction: column;
 
             .btn {
                 padding: 0.13rem 0.3rem; 
                 line-height: 1;
+                flex-grow:1;
+
+                @include not-rounded {
+                    @include border-radius(0 !important);
+                }
             }
 
             i {
@@ -43,14 +61,24 @@
                 line-height: 0;
                 vertical-align: middle;
             }
+
+            @include not-rounded {
+                @include border-radius(0 !important);
+            }
         }
 
         .input-group-btn {
             &:first-child {
                 .btn {
-                    @include border-top-right-radius(0);
-                    @include border-bottom-right-radius(0); 
+                    @include rounded {
+                        @include border-top-right-radius(0);
+                        @include border-bottom-right-radius(0); 
+                    }
                     border-right: 0;
+
+                    @include not-rounded {
+                        @include border-radius(0 !important);
+                    }
                 }
 
                 & + .input-group-addon {
@@ -61,8 +89,14 @@
             &:last-child {
                 .btn {
                     border-left: 0;
-                    @include border-top-left-radius(0);
-                    @include border-bottom-left-radius(0);
+                    @include rounded {
+                        @include border-top-left-radius(0);
+                        @include border-bottom-left-radius(0);
+                    }
+
+                    @include not-rounded {
+                        @include border-radius(0 !important);
+                    }
                 }
             }
         }

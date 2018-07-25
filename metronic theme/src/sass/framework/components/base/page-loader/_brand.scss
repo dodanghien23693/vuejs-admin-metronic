@@ -12,15 +12,12 @@
 		left: 0;
 		right: 0;
 		z-index: array-get($m--page-loader, layout, self, zindex);
-		
-		// vertical & horizontal center
-		@include flexbox-justify-content(center);
-    	@include flexbox-align-items(center);
-
-    	display: none;
+		display: none;
 
     	.m-page--loading & {	
-			@include flexbox();
+			display: flex;
+			justify-content: center;
+    		align-items: center;
 		}
 
 		&.m-page-loader--non-block {

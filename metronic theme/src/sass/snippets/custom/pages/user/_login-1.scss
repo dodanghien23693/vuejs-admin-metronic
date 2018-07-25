@@ -15,8 +15,7 @@
         }
 
         //== Page Content
-        .m-login__content {
-            padding: 5rem 10rem 10rem 10rem;
+        .m-login__content {            
             background-attachment: fixed;
             background-size: cover;
 
@@ -223,7 +222,10 @@
             }
 
             .m-login__content {
-                padding: 2rem;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100%;
 
                 .m-login__welcome {
                     font-size: 1.5rem;

@@ -7778,7 +7778,7 @@ body {
   padding: 0px;
   font-size: 14px;
   font-weight: 300;
-  font-family: Poppins;
+  font-family: sans-serif;
   -ms-text-size-adjust: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale; }
@@ -12855,7 +12855,7 @@ code {
     padding: 0.75rem 2rem;
     font-size: 1rem;
     font-weight: 400;
-    font-family: Poppins; }
+    font-family: sans-serif; }
     .btn.m-btn--custom.btn-sm, .btn-group-sm > .btn.m-btn--custom {
       padding: 0.5rem 1rem;
       font-size: 0.9rem; }
@@ -17693,7 +17693,7 @@ code {
         .m-portlet.m-portlet--creative .m-portlet__head .m-portlet__head-caption .m-portlet__head-title .m-portlet__head-text {
           font-size: 1rem;
           font-weight: 400;
-          font-family: Poppins; }
+          font-family: sans-serif; }
           .m-portlet.m-portlet--creative .m-portlet__head .m-portlet__head-caption .m-portlet__head-title .m-portlet__head-text .m-portlet__head-desc {
             font-size: 0.8rem;
             font-weight: 300; }
@@ -26418,7 +26418,7 @@ body.m-portlet--fullscreen {
   padding: 0;
   min-width: 125px;
   font-size: 1rem;
-  font-family: Poppins;
+  font-family: sans-serif;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   -ms-border-radius: 4px;

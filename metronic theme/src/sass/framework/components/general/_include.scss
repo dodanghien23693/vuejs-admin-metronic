@@ -7,6 +7,7 @@
 
 //== Datatable
 @import "datatable/datatable";
+@import "datatable/datatable.net";
 
 //== Navigation menu
 @import "nav/nav";
@@ -28,6 +29,8 @@
 @import "typography/section";
 @import "typography/separator";
 @import "typography/code";
+@import "typography/type";
+@import "typography/divider";
 
 //== Buttons
 @import "buttons/buttons";
@@ -91,11 +94,9 @@
 @import "widgets/widget29";  
 @import "widgets/widget30"; 
 
-
 //== Demo
 @import "demo/icon";
 @import "demo/demo";
-
 //== Forms
 @import "forms/checkbox-radio";
 @import "forms/input";

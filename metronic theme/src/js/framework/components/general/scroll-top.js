@@ -95,7 +95,7 @@ var mScrollTop = function(elementId, options) {
         scroll: function(e) {
             e.preventDefault();
 
-            mUtil.scrollTop(the.options.speed);
+            mUtil.scrollTop(0, the.options.speed);
         },
 
 

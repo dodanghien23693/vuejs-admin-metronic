@@ -9,6 +9,11 @@
     .datetimepicker  {
     	width: 265px;
     	padding: 10px;
+        left: auto;
+
+        @include not-rounded {
+            @include border-radius(0 !important);
+        }
 
     	&.datetimepicker-orient-top {
     		margin-top: 8px;
@@ -23,6 +28,10 @@
     		height: 35px;
     		@include border-radius(3px);
     		font-weight: get-font-weight(regular);
+
+            @include not-rounded {
+                @include border-radius(0 !important);
+            }
     	}
 
     	thead {

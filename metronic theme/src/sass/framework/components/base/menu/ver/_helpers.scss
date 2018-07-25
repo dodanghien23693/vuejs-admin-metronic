@@ -46,7 +46,7 @@
 				> span {
 					width: array-get($item, link, bullet, dot, size);
 					height: array-get($item, link, bullet, dot, size);
-					@include border-radius(100%);
+					border-radius: 100%;
 				}
 			}
 
@@ -72,7 +72,7 @@
 
 			&:before {		
 				display: inline-block;
-				@include transition(array-get($item, link, arrow, transition)); 
+				transition: array-get($item, link, arrow, transition); 
 			}
 		}
 
@@ -90,7 +90,7 @@
 			// menu item link's arrow part
 			.m-menu__ver-arrow {
 				&:before {							
-					@include transition(array-get($item, link, arrow, transition)); 
+					transition: array-get($item, link, arrow, transition); 
 				}
 			}
 		}
@@ -139,7 +139,7 @@
 
 	// item link open state
 	&.m-menu__item--open {
-		@include transition( background-color 0.3s );
+		transition: background-color 0.3s;
 		@include attr(background-color, array-get($item, self, bg-color, open));
 
 		> .m-menu__heading,
@@ -180,7 +180,7 @@
 
 	// item link open state
 	&.m-menu__item--expanded {
-		@include transition( background-color 0.3s );
+		transition: background-color 0.3s;
 		@include attr(background-color, array-get($item, self, bg-color, expanded));
 
 		> .m-menu__heading,
@@ -221,7 +221,7 @@
 
 	// item link active state
 	&.m-menu__item--active {
-		@include transition( background-color 0.3s );
+		transition: background-color 0.3s;
 		@include attr(background-color, array-get($item, self, bg-color, active));
 
 		> .m-menu__heading,
@@ -262,7 +262,7 @@
 
 	// item link hover state
 	&:not(.m-menu__item--parent):not(.m-menu__item--open):not(.m-menu__item--expanded):not(.m-menu__item--active):hover {
-		@include transition( background-color 0.3s );
+		transition: background-color 0.3s;
 		@include attr(background-color, array-get($item, self, bg-color, hover));
 
 		> .m-menu__heading,
@@ -566,8 +566,7 @@
 						// menu item link's arrow part
 						> .m-menu__ver-arrow {
 							&:before {  
-								-webkit-transform: translate3d(0,0,0); 
-								@include transform(rotateZ(90deg));
+								transform: rotateZ(90deg)#{'/*rtl:ignore*/'};
 							}
 						}
 					}
@@ -611,6 +610,10 @@
 				width: 100%;
 				vertical-align: middle;
 				padding: array-get($layout, default, section, self, padding);
+
+				&.m-menu__section--first {
+					margin-top: 0 !important;
+				}
 
 				.m-menu__section-text {
 					display: table-cell;
@@ -903,7 +906,7 @@
 							padding: array-get($layout, dropdown, item, submenu, self, padding); 
 
 							@include rounded {
-								@include border-radius( array-get($layout, dropdown, item, submenu, self, border-radius) );
+								border-radius: array-get($layout, dropdown, item, submenu, self, border-radius);
 							}
 
 							// menu item
@@ -991,7 +994,7 @@
 			> .m-menu__item:not([m-menu-submenu-mode='accordion']) {
 				&.m-menu__item--hover {
 					> .m-menu__submenu {
-						margin-left: $m-aside-left-width;
+						margin-left: array-get($layout, dropdown, item, submenu, self, parent-width);
 						top: array-get($layout, dropdown, item, submenu, self, offset, root, default);
 					
 						&.m-menu__submenu--up {
@@ -1033,21 +1036,21 @@
 	} @else {
 		.m-menu__nav.m-menu__nav--dropdown-submenu-arrow .m-menu__item.m-menu__item--hover > .m-menu__submenu {
 			.m-menu__subnav {
-				margin-left: array-get($layout, smooth, arrow, size) - 1px;
+				margin-left: array-get($layout, classic, size) - 1px;
 			}
 
 			> .m-menu__arrow {
-				@include m--build-classic-arrow(right, array-get($layout, smooth, size));
+				@include m--build-classic-arrow(right, array-get($layout, classic, size));
 				position: absolute;
-				left: array-get($layout, smooth, left);
-				top: array-get($layout, smooth, offset, default);
-				margin: array-get($layout, smooth,  margin);
+				right: array-get($layout, classic, right);
+				top: array-get($layout, classic, offset, default);
+				margin: array-get($layout, classic,  margin);
 			}
 
 			&.m-menu__submenu--up {
 				> .m-menu__arrow {
 					top: auto;
-					bottom: array-get($layout, smooth, offset, up);
+					bottom: array-get($layout, classic, offset, up);
 				}
 			}
 		}
@@ -1169,7 +1172,7 @@
 					}
 
 					> .m-menu__link {
-						width: $m-aside-left-width-minimize;
+						width: array-get($layout, minimize, self, width);
 
 						.m-menu__link-icon {
 							width: table-cell;
@@ -1251,6 +1254,19 @@
 					}
 				}
 
+				&.m-menu__item--expanded,
+				&.m-menu__item--active {
+					background: transparent !important;
+
+					> .m-menu__link {
+						background-color: array-get($layout, minimize, item, link, self, bg-color, active);
+
+						> .m-menu__link-icon {
+							@include attr(color, array-get($layout, minimize, item, link, icon, font-color, active));
+						}
+					}
+				}
+
 				&:hover {
 					background: transparent;
 
@@ -1258,7 +1274,7 @@
 						background-color: array-get($layout, minimize, item, link, self, bg-color, hover);
 
 						> .m-menu__link-icon {
-							@include attr(color, array-get($layout, minimize, item, link, icon, font-color, hover));
+							@include attr(color, array-get($layout, minimize, item, link, icon, font-color, hover), !important);
 						}
 					}
 				}

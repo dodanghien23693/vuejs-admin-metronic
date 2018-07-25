@@ -1,44 +1,46 @@
 /**
  * @class mUtil  Metronic base utilize class that privides helper functions
  */
-
 //== Polyfill
-
 // matches polyfill
 this.Element && function(ElementPrototype) {
     ElementPrototype.matches = ElementPrototype.matches ||
-    ElementPrototype.matchesSelector ||
-    ElementPrototype.webkitMatchesSelector ||
-    ElementPrototype.msMatchesSelector ||
-    function(selector) {
-        var node = this, nodes = (node.parentNode || node.document).querySelectorAll(selector), i = -1;
-        while (nodes[++i] && nodes[i] != node);
-        return !!nodes[i];
-    }
+        ElementPrototype.matchesSelector ||
+        ElementPrototype.webkitMatchesSelector ||
+        ElementPrototype.msMatchesSelector ||
+        function(selector) {
+            var node = this,
+                nodes = (node.parentNode || node.document).querySelectorAll(selector),
+                i = -1;
+            while (nodes[++i] && nodes[i] != node);
+            return !!nodes[i];
+        }
 }(Element.prototype);
 
 // closest polyfill
 this.Element && function(ElementPrototype) {
     ElementPrototype.closest = ElementPrototype.closest ||
-    function(selector) {
-        var el = this;
-        while (el.matches && !el.matches(selector)) el = el.parentNode;
-        return el.matches ? el : null;
-    }
+        function(selector) {
+            var el = this;
+            while (el.matches && !el.matches(selector)) el = el.parentNode;
+            return el.matches ? el : null;
+        }
 }(Element.prototype);
 
 
 // matches polyfill
 this.Element && function(ElementPrototype) {
     ElementPrototype.matches = ElementPrototype.matches ||
-    ElementPrototype.matchesSelector ||
-    ElementPrototype.webkitMatchesSelector ||
-    ElementPrototype.msMatchesSelector ||
-    function(selector) {
-        var node = this, nodes = (node.parentNode || node.document).querySelectorAll(selector), i = -1;
-        while (nodes[++i] && nodes[i] != node);
-        return !!nodes[i];
-    }
+        ElementPrototype.matchesSelector ||
+        ElementPrototype.webkitMatchesSelector ||
+        ElementPrototype.msMatchesSelector ||
+        function(selector) {
+            var node = this,
+                nodes = (node.parentNode || node.document).querySelectorAll(selector),
+                i = -1;
+            while (nodes[++i] && nodes[i] != node);
+            return !!nodes[i];
+        }
 }(Element.prototype);
 
 //
@@ -77,35 +79,34 @@ this.Element && function(ElementPrototype) {
 }());
 
 // Source: https://github.com/jserz/js_piece/blob/master/DOM/ParentNode/prepend()/prepend().md
-(function (arr) {
-  arr.forEach(function (item) {
-    if (item.hasOwnProperty('prepend')) {
-      return;
-    }
-    Object.defineProperty(item, 'prepend', {
-      configurable: true,
-      enumerable: true,
-      writable: true,
-      value: function prepend() {
-        var argArr = Array.prototype.slice.call(arguments),
-          docFrag = document.createDocumentFragment();
-        
-        argArr.forEach(function (argItem) {
-          var isNode = argItem instanceof Node;
-          docFrag.appendChild(isNode ? argItem : document.createTextNode(String(argItem)));
+(function(arr) {
+    arr.forEach(function(item) {
+        if (item.hasOwnProperty('prepend')) {
+            return;
+        }
+        Object.defineProperty(item, 'prepend', {
+            configurable: true,
+            enumerable: true,
+            writable: true,
+            value: function prepend() {
+                var argArr = Array.prototype.slice.call(arguments),
+                    docFrag = document.createDocumentFragment();
+
+                argArr.forEach(function(argItem) {
+                    var isNode = argItem instanceof Node;
+                    docFrag.appendChild(isNode ? argItem : document.createTextNode(String(argItem)));
+                });
+
+                this.insertBefore(docFrag, this.firstChild);
+            }
         });
-        
-        this.insertBefore(docFrag, this.firstChild);
-      }
     });
-  });
 })([Element.prototype, Document.prototype, DocumentFragment.prototype]);
 
 //== Global variables 
 window.mUtilElementDataStore = {};
 window.mUtilElementDataStoreID = 0;
 window.mUtilDelegatedEventHandlers = {};
-window.noZensmooth = true;
 
 var mUtil = function() {
 
@@ -167,10 +168,35 @@ var mUtil = function() {
         },
 
         /**
+         * Removes window resize event handler.
+         * @param {function} callback function.
+         */
+        removeResizeHandler: function(callback) {
+            for (var i = 0; i < resizeHandlers.length; i++) {
+                if (callback === resizeHandlers[i]) {
+                    delete resizeHandlers[i];
+                }
+            }
+        },
+
+        /**
          * Trigger window resize handlers.
          */
         runResizeHandlers: function() {
             _runResizeHandlers();
+        },
+
+        resize: function() {
+            if (typeof(Event) === 'function') {
+                // modern browsers
+                window.dispatchEvent(new Event('resize'));
+            } else {
+                // for IE and other old browsers
+                // causes deprecation warning on modern browsers
+                var evt = window.document.createEvent('UIEvents'); 
+                evt.initUIEvent('resize', true, false, window, 0); 
+                window.dispatchEvent(evt);
+            }
         },
 
         /**
@@ -209,7 +235,8 @@ var mUtil = function() {
         },
 
         /**
-         * Gets browser window viewport size. Ref: http://andylangton.co.uk/articles/javascript/get-viewport-size-javascript/
+         * Gets browser window viewport size. Ref:
+         * http://andylangton.co.uk/articles/javascript/get-viewport-size-javascript/
          * @returns {object}  
          */
         getViewPort: function() {
@@ -228,7 +255,8 @@ var mUtil = function() {
 
         /**
          * Checks whether given device mode is currently activated.
-         * @param {string} mode Responsive mode name(e.g: desktop, desktop-and-tablet, tablet, tablet-and-mobile, mobile)
+         * @param {string} mode Responsive mode name(e.g: desktop,
+         *     desktop-and-tablet, tablet, tablet-and-mobile, mobile)
          * @returns {boolean}  
          */
         isInResponsiveRange: function(mode) {
@@ -306,57 +334,37 @@ var mUtil = function() {
             return true;
         },
 
-        getHighestZindex1: function(el) {
-            var position, value;
-
-            while (el && el !== document && el !== window) {
-                // Ignore z-index if position is set to a value where z-index is ignored by the browser
-                // This makes behavior of this function consistent across browsers
-                // WebKit always returns auto if the element is positioned
-                position = mUtil.css(el, 'position');
-
-                if (position === "absolute" || position === "relative" || position === "fixed") {
-                    // IE returns 0 when zIndex is not specified
-                    // other browsers return a string
-                    // we ignore the case of nested elements with an explicit value of 0
-                    // <div style="z-index: -10;"><div style="z-index: 0;"></div></div>
-                    value = parseInt(elem.css("zIndex"), 10);
-                    if (!isNaN(value) && value !== 0) {
-                        return value;
-                    }
-                }
-
-                el = el.parentNode;
-            }
-        },
-
         /**
-        * Gets highest z-index of the given element parents
-        * @param {object} el jQuery element object
-        * @returns {number}  
-        */
+         * Gets highest z-index of the given element parents
+         * @param {object} el jQuery element object
+         * @returns {number}  
+         */
         getHighestZindex: function(el) {
             var elem = mUtil.get(el),
                 position, value;
 
-            while (elem.length && elem[0] !== document) {
+            while (elem && elem !== document) {
                 // Ignore z-index if position is set to a value where z-index is ignored by the browser
                 // This makes behavior of this function consistent across browsers
                 // WebKit always returns auto if the element is positioned
-                position = elem.css("position");
+                position = mUtil.css(elem, 'position');
 
                 if (position === "absolute" || position === "relative" || position === "fixed") {
                     // IE returns 0 when zIndex is not specified
                     // other browsers return a string
                     // we ignore the case of nested elements with an explicit value of 0
                     // <div style="z-index: -10;"><div style="z-index: 0;"></div></div>
-                    value = parseInt(elem.css("zIndex"), 10);
+                    value = parseInt(mUtil.css(elem, 'z-index'));
+
                     if (!isNaN(value) && value !== 0) {
                         return value;
                     }
                 }
-                elem = elem.parent();
+
+                elem = elem.parentNode;
             }
+
+            return null;
         },
 
         /**
@@ -472,6 +480,16 @@ var mUtil = function() {
             }
         },
 
+        getByClass: function(query) {
+            var el;
+            
+            if (el = document.getElementsByClassName(query)) {
+                return el[0];
+            } else {
+                return null;
+            }
+        },
+
         /**
          * Checks whether the element has given classes
          * @param {object} el jQuery element object
@@ -498,12 +516,12 @@ var mUtil = function() {
             if (!el) {
                 return;
             }
-            
-            return el.classList ? el.classList.contains(className) : new RegExp('\\b'+ className+'\\b').test(el.className);
+
+            return el.classList ? el.classList.contains(className) : new RegExp('\\b' + className + '\\b').test(el.className);
         },
 
         addClass: function(el, className) {
-            if (!el) {
+            if (!el || typeof className === 'undefined') {
                 return;
             }
 
@@ -515,7 +533,7 @@ var mUtil = function() {
                         el.classList.add(mUtil.trim(classNames[i]));
                     }
                 }
-            } else if (!hasClass(el, className)) {
+            } else if (!mUtil.hasClass(el, className)) {
                 for (var i = 0; i < classNames.length; i++) {
                     el.className += ' ' + mUtil.trim(classNames[i]);
                 }
@@ -570,7 +588,7 @@ var mUtil = function() {
         remove: function(el) {
             if (el && el.parentNode) {
                 el.parentNode.removeChild(el);
-            }            
+            }
         },
 
         find: function(parent, query) {
@@ -611,7 +629,7 @@ var mUtil = function() {
         children: function(el, selector, log) {
             if (!el || !el.childNodes) {
                 return;
-            } 
+            }
 
             var result = [],
                 i = 0,
@@ -620,7 +638,7 @@ var mUtil = function() {
             for (var i; i < l; ++i) {
                 if (el.childNodes[i].nodeType == 1 && mUtil.matches(el.childNodes[i], selector, log)) {
                     result.push(el.childNodes[i]);
-                } 
+                }
             }
 
             return result;
@@ -657,7 +675,7 @@ var mUtil = function() {
 
                     if (mUtilElementDataStore[element.customDataTag] === undefined) {
                         mUtilElementDataStore[element.customDataTag] = {};
-                    }                    
+                    }
 
                     mUtilElementDataStore[element.customDataTag][name] = data;
                 },
@@ -667,13 +685,13 @@ var mUtil = function() {
                 },
 
                 has: function(name) {
-                    return (mUtilElementDataStore[element.customDataTag] && mUtilElementDataStore[element.customDataTag][name]) ? true : false; 
+                    return (mUtilElementDataStore[element.customDataTag] && mUtilElementDataStore[element.customDataTag][name]) ? true : false;
                 },
 
                 remove: function(name) {
                     if (this.has(name)) {
                         delete mUtilElementDataStore[element.customDataTag][name];
-                    } 
+                    }
                 }
             };
         },
@@ -693,13 +711,31 @@ var mUtil = function() {
             }
         },
 
-        offset: function(el) {
-            var rect = el.getBoundingClientRect();
+        offset: function(elem) {
+            var rect, win;
+            elem = mUtil.get(elem);
+
+            if ( !elem ) {
+                return;
+            }
+
+            // Return zeros for disconnected and hidden (display: none) elements (gh-2310)
+            // Support: IE <=11 only
+            // Running getBoundingClientRect on a
+            // disconnected node in IE throws an error
+
+            if ( !elem.getClientRects().length ) {
+                return { top: 0, left: 0 };
+            }
+
+            // Get document-relative position by adding viewport scroll to viewport-relative gBCR
+            rect = elem.getBoundingClientRect();
+            win = elem.ownerDocument.defaultView;
 
             return {
-                top: rect.top + document.body.scrollTop,
-                left: rect.left + document.body.scrollLeft
-            }
+                top: rect.top + win.pageYOffset,
+                left: rect.left + win.pageXOffset
+            };
         },
 
         height: function(el) {
@@ -724,7 +760,7 @@ var mUtil = function() {
             }
         },
 
-        hasAttr: function(el, name)   {
+        hasAttr: function(el, name) {
             el = mUtil.get(el);
 
             if (el == undefined) {
@@ -734,7 +770,7 @@ var mUtil = function() {
             return el.getAttribute(name) ? true : false;
         },
 
-        removeAttr: function(el, name)   {
+        removeAttr: function(el, name) {
             el = mUtil.get(el);
 
             if (el == undefined) {
@@ -750,155 +786,13 @@ var mUtil = function() {
              *  Adapted from jQuery Easing
              */
             var easings = {};
+            var easing;
 
             easings.linear = function(t, b, c, d) {
                 return c * t / d + b;
             };
 
-            /*
-            easings.easeInQuad = function(t, b, c, d) {
-                return c * (t /= d) * t + b;
-            };
-            easings.easeOutQuad = function(t, b, c, d) {
-                return -c * (t /= d) * (t - 2) + b;
-            };
-            easings.easeInOutQuad = function(t, b, c, d) {
-                if ((t /= d / 2) < 1) return c / 2 * t * t + b;
-                return -c / 2 * ((--t) * (t - 2) - 1) + b;
-            };
-            easings.easeInCubic = function(t, b, c, d) {
-                return c * (t /= d) * t * t + b;
-            };
-            easings.easeOutCubic = function(t, b, c, d) {
-                return c * ((t = t / d - 1) * t * t + 1) + b;
-            };
-            easings.easeInOutCubic = function(t, b, c, d) {
-                if ((t /= d / 2) < 1) return c / 2 * t * t * t + b;
-                return c / 2 * ((t -= 2) * t * t + 2) + b;
-            };
-            easings.easeInQuart = function(t, b, c, d) {
-                return c * (t /= d) * t * t * t + b;
-            };
-            easings.easeOutQuart = function(t, b, c, d) {
-                return -c * ((t = t / d - 1) * t * t * t - 1) + b;
-            };
-            easings.easeInOutQuart = function(t, b, c, d) {
-                if ((t /= d / 2) < 1) return c / 2 * t * t * t * t + b;
-                return -c / 2 * ((t -= 2) * t * t * t - 2) + b;
-            };
-            easings.easeInQuint = function(t, b, c, d) {
-                return c * (t /= d) * t * t * t * t + b;
-            };
-            easings.easeOutQuint = function(t, b, c, d) {
-                return c * ((t = t / d - 1) * t * t * t * t + 1) + b;
-            };
-            easings.easeInOutQuint = function(t, b, c, d) {
-                if ((t /= d / 2) < 1) return c / 2 * t * t * t * t * t + b;
-                return c / 2 * ((t -= 2) * t * t * t * t + 2) + b;
-            };
-            easings.easeInSine = function(t, b, c, d) {
-                return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
-            };
-            easings.easeOutSine = function(t, b, c, d) {
-                return c * Math.sin(t / d * (Math.PI / 2)) + b;
-            };
-            easings.easeInOutSine = function(t, b, c, d) {
-                return -c / 2 * (Math.cos(Math.PI * t / d) - 1) + b;
-            };
-            easings.easeInExpo = function(t, b, c, d) {
-                return (t == 0) ? b : c * Math.pow(2, 10 * (t / d - 1)) + b;
-            };
-            easings.easeOutExpo = function(t, b, c, d) {
-                return (t == d) ? b + c : c * (-Math.pow(2, -10 * t / d) + 1) + b;
-            };
-            easings.easeInOutExpo = function(t, b, c, d) {
-                if (t == 0) return b;
-                if (t == d) return b + c;
-                if ((t /= d / 2) < 1) return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
-                return c / 2 * (-Math.pow(2, -10 * --t) + 2) + b;
-            };
-            easings.easeInCirc = function(t, b, c, d) {
-                return -c * (Math.sqrt(1 - (t /= d) * t) - 1) + b;
-            };
-            easings.easeOutCirc = function(t, b, c, d) {
-                return c * Math.sqrt(1 - (t = t / d - 1) * t) + b;
-            };
-            easings.easeInOutCirc = function(t, b, c, d) {
-                if ((t /= d / 2) < 1) return -c / 2 * (Math.sqrt(1 - t * t) - 1) + b;
-                return c / 2 * (Math.sqrt(1 - (t -= 2) * t) + 1) + b;
-            };
-            easings.easeInElastic = function(t, b, c, d) {
-                var p = 0;
-                var a = c;
-                if (t == 0) return b;
-                if ((t /= d) == 1) return b + c;
-                if (!p) p = d * .3;
-                if (a < Math.abs(c)) {
-                    a = c;
-                    var s = p / 4;
-                }
-                else var s = p / (2 * Math.PI) * Math.asin(c / a);
-                return -(a * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
-            };
-            easings.easeOutElastic = function(t, b, c, d) {
-                var p = 0;
-                var a = c;
-                if (t == 0) return b;
-                if ((t /= d) == 1) return b + c;
-                if (!p) p = d * .3;
-                if (a < Math.abs(c)) {
-                    a = c;
-                    var s = p / 4;
-                }
-                else var s = p / (2 * Math.PI) * Math.asin(c / a);
-                return a * Math.pow(2, -10 * t) * Math.sin((t * d - s) * (2 * Math.PI) / p) + c + b;
-            };
-            easings.easeInOutElastic = function(t, b, c, d) {
-                var p = 0;
-                var a = c;
-                if (t == 0) return b;
-                if ((t /= d / 2) == 2) return b + c;
-                if (!p) p = d * (.3 * 1.5);
-                if (a < Math.abs(c)) {
-                    a = c;
-                    var s = p / 4;
-                }
-                else var s = p / (2 * Math.PI) * Math.asin(c / a);
-                if (t < 1) return -.5 * (a * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
-                return a * Math.pow(2, -10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p) * .5 + c + b;
-            };
-            easings.easeInBack = function(t, b, c, d, s) {
-                if (s == undefined) s = 1.70158;
-                return c * (t /= d) * t * ((s + 1) * t - s) + b;
-            };
-            easings.easeOutBack = function(t, b, c, d, s) {
-                if (s == undefined) s = 1.70158;
-                return c * ((t = t / d - 1) * t * ((s + 1) * t + s) + 1) + b;
-            };
-            easings.easeInOutBack = function(t, b, c, d, s) {
-                if (s == undefined) s = 1.70158;
-                if ((t /= d / 2) < 1) return c / 2 * (t * t * (((s *= (1.525)) + 1) * t - s)) + b;
-                return c / 2 * ((t -= 2) * t * (((s *= (1.525)) + 1) * t + s) + 2) + b;
-            };
-            easings.easeInBounce = function(t, b, c, d) {
-                return c - easings.easeOutBounce(d - t, 0, c, d) + b;
-            };
-            easings.easeOutBounce = function(t, b, c, d) {
-                if ((t /= d) < (1 / 2.75)) {
-                    return c * (7.5625 * t * t) + b;
-                } else if (t < (2 / 2.75)) {
-                    return c * (7.5625 * (t -= (1.5 / 2.75)) * t + .75) + b;
-                } else if (t < (2.5 / 2.75)) {
-                    return c * (7.5625 * (t -= (2.25 / 2.75)) * t + .9375) + b;
-                } else {
-                    return c * (7.5625 * (t -= (2.625 / 2.75)) * t + .984375) + b;
-                }
-            };
-            easings.easeInOutBounce = function(t, b, c, d) {
-                if (t < d / 2) return easings.easeInBounce(t * 2, 0, c, d) * .5 + b;
-                return easings.easeOutBounce(t * 2 - d, 0, c, d) * .5 + c * .5 + b;
-            };
-            */
+            easing = easings.linear;
 
             // Early bail out if called incorrectly
             if (typeof from !== 'number' ||
@@ -906,15 +800,6 @@ var mUtil = function() {
                 typeof duration !== 'number' ||
                 typeof update !== 'function') {
                 return;
-            }
-                
-
-            // Determine easing
-            if (typeof easing === 'string' && easings[easing]) {
-                easing = easings[easing];
-            }
-            if (typeof easing !== 'function') {
-                easing = easings.linear;
             }
 
             // Create mock done() function if necessary
@@ -924,7 +809,7 @@ var mUtil = function() {
 
             // Pick implementation (requestAnimationFrame | setTimeout)
             var rAF = window.requestAnimationFrame || function(callback) {
-                window.setTimeout(callback, 1000 / 60);
+                window.setTimeout(callback, 1000 / 50);
             };
 
             // Animation loop
@@ -944,6 +829,7 @@ var mUtil = function() {
                     rAF(loop);
                 }
             }
+
             update(from);
 
             // Start animation loop
@@ -963,15 +849,15 @@ var mUtil = function() {
                 // the element is hidden so:
                 // making the el block so we can meassure its height but still be hidden
                 el.style.cssText = 'position: absolute; visibility: hidden; display: block;';
-                
+
                 if (prop == 'width') {
                     value = el.offsetWidth;
                 } else if (prop == 'height') {
                     value = el.offsetHeight;
-                } 
+                }
 
                 el.style.cssText = '';
-                    
+
                 // store it in cache
                 el.setAttribute('m-hidden-' + prop, value);
 
@@ -990,7 +876,7 @@ var mUtil = function() {
             return mUtil.actualCss(el, 'width', cache);
         },
 
-        getScroll: function (element, method) {
+        getScroll: function(element, method) {
             // The passed in `method` value should be 'Top' or 'Left'
             method = 'scroll' + method;
             return (element == window || element == document) ? (
@@ -1002,7 +888,11 @@ var mUtil = function() {
 
         css: function(el, styleProp, value) {
             el = mUtil.get(el);
-            
+
+            if (!el) {
+                return;
+            }
+
             if (value !== undefined) {
                 el.style[styleProp] = value;
             } else {
@@ -1020,9 +910,10 @@ var mUtil = function() {
                     });
                     value = el.currentStyle[styleProp];
                     // convert other units to pixels on IE
-                    if (/^\d+(em|pt|%|ex)?$/i.test(value)) { 
+                    if (/^\d+(em|pt|%|ex)?$/i.test(value)) {
                         return (function(value) {
-                            var oldLeft = el.style.left, oldRsLeft = el.runtimeStyle.left;
+                            var oldLeft = el.style.left,
+                                oldRsLeft = el.runtimeStyle.left;
                             el.runtimeStyle.left = el.currentStyle.left;
                             el.style.left = value || 0;
                             value = el.style.pixelLeft + "px";
@@ -1037,11 +928,11 @@ var mUtil = function() {
         },
 
         slide: function(el, dir, speed, callback, recalcMaxHeight) {
-            if ( !el || (dir == 'up' && mUtil.visible(el) === false) || (dir == 'down' && mUtil.visible(el) === true) )  {
+            if (!el || (dir == 'up' && mUtil.visible(el) === false) || (dir == 'down' && mUtil.visible(el) === true)) {
                 return;
             }
 
-            speed = (speed ? speed : 600); 
+            speed = (speed ? speed : 600);
             var calcHeight = mUtil.actualHeight(el);
             var calcPaddingTop = false;
             var calcPaddingBottom = false;
@@ -1063,7 +954,7 @@ var mUtil = function() {
             }
 
             if (dir == 'up') { // up          
-                el.style.cssText = 'display: block; overflow: hidden;';  
+                el.style.cssText = 'display: block; overflow: hidden;';
 
                 if (calcPaddingTop) {
                     mUtil.animate(0, calcPaddingTop, speed, function(value) {
@@ -1086,7 +977,7 @@ var mUtil = function() {
                 });
 
 
-            } else if(dir == 'down') { // down
+            } else if (dir == 'down') { // down
                 el.style.cssText = 'display: block; overflow: hidden;';
 
                 if (calcPaddingTop) {
@@ -1104,7 +995,7 @@ var mUtil = function() {
                         el.style.paddingBottom = '';
                     });
                 }
-                
+
                 mUtil.animate(0, calcHeight, speed, function(value) {
                     el.style.height = value + 'px';
                 }, 'linear', function() {
@@ -1130,12 +1021,12 @@ var mUtil = function() {
 
         hide: function(el) {
             el.style.display = 'none';
-        }, 
+        },
 
         addEvent: function(el, type, handler, one) {
             el = mUtil.get(el);
-            if(typeof el !=='undefined'){
-	            el.addEventListener(type, handler);
+            if (typeof el !== 'undefined') {
+                el.addEventListener(type, handler);
             }
         },
 
@@ -1155,7 +1046,7 @@ var mUtil = function() {
                 var targets = element.querySelectorAll(selector);
                 var target = e.target;
 
-                while(target && target !== element) {                    
+                while (target && target !== element) {
                     for (var i = 0, j = targets.length; i < j; i++) {
                         if (target === targets[i]) {
                             handler.call(target, e);
@@ -1176,7 +1067,7 @@ var mUtil = function() {
                 return;
             }
 
-            mUtil.removeEvent(element, event, mUtilDelegatedEventHandlers[eventId]);   
+            mUtil.removeEvent(element, event, mUtilDelegatedEventHandlers[eventId]);
 
             delete mUtilDelegatedEventHandlers[eventId];
         },
@@ -1193,29 +1084,30 @@ var mUtil = function() {
         },
 
         hash: function(str) {
-            var hash = 0, i, chr;
+            var hash = 0,
+                i, chr;
 
             if (str.length === 0) return hash;
             for (i = 0; i < str.length; i++) {
-                chr   = str.charCodeAt(i);
-                hash  = ((hash << 5) - hash) + chr;
+                chr = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + chr;
                 hash |= 0; // Convert to 32bit integer
             }
-            
+
             return hash;
         },
 
         animateClass: function(el, animationName, callback) {
             var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
-            
+
             mUtil.addClass(el, 'animated ' + animationName);
-            
+
             mUtil.one(el, animationEnd, function() {
                 mUtil.removeClass(el, 'animated ' + animationName);
             });
 
             if (callback) {
-                mUtil.one(el. animationEnd, callback);
+                mUtil.one(el.animationEnd, callback);
             }
         },
 
@@ -1233,27 +1125,37 @@ var mUtil = function() {
             }
         },
 
-        scrollTo: function(el, offset, speed) {   
-            if (!speed) speed = 600;
-            zenscroll.toY(el, speed);
+        scrollTo: function(target, offset, duration) {
+            var duration = duration ? duration : 500;
+            var target = mUtil.get(target);
+            var targetPos = target ? mUtil.offset(target).top : 0;
+            var scrollPos = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+            var from, to;
+
+            if (targetPos > scrollPos) {
+                from = targetPos;
+                to = scrollPos;
+            } else {
+                from = scrollPos;
+                to = targetPos;
+            }
+
+            if (offset) {
+                to += offset;
+            }
+
+            mUtil.animate(from, to, duration, function(value) {
+                document.documentElement.scrollTop = value;
+                document.body.parentNode.scrollTop = value;
+                document.body.scrollTop = value;
+            }); //, easing, done
         },
 
-        scrollToViewport: function(el, speed) {
-            if (!speed) speed = 1200;
-            zenscroll.intoView(el, speed);
+        scrollTop: function(offset, duration) {
+            mUtil.scrollTo(null, offset, duration);
         },
 
-        scrollToCenter: function(el, speed) {
-            if (!speed) speed = 1200;
-            zenscroll.center(el, speed);
-        },
-
-        scrollTop: function(speed) {
-            if (!speed) speed = 600;
-            zenscroll.toY(0, speed);
-        },
-
-        isArray: function(obj){
+        isArray: function(obj) {
             return obj && Array.isArray(obj);
         },
 
@@ -1262,6 +1164,171 @@ var mUtil = function() {
                 callback();
             } else {
                 document.addEventListener('DOMContentLoaded', callback);
+            }
+        },
+
+        isEmpty: function(obj) {
+            for (var prop in obj) {
+                if (obj.hasOwnProperty(prop)) {
+                    return false;
+                }
+            }
+
+            return true;
+        },
+
+        numberString: function(nStr) {
+            nStr += '';
+            var x = nStr.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return x1 + x2;
+        },
+
+        detectIE: function() {
+            var ua = window.navigator.userAgent;
+
+            // Test values; Uncomment to check result …
+
+            // IE 10
+            // ua = 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0)';
+
+            // IE 11
+            // ua = 'Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko';
+
+            // Edge 12 (Spartan)
+            // ua = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36 Edge/12.0';
+
+            // Edge 13
+            // ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2486.0 Safari/537.36 Edge/13.10586';
+
+            var msie = ua.indexOf('MSIE ');
+            if (msie > 0) {
+                // IE 10 or older => return version number
+                return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
+            }
+
+            var trident = ua.indexOf('Trident/');
+            if (trident > 0) {
+                // IE 11 => return version number
+                var rv = ua.indexOf('rv:');
+                return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
+            }
+
+            var edge = ua.indexOf('Edge/');
+            if (edge > 0) {
+                // Edge (IE 12+) => return version number
+                return parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
+            }
+
+            // other browser
+            return false;
+        },
+
+        isRTL: function() {
+            return (mUtil.attr(mUtil.get('html'), 'direction') == 'rtl');
+        },
+
+        //== Scroller
+        scrollerInit: function(element, options) {
+            //== Define init function
+            function init() {
+                var ps;
+                var height;
+
+                if (options.height instanceof Function) {
+                    height = parseInt(options.height.call());
+                } else {
+                    height = parseInt(options.height);
+                }
+
+                //== Destroy scroll on table and mobile modes
+                if (options.disableForMobile && mUtil.isInResponsiveRange('tablet-and-mobile')) {
+                    if (ps = mUtil.data(element).get('ps')) {
+                        if (options.resetHeightOnDestroy) {
+                            mUtil.css(element, 'height', 'auto');
+                        } else {
+                            mUtil.css(element, 'overflow', 'auto');
+                            if (height > 0) {
+                                mUtil.css(element, 'height', height + 'px');
+                            }
+                        }
+
+                        ps.destroy();
+                        ps = mUtil.data(element).remove('ps');
+                    } else if (height > 0){
+                        mUtil.css(element, 'overflow', 'auto');
+                        mUtil.css(element, 'height', height + 'px');
+                    }
+
+                    return;
+                }
+
+                if (height > 0) {
+                    mUtil.css(element, 'height', height + 'px');
+                }
+
+                mUtil.css(element, 'overflow', 'hidden');
+
+                //== Init scroll
+                if (ps = mUtil.data(element).get('ps')) {
+                    ps.update();
+                } else {
+                    mUtil.addClass(element, 'm-scroller');
+                    ps = new PerfectScrollbar(element, {
+                        wheelSpeed: 0.5,
+                        swipeEasing: true,
+                        wheelPropagation: false,
+                        minScrollbarLength: 40,
+                        suppressScrollX: true
+                    });
+
+                    mUtil.data(element).set('ps', ps);
+                }
+            }
+
+            //== Init
+            init();
+
+            //== Handle window resize
+            if (options.handleWindowResize) {
+                mUtil.addResizeHandler(function() {
+                    init();
+                });
+            }
+        },
+
+        scrollerUpdate: function(element) {
+            var ps;
+            if (ps = mUtil.data(element).get('ps')) {
+                console.log('update!');
+                ps.update();
+            }
+        },
+
+        scrollersUpdate: function(parent) {
+            var scrollers = mUtil.findAll(parent, '.ps');
+            for (var i = 0, len = scrollers.length; i < len; i++) {
+                mUtil.scrollerUpdate(scrollers[i]);
+            }
+        },
+
+        scrollerTop: function(element) {
+            var ps;
+            if (ps = mUtil.data(element).get('ps')) {
+                element.scrollTop = 0;
+            }
+        },
+
+        scrollerDestroy: function(element) {
+            var ps;
+            if (ps = mUtil.data(element).get('ps')) {
+                ps.destroy();
+                ps = mUtil.data(element).remove('ps');
             }
         }
     }
@@ -1298,7 +1365,8 @@ var mApp = function() {
         var skin = el.data('skin') ? 'm-tooltip--skin-' + el.data('skin') : '';
         var width = el.data('width') == 'auto' ? 'm-tooltop--auto-width' : '';
         var triggerValue = el.data('trigger') ? el.data('trigger') : 'hover';
-            
+        var placement = el.data('placement') ? el.data('placement') : 'left';
+                    
         el.tooltip({
             trigger: triggerValue,
             template: '<div class="m-tooltip ' + skin + ' ' + width + ' tooltip" role="tooltip">\
@@ -1384,37 +1452,16 @@ var mApp = function() {
     /**
     * Initializes scrollable contents
     */
-    var initScrollables = function() {
+    var initScrollers = function() {
         $('[data-scrollable="true"]').each(function(){
-            var maxHeight;
-            var height;
             var el = $(this);
-
-            if (mUtil.isInResponsiveRange('tablet-and-mobile')) {
-                if (el.data('mobile-max-height')) {
-                    maxHeight = el.data('mobile-max-height');
+            mUtil.scrollerInit(this, {disableForMobile: true, handleWindowResize: true, height: function() {
+                if (mUtil.isInResponsiveRange('tablet-and-mobile') && el.data('mobile-height')) {
+                    return el.data('mobile-height');
                 } else {
-                    maxHeight = el.data('max-height');
+                    return el.data('height');
                 }
-
-                if (el.data('mobile-height')) {
-                    height = el.data('mobile-height');
-                } else {
-                    height = el.data('height');
-                }
-            } else {
-                maxHeight = el.data('max-height');
-                height = el.data('max-height');
-            }
-
-            if (maxHeight) {
-                el.css('max-height', maxHeight);
-            }
-            if (height) {
-                el.css('height', height);
-            }
-
-            mApp.initScroller(el, {});
+            }});
         });
     }
 
@@ -1506,7 +1553,7 @@ var mApp = function() {
         */
         initComponents: function() {
             hideTouchWarning();
-            initScrollables();
+            initScrollers();
             initTooltips();
             initPopovers();
             initAlerts();
@@ -1575,143 +1622,6 @@ var mApp = function() {
         // function to init portlets
         initPortlets: function() {
             initPortlets();
-        },
-
-        /**
-        * Scrolls to an element with animation
-        * @param {object} el jQuery element object
-        * @param {number} offset Offset to element scroll position
-        */
-        scrollTo: function(target, offset) {
-            el = $(target);
-
-            var pos = (el && el.length > 0) ? el.offset().top : 0;
-            pos = pos + (offset ? offset : 0);
-
-            jQuery('html,body').animate({
-                scrollTop: pos
-            }, 'slow');
-        },
-
-        /**
-        * Scrolls until element is centered in the viewport 
-        * @param {object} el jQuery element object
-        */
-        // wrJangoer function to scroll(focus) to an element
-        scrollToViewport: function(el) {
-            var elOffset = $(el).offset().top;
-            var elHeight = el.height();
-            var windowHeight = mUtil.getViewPort().height;
-            var offset = elOffset - ((windowHeight / 2) - (elHeight / 2));
-
-            jQuery('html,body').animate({
-                scrollTop: offset
-            }, 'slow');
-        },
-
-        /**
-        * Scrolls to the top of the page
-        */
-        // function to scroll to the top
-        scrollTop: function() {
-            mApp.scrollTo();
-        },
-
-        /**
-        * Initializes scrollable content using mCustomScrollbar plugin
-        * @param {object} el jQuery element object
-        * @param {object} options mCustomScrollbar plugin options(refer: http://manos.malihu.gr/jquery-custom-content-scroller/)
-        */
-        initScroller: function(el, options, doNotDestroy) {
-            if (mUtil.isMobileDevice()) {
-                el.css('overflow', 'auto');
-            } else {
-                if (doNotDestroy !== true) {
-                     mApp.destroyScroller(el); 
-                }               
-                el.mCustomScrollbar({
-                    scrollInertia: 0,
-                    autoDraggerLength: true,
-                    autoHideScrollbar: true,
-                    autoExpandScrollbar: false,
-                    alwaysShowScrollbar: 0,
-                    axis: el.data('axis') ? el.data('axis') : 'y',
-                    mouseWheel: {
-                        scrollAmount: 120,
-                        preventDefault: true
-                    },
-                    setHeight: (options.height ? options.height : ''),
-                    theme:"minimal-dark"
-                });
-            }           
-        },
-
-        /**
-        * Destroys scrollable content's mCustomScrollbar plugin instance
-        * @param {object} el jQuery element object
-        */
-        destroyScroller: function(el) {
-            el.mCustomScrollbar("destroy");
-            el.removeClass('mCS_destroyed');
-        },
-
-        /**
-        * Shows bootstrap alert
-        * @param {object} options
-        * @returns {string} ID attribute of the created alert
-        */
-        alert: function(options) {
-            options = $.extend(true, {
-                container: "", // alerts parent container(by default placed after the page breadcrumbs)
-                place: "append", // "append" or "prepend" in container 
-                type: 'success', // alert's type
-                message: "", // alert's message
-                close: true, // make alert closable
-                reset: true, // close all previouse alerts first
-                focus: true, // auto scroll to the alert after shown
-                closeInSeconds: 0, // auto close after defined seconds
-                icon: "" // put icon before the message
-            }, options);
-
-            var id = mUtil.getUniqueID("App_alert");
-
-            var html = '<div id="' + id + '" class="custom-alerts alert alert-' + options.type + ' fade in">' + (options.close ? '<button type="button" class="close" data-dismiss="alert" aria-hidden="true"></button>' : '') + (options.icon !== "" ? '<i class="fa-lg fa fa-' + options.icon + '"></i>  ' : '') + options.message + '</div>';
-
-            if (options.reset) {
-                $('.custom-alerts').remove();
-            }
-
-            if (!options.container) {
-                if ($('.page-fixed-main-content').size() === 1) {
-                    $('.page-fixed-main-content').prepend(html);
-                } else if (($('body').hasClass("page-container-bg-solid") || $('body').hasClass("page-content-white")) && $('.page-head').size() === 0) {
-                    $('.page-title').after(html);
-                } else {
-                    if ($('.page-bar').size() > 0) {
-                        $('.page-bar').after(html);
-                    } else {
-                        $('.page-breadcrumb, .breadcrumbs').after(html);
-                    }
-                }
-            } else {
-                if (options.place == "append") {
-                    $(options.container).append(html);
-                } else {
-                    $(options.container).prepend(html);
-                }
-            }
-
-            if (options.focus) {
-                mApp.scrollTo($('#' + id));
-            }
-
-            if (options.closeInSeconds > 0) {
-                setTimeout(function() {
-                    $('#' + id).remove();
-                }, options.closeInSeconds * 1000);
-            }
-
-            return id;
         },
 
         /**
@@ -1788,9 +1698,9 @@ var mApp = function() {
                     zIndex: '10'
                 },
                 onUnblock: function() {
-                    if (el) {
-                        el.css('position', '');
-                        el.css('zoom', '');
+                    if (el && el[0]) {
+                        mUtil.css(el[0], 'position', '');
+                        mUtil.css(el[0], 'zoom', '');
                     }                    
                 }
             };
@@ -1871,12 +1781,12 @@ var mApp = function() {
 $(document).ready(function() {
     mApp.init({});
 });
-(function($) {
+(function ($) {
 
 	if (typeof mUtil === 'undefined') throw new Error('mUtil is required and must be included before mDatatable.');
 
 	// plugin setup
-	$.fn.mDatatable = function(options) {
+	$.fn.mDatatable = function (options) {
 		if ($(this).length === 0) {
 			console.log('No mDatatable element exist.');
 			return;
@@ -1906,10 +1816,12 @@ $(document).ready(function() {
 			stateId: 'meta',
 			ajaxParams: {},
 
-			init: function(options) {
+			init: function (options) {
+				var isHtmlTable = false;
 				// data source option empty is normal table
 				if (options.data.source === null) {
 					Plugin.extractTable();
+					isHtmlTable = true;
 				}
 
 				Plugin.setupBaseDOM.call();
@@ -1925,7 +1837,7 @@ $(document).ready(function() {
 				if (datatable.debug) Plugin.stateRemove(Plugin.stateId);
 
 				// initialize extensions
-				$.each(Plugin.getOption('extensions'), function(extName, extOptions) {
+				$.each(Plugin.getOption('extensions'), function (extName, extOptions) {
 					if (typeof $.fn.mDatatable[extName] === 'function')
 						new $.fn.mDatatable[extName](datatable, extOptions);
 				});
@@ -1944,8 +1856,13 @@ $(document).ready(function() {
 					Plugin.dataRender();
 				}
 
-				Plugin.setHeadTitle();
-				Plugin.setHeadTitle(datatable.tableFoot);
+				if (!isHtmlTable) {
+					// if not a html table, setup header
+					Plugin.setHeadTitle();
+					if (Plugin.getOption('layout.footer')) {
+						Plugin.setHeadTitle(datatable.tableFoot);
+					}
+				}
 
 				// hide header
 				if (typeof options.layout.header !== 'undefined' &&
@@ -1977,9 +1894,9 @@ $(document).ready(function() {
 
 				$(datatable).height('');
 
-				$(Plugin.getOption('search.input')).on('keyup', function(e) {
+				$(Plugin.getOption('search.input')).on('keyup', function (e) {
 					if (Plugin.getOption('search.onEnter') && e.which !== 13) return;
-					Plugin.search($(this).val().toLowerCase());
+					Plugin.search($(this).val());
 				});
 
 				return datatable;
@@ -1988,56 +1905,49 @@ $(document).ready(function() {
 			/**
 			 * Extract static HTML table content into datasource
 			 */
-			extractTable: function() {
+			extractTable: function () {
 				var columns = [];
-				var headers = $(datatable).
-					find('tr:first-child th').
-					get().
-					map(function(cell, i) {
-						var field = $(cell).data('field');
-						if (typeof field === 'undefined') {
-							field = $(cell).text().trim();
+				var headers = $(datatable).find('tr:first-child th').get().map(function (cell, i) {
+					var field = $(cell).data('field');
+					if (typeof field === 'undefined') {
+						field = $(cell).text().trim();
+					}
+					var column = {field: field, title: field};
+					for (var ii in options.columns) {
+						if (options.columns[ii].field === field) {
+							column = $.extend(true, {}, options.columns[ii], column);
 						}
-						var column = {field: field, title: field};
-						for (var ii in options.columns) {
-							if (options.columns[ii].field === field) {
-								column = $.extend(true, {}, options.columns[ii], column);
-							}
-						}
-						columns.push(column);
-						return field;
-					});
+					}
+					columns.push(column);
+					return field;
+				});
 				// auto create columns config
 				options.columns = columns;
 
 				var rowProp = [];
-				var data = $(datatable).find('tr').get().map(function(row) {
-					if ($(row).find('td').length) {
-						rowProp.push($(row).prop('attributes'));
+				var source = [];
+
+				$(datatable).find('tr').each(function () {
+					if ($(this).find('td').length) {
+						rowProp.push($(this).prop('attributes'));
 					}
-					return $(row).find('td').get().map(function(cell, i) {
-						return $(cell).html();
+					var td = {};
+					$(this).find('td').each(function (i, cell) {
+						td[headers[i]] = cell.innerHTML.trim();
 					});
+					if (!mUtil.isEmpty(td)) {
+						source.push(td);
+					}
 				});
 
 				options.data.attr.rowProps = rowProp;
-
-				var source = [];
-				$.each(data, function(i, row) {
-					if (row.length === 0) return;
-					var td = {};
-					$.each(row, function(index, value) {
-						td[headers[index]] = $.trim(value);
-					});
-					source.push(td);
-				});
 				options.data.source = source;
 			},
 
 			/**
 			 * One time layout update on init
 			 */
-			layoutUpdate: function() {
+			layoutUpdate: function () {
 				// setup nested datatable, if option enabled
 				Plugin.setupSubDatatable.call();
 
@@ -2066,11 +1976,11 @@ $(document).ready(function() {
 				$(datatable).trigger('m-datatable--on-layout-updated', {table: $(datatable.wrap).attr('id')});
 			},
 
-			lockTable: function() {
+			lockTable: function () {
 				// todo; revise lock table responsive
 				var lock = {
 					lockEnabled: false,
-					init: function() {
+					init: function () {
 						// check if table should be locked columns
 						lock.lockEnabled = Plugin.lockEnabledColumns();
 						if (lock.lockEnabled.left.length === 0 &&
@@ -2079,8 +1989,8 @@ $(document).ready(function() {
 						}
 						lock.enable();
 					},
-					enable: function() {
-						var enableLock = function(tablePart) {
+					enable: function () {
+						var enableLock = function (tablePart) {
 							// check if already has lock column
 							if ($(tablePart).find('.m-datatable__lock').length > 0) {
 								Plugin.log('Locked container already exist in: ', tablePart);
@@ -2093,24 +2003,15 @@ $(document).ready(function() {
 							}
 
 							// locked div container
-							var lockLeft = $('<div/>').
-								addClass('m-datatable__lock m-datatable__lock--left');
-							var lockScroll = $('<div/>').
-								addClass('m-datatable__lock m-datatable__lock--scroll');
-							var lockRight = $('<div/>').
-								addClass('m-datatable__lock m-datatable__lock--right');
+							var lockLeft = $('<div/>').addClass('m-datatable__lock m-datatable__lock--left');
+							var lockScroll = $('<div/>').addClass('m-datatable__lock m-datatable__lock--scroll');
+							var lockRight = $('<div/>').addClass('m-datatable__lock m-datatable__lock--right');
 
-							$(tablePart).find('.m-datatable__row').each(function() {
-								var rowLeft = $('<tr/>').
-									addClass('m-datatable__row').
-									appendTo(lockLeft);
-								var rowScroll = $('<tr/>').
-									addClass('m-datatable__row').
-									appendTo(lockScroll);
-								var rowRight = $('<tr/>').
-									addClass('m-datatable__row').
-									appendTo(lockRight);
-								$(this).find('.m-datatable__cell').each(function() {
+							$(tablePart).find('.m-datatable__row').each(function () {
+								var rowLeft = $('<tr/>').addClass('m-datatable__row').appendTo(lockLeft);
+								var rowScroll = $('<tr/>').addClass('m-datatable__row').appendTo(lockScroll);
+								var rowRight = $('<tr/>').addClass('m-datatable__row').appendTo(lockRight);
+								$(this).find('.m-datatable__cell').each(function () {
 									var locked = $(this).data('locked');
 									if (typeof locked !== 'undefined') {
 										if (typeof locked.left !== 'undefined' || locked === true) {
@@ -2141,10 +2042,10 @@ $(document).ready(function() {
 							}
 						};
 
-						$(datatable.table).find('thead,tbody,tfoot').each(function() {
+						$(datatable.table).find('thead,tbody,tfoot').each(function () {
 							var tablePart = this;
 							if ($(this).find('.m-datatable__lock').length === 0) {
-								$(this).ready(function() {
+								$(this).ready(function () {
 									enableLock(tablePart);
 								});
 							}
@@ -2158,19 +2059,29 @@ $(document).ready(function() {
 			/**
 			 * Render everything for resize
 			 */
-			fullRender: function() {
-				// todo; full render datatable for specific condition only
-				Plugin.spinnerCallback(true);
-				$(datatable.wrap).removeClass('m-datatable--loaded');
+			fullRender: function () {
+				if (Plugin.isLocked()) {
 
-				Plugin.insertData();
+					$(datatable.tableHead).empty();
+					Plugin.setHeadTitle();
+					if (Plugin.getOption('layout.footer')) {
+						$(datatable.tableFoot).empty();
+						Plugin.setHeadTitle(datatable.tableFoot);
+					}
+
+					// todo; full render datatable for specific condition only
+					Plugin.spinnerCallback(true);
+					$(datatable.wrap).removeClass('m-datatable--loaded');
+
+					Plugin.insertData();
+				}
 			},
 
-			lockEnabledColumns: function() {
+			lockEnabledColumns: function () {
 				var screen = $(window).width();
 				var columns = options.columns;
 				var enabled = {left: [], right: []};
-				$.each(columns, function(i, column) {
+				$.each(columns, function (i, column) {
 					if (typeof column.locked !== 'undefined') {
 						if (typeof column.locked.left !== 'undefined') {
 							if (mUtil.getBreakpoint(column.locked.left) <= screen) {
@@ -2192,9 +2103,9 @@ $(document).ready(function() {
 			 * @param e
 			 * @param args
 			 */
-			afterRender: function(e, args) {
+			afterRender: function (e, args) {
 				if (args.table == $(datatable.wrap).attr('id')) {
-					$(datatable).ready(function() {
+					$(datatable).ready(function () {
 						if (!Plugin.isLocked()) {
 							Plugin.redraw();
 							// work on non locked columns
@@ -2205,20 +2116,15 @@ $(document).ready(function() {
 							}
 						}
 
-						// row even class
-						$(datatable.tableBody).find('.m-datatable__row').removeClass('m-datatable__row--even');
-						if ($(datatable.wrap).hasClass('m-datatable--subtable')) {
-							$(datatable.tableBody).find('.m-datatable__row:not(.m-datatable__row-detail):even').addClass('m-datatable__row--even');
-						} else {
-							$(datatable.tableBody).find('.m-datatable__row:nth-child(even)').addClass('m-datatable__row--even');
-						}
+						Plugin.rowEvenOdd.call();
 
 						// redraw locked columns table
 						if (Plugin.isLocked()) Plugin.redraw();
 						$(datatable.tableBody).css('visibility', '');
 						$(datatable.wrap).addClass('m-datatable--loaded');
-						Plugin.scrollbar.call();
+
 						Plugin.sorting.call();
+						Plugin.scrollbar.call();
 
 						// Plugin.hoverColumn.call();
 						Plugin.spinnerCallback(false);
@@ -2228,75 +2134,53 @@ $(document).ready(function() {
 
 			hoverTimer: 0,
 			isScrolling: false,
-			setupHover: function() {
-				$(window).scroll(function(e) {
+			setupHover: function () {
+				$(window).scroll(function (e) {
 					// stop hover when scrolling
 					clearTimeout(Plugin.hoverTimer);
 					Plugin.isScrolling = true;
 				});
 
-				$(datatable.tableBody).
-					find('.m-datatable__cell').
-					off('mouseenter', 'mouseleave').
-					on('mouseenter', function() {
-						// reset scroll timer to hover class
-						Plugin.hoverTimer = setTimeout(function() {
-							Plugin.isScrolling = false;
-						}, 200);
-						if (Plugin.isScrolling) return;
+				$(datatable.tableBody).find('.m-datatable__cell').off('mouseenter', 'mouseleave').on('mouseenter', function () {
+					// reset scroll timer to hover class
+					Plugin.hoverTimer = setTimeout(function () {
+						Plugin.isScrolling = false;
+					}, 200);
+					if (Plugin.isScrolling) return;
 
-						// normal table
-						var row = $(this).
-							closest('.m-datatable__row').
-							addClass('m-datatable__row--hover');
-						var index = $(row).index() + 1;
+					// normal table
+					var row = $(this).closest('.m-datatable__row').addClass('m-datatable__row--hover');
+					var index = $(row).index() + 1;
 
-						// lock table
-						$(row).
-							closest('.m-datatable__lock').
-							parent().
-							find('.m-datatable__row:nth-child(' + index + ')').
-							addClass('m-datatable__row--hover');
-					}).
-					on('mouseleave', function() {
-						// normal table
-						var row = $(this).
-							closest('.m-datatable__row').
-							removeClass('m-datatable__row--hover');
-						var index = $(row).index() + 1;
+					// lock table
+					$(row).closest('.m-datatable__lock').parent().find('.m-datatable__row:nth-child(' + index + ')').addClass('m-datatable__row--hover');
+				}).on('mouseleave', function () {
+					// normal table
+					var row = $(this).closest('.m-datatable__row').removeClass('m-datatable__row--hover');
+					var index = $(row).index() + 1;
 
-						// look table
-						$(row).
-							closest('.m-datatable__lock').
-							parent().
-							find('.m-datatable__row:nth-child(' + index + ')').
-							removeClass('m-datatable__row--hover');
-					});
+					// look table
+					$(row).closest('.m-datatable__lock').parent().find('.m-datatable__row:nth-child(' + index + ')').removeClass('m-datatable__row--hover');
+				});
 			},
 
 			/**
 			 * Adjust width of locked table containers by resize handler
 			 * @returns {number}
 			 */
-			adjustLockContainer: function() {
+			adjustLockContainer: function () {
 				if (!Plugin.isLocked()) return 0;
 
 				// refer to head dimension
 				var containerWidth = $(datatable.tableHead).width();
-				var lockLeft = $(datatable.tableHead).
-					find('.m-datatable__lock--left').
-					width();
-				var lockRight = $(datatable.tableHead).
-					find('.m-datatable__lock--right').
-					width();
+				var lockLeft = $(datatable.tableHead).find('.m-datatable__lock--left').width();
+				var lockRight = $(datatable.tableHead).find('.m-datatable__lock--right').width();
 
 				if (typeof lockLeft === 'undefined') lockLeft = 0;
 				if (typeof lockRight === 'undefined') lockRight = 0;
 
 				var lockScroll = Math.floor(containerWidth - lockLeft - lockRight);
-				$(datatable.table).
-					find('.m-datatable__lock--scroll').
-					css('width', lockScroll);
+				$(datatable.table).find('.m-datatable__lock--scroll').css('width', lockScroll);
 
 				return lockScroll;
 			},
@@ -2304,52 +2188,41 @@ $(document).ready(function() {
 			/**
 			 * todo; not in use
 			 */
-			dragResize: function() {
+			dragResize: function () {
 				var pressed = false;
 				var start = undefined;
 				var startX, startWidth;
-				$(datatable.tableHead).
-					find('.m-datatable__cell').
-					mousedown(function(e) {
-						start = $(this);
-						pressed = true;
-						startX = e.pageX;
-						startWidth = $(this).width();
-						$(start).addClass('m-datatable__cell--resizing');
+				$(datatable.tableHead).find('.m-datatable__cell').mousedown(function (e) {
+					start = $(this);
+					pressed = true;
+					startX = e.pageX;
+					startWidth = $(this).width();
+					$(start).addClass('m-datatable__cell--resizing');
 
-					}).
-					mousemove(function(e) {
-						if (pressed) {
-							var i = $(start).index();
-							var tableBody = $(datatable.tableBody);
-							var ifLocked = $(start).closest('.m-datatable__lock');
+				}).mousemove(function (e) {
+					if (pressed) {
+						var i = $(start).index();
+						var tableBody = $(datatable.tableBody);
+						var ifLocked = $(start).closest('.m-datatable__lock');
 
-							if (ifLocked) {
-								var lockedIndex = $(ifLocked).index();
-								tableBody = $(datatable.tableBody).
-									find('.m-datatable__lock').
-									eq(lockedIndex);
-							}
-
-							$(tableBody).find('.m-datatable__row').each(function(tri, tr) {
-								$(tr).
-									find('.m-datatable__cell').
-									eq(i).
-									width(startWidth + (e.pageX - startX)).
-									children().
-									width(startWidth + (e.pageX - startX));
-							});
-
-							$(start).children().css('width', startWidth + (e.pageX - startX));
+						if (ifLocked) {
+							var lockedIndex = $(ifLocked).index();
+							tableBody = $(datatable.tableBody).find('.m-datatable__lock').eq(lockedIndex);
 						}
 
-					}).
-					mouseup(function() {
-						$(start).removeClass('m-datatable__cell--resizing');
-						pressed = false;
-					});
+						$(tableBody).find('.m-datatable__row').each(function (tri, tr) {
+							$(tr).find('.m-datatable__cell').eq(i).width(startWidth + (e.pageX - startX)).children().width(startWidth + (e.pageX - startX));
+						});
 
-				$(document).mouseup(function() {
+						$(start).children().css('width', startWidth + (e.pageX - startX));
+					}
+
+				}).mouseup(function () {
+					$(start).removeClass('m-datatable__cell--resizing');
+					pressed = false;
+				});
+
+				$(document).mouseup(function () {
 					$(start).removeClass('m-datatable__cell--resizing');
 					pressed = false;
 				});
@@ -2358,7 +2231,7 @@ $(document).ready(function() {
 			/**
 			 * To prepare placeholder for table before content is loading
 			 */
-			initHeight: function() {
+			initHeight: function () {
 				if (options.layout.height && options.layout.scroll) {
 					var theadHeight = $(datatable.tableHead).find('.m-datatable__row').height();
 					var tfootHeight = $(datatable.tableFoot).find('.m-datatable__row').height();
@@ -2370,45 +2243,38 @@ $(document).ready(function() {
 						bodyHeight -= tfootHeight;
 					}
 					$(datatable.tableBody).css('max-height', bodyHeight);
+
+					// set scrollable area fixed height
+					$(datatable.tableBody).find('.m-datatable__lock--scroll').css('height', bodyHeight);
 				}
 			},
 
 			/**
 			 * Setup base DOM (table, thead, tbody, tfoot) and create if not exist.
 			 */
-			setupBaseDOM: function() {
+			setupBaseDOM: function () {
 				// keep original state before mDatatable initialize
 				datatable.initialDatatable = $(datatable).clone();
 
 				// main element
 				if ($(datatable).prop('tagName') === 'TABLE') {
 					// if main init element is <table>, wrap with div
-					datatable.table = $(datatable).
-						removeClass('m-datatable').
-						addClass('m-datatable__table');
+					datatable.table = $(datatable).removeClass('m-datatable').addClass('m-datatable__table');
 					if ($(datatable.table).parents('.m-datatable').length === 0) {
-						datatable.table.wrap($('<div/>').
-							addClass('m-datatable').
-							addClass('m-datatable--' + options.layout.theme));
+						datatable.table.wrap($('<div/>').addClass('m-datatable').addClass('m-datatable--' + options.layout.theme));
 						datatable.wrap = $(datatable.table).parent();
 					}
 				} else {
 					// create table
-					datatable.wrap = $(datatable).
-						addClass('m-datatable').
-						addClass('m-datatable--' + options.layout.theme);
-					datatable.table = $('<table/>').
-						addClass('m-datatable__table').
-						appendTo(datatable);
+					datatable.wrap = $(datatable).addClass('m-datatable').addClass('m-datatable--' + options.layout.theme);
+					datatable.table = $('<table/>').addClass('m-datatable__table').appendTo(datatable);
 				}
 
 				if (typeof options.layout.class !== 'undefined') {
 					$(datatable.wrap).addClass(options.layout.class);
 				}
 
-				$(datatable.table).
-					removeClass('m-datatable--destroyed').
-					css('display', 'block');
+				$(datatable.table).removeClass('m-datatable--destroyed').css('display', 'block');
 
 				// force disable save state
 				if (typeof $(datatable).attr('id') === 'undefined') {
@@ -2453,13 +2319,13 @@ $(document).ready(function() {
 			/**
 			 * Set column data before table manipulation.
 			 */
-			setupCellField: function(tableParts) {
+			setupCellField: function (tableParts) {
 				if (typeof tableParts === 'undefined') tableParts = $(datatable.table).children();
 				var columns = options.columns;
-				$.each(tableParts, function(part, tablePart) {
-					$(tablePart).find('.m-datatable__row').each(function(tri, tr) {
+				$.each(tableParts, function (part, tablePart) {
+					$(tablePart).find('.m-datatable__row').each(function (tri, tr) {
 						// prepare data
-						$(tr).find('.m-datatable__cell').each(function(tdi, td) {
+						$(tr).find('.m-datatable__cell').each(function (tdi, td) {
 							if (typeof columns[tdi] !== 'undefined') {
 								$(td).data(columns[tdi]);
 							}
@@ -2472,21 +2338,21 @@ $(document).ready(function() {
 			 * Set column template callback
 			 * @param tablePart
 			 */
-			setupTemplateCell: function(tablePart) {
+			setupTemplateCell: function (tablePart) {
 				if (typeof tablePart === 'undefined') tablePart = datatable.tableBody;
 				var columns = options.columns;
-				$(tablePart).find('.m-datatable__row').each(function(tri, tr) {
+				$(tablePart).find('.m-datatable__row').each(function (tri, tr) {
 					// row data object, if any
 					var obj = $(tr).data('obj') || {};
 
 					// @deprecated in v5.0.6
-					obj['getIndex'] = function() {
-						return tri;
-					};
+					// obj['getIndex'] = function() {
+					// 	return tri;
+					// };
 					// @deprecated in v5.0.6
-					obj['getDatatable'] = function() {
-						return datatable;
-					};
+					// obj['getDatatable'] = function() {
+					// 	return datatable;
+					// };
 
 					// @deprecated in v5.0.6
 					var rowCallback = Plugin.getOption('rows.callback');
@@ -2501,9 +2367,9 @@ $(document).ready(function() {
 					// if data object is undefined, collect from table
 					if (typeof obj === 'undefined') {
 						obj = {};
-						$(tr).find('.m-datatable__cell').each(function(tdi, td) {
+						$(tr).find('.m-datatable__cell').each(function (tdi, td) {
 							// get column settings by field
-							var column = $.grep(columns, function(n, i) {
+							var column = $.grep(columns, function (n, i) {
 								return $(td).data('field') === n.field;
 							})[0];
 							if (typeof column !== 'undefined') {
@@ -2512,9 +2378,9 @@ $(document).ready(function() {
 						});
 					}
 
-					$(tr).find('.m-datatable__cell').each(function(tdi, td) {
+					$(tr).find('.m-datatable__cell').each(function (tdi, td) {
 						// get column settings by field
-						var column = $.grep(columns, function(n, i) {
+						var column = $.grep(columns, function (n, i) {
 							return $(td).data('field') === n.field;
 						})[0];
 						if (typeof column !== 'undefined') {
@@ -2529,13 +2395,15 @@ $(document).ready(function() {
 								if (typeof column.template === 'function') {
 									finalValue = column.template(obj, tri, datatable);
 								}
-								var span = $('<span/>').append(finalValue);
+								var span = document.createElement('span');
+								span.innerHTML = finalValue;
 								// insert to cell, wrap with span
 								$(td).html(span);
 
 								// set span overflow
 								if (typeof column.overflow !== 'undefined') {
 									$(span).css('overflow', column.overflow);
+									$(span).css('position', 'relative');
 								}
 							}
 						}
@@ -2553,76 +2421,61 @@ $(document).ready(function() {
 			 * Setup extra system column properties
 			 * Note: selector checkbox, subtable toggle
 			 */
-			setupSystemColumn: function() {
+			setupSystemColumn: function () {
 				datatable.dataSet = datatable.dataSet || [];
 				// no records available
 				if (datatable.dataSet.length === 0) return;
 
 				var columns = options.columns;
-				$(datatable.tableBody).
-					find('.m-datatable__row').
-					each(function(tri, tr) {
-						$(tr).find('.m-datatable__cell').each(function(tdi, td) {
-							// get column settings by field
-							var column = $.grep(columns, function(n, i) {
-								return $(td).data('field') === n.field;
-							})[0];
-							if (typeof column !== 'undefined') {
-								var value = $(td).text();
+				$(datatable.tableBody).find('.m-datatable__row').each(function (tri, tr) {
+					$(tr).find('.m-datatable__cell').each(function (tdi, td) {
+						// get column settings by field
+						var column = $.grep(columns, function (n, i) {
+							return $(td).data('field') === n.field;
+						})[0];
+						if (typeof column !== 'undefined') {
+							var value = $(td).text();
 
-								// enable column selector
-								if (typeof column.selector !== 'undefined' &&
-									column.selector !== false) {
-									// check if checkbox exist
-									if ($(td).find('.m-checkbox [type="checkbox"]').length > 0) return;
-									$(td).addClass('m-datatable__cell--check');
-									// append checkbox
-									var chk = $('<label/>').
-										addClass('m-checkbox m-checkbox--single').
-										append($('<input/>').
-											attr('type', 'checkbox').
-											attr('value', value).
-											on('click', function() {
-												if ($(this).is(':checked')) {
-													// add checkbox active row class
-													Plugin.setActive(this);
-												} else {
-													// add checkbox active row class
-													Plugin.setInactive(this);
-												}
-											})).
-										append($('<span/>'));
-
-									// checkbox selector has outline style
-									if (typeof column.selector.class !== 'undefined') {
-										$(chk).addClass(column.selector.class);
+							// enable column selector
+							if (typeof column.selector !== 'undefined' &&
+								column.selector !== false) {
+								// check if checkbox exist
+								if ($(td).find('.m-checkbox [type="checkbox"]').length > 0) return;
+								$(td).addClass('m-datatable__cell--check');
+								// append checkbox
+								var chk = $('<label/>').addClass('m-checkbox m-checkbox--single').append($('<input/>').attr('type', 'checkbox').attr('value', value).on('click', function () {
+									if ($(this).is(':checked')) {
+										// add checkbox active row class
+										Plugin.setActive(this);
+									} else {
+										// add checkbox active row class
+										Plugin.setInactive(this);
 									}
+								})).append($('<span/>'));
 
-									$(td).children().html(chk);
+								// checkbox selector has outline style
+								if (typeof column.selector.class !== 'undefined') {
+									$(chk).addClass(column.selector.class);
 								}
 
-								// enable column subtable toggle
-								if (typeof column.subtable !== 'undefined' && column.subtable) {
-									// check if subtable toggle exist
-									if ($(td).find('.m-datatable__toggle-subtable').length > 0) return;
-									// append subtable toggle
-									$(td).
-										children().
-										html($('<a/>').
-											addClass('m-datatable__toggle-subtable').
-											attr('href', '#').
-											attr('data-value', value).
-											append($('<i/>').
-												addClass(Plugin.getOption('layout.icons.rowDetail.collapse'))));
-								}
+								$(td).children().html(chk);
 							}
-						});
+
+							// enable column subtable toggle
+							if (typeof column.subtable !== 'undefined' && column.subtable) {
+								// check if subtable toggle exist
+								if ($(td).find('.m-datatable__toggle-subtable').length > 0) return;
+								// append subtable toggle
+								$(td).children().html($('<a/>').addClass('m-datatable__toggle-subtable').attr('href', '#').attr('data-value', value).append($('<i/>').addClass(Plugin.getOption('layout.icons.rowDetail.collapse'))));
+							}
+						}
 					});
+				});
 
 				// init checkbox for header/footer
-				var initCheckbox = function(tr) {
+				var initCheckbox = function (tr) {
 					// get column settings by field
-					var column = $.grep(columns, function(n, i) {
+					var column = $.grep(columns, function (n, i) {
 						return typeof n.selector !== 'undefined' && n.selector !== false;
 					})[0];
 
@@ -2636,18 +2489,13 @@ $(document).ready(function() {
 
 							// todo; check all, for server pagination
 							// append checkbox
-							var chk = $('<label/>').
-								addClass('m-checkbox m-checkbox--single m-checkbox--all').
-								append($('<input/>').
-									attr('type', 'checkbox').
-									on('click', function() {
-										if ($(this).is(':checked')) {
-											Plugin.setActiveAll(true);
-										} else {
-											Plugin.setActiveAll(false);
-										}
-									})).
-								append($('<span/>'));
+							var chk = $('<label/>').addClass('m-checkbox m-checkbox--single m-checkbox--all').append($('<input/>').attr('type', 'checkbox').on('click', function () {
+								if ($(this).is(':checked')) {
+									Plugin.setActiveAll(true);
+								} else {
+									Plugin.setActiveAll(false);
+								}
+							})).append($('<span/>'));
 
 							// checkbox selector has outline style
 							if (typeof column.selector.class !== 'undefined') {
@@ -2670,7 +2518,7 @@ $(document).ready(function() {
 			/**
 			 * Adjust width to match container size
 			 */
-			adjustCellsWidth: function() {
+			adjustCellsWidth: function () {
 				// get table width
 				var containerWidth = $(datatable.tableHead).width();
 
@@ -2689,17 +2537,14 @@ $(document).ready(function() {
 						minWidth = Plugin.offset;
 					}
 
-					$(datatable.table).
-						find('.m-datatable__row').
-						find('.m-datatable__cell:visible').
-						each(function(tdi, td) {
-							var width = minWidth;
-							var dataWidth = $(td).data('width');
-							if (typeof dataWidth !== 'undefined') {
-								width = dataWidth;
-							}
-							$(td).children().css('width', width);
-						});
+					$(datatable.table).find('.m-datatable__row').find('.m-datatable__cell:visible').each(function (tdi, td) {
+						var width = minWidth;
+						var dataWidth = $(td).data('width');
+						if (typeof dataWidth !== 'undefined') {
+							width = dataWidth;
+						}
+						$(td).children().css('width', parseInt(width));
+					});
 				}
 
 				return datatable;
@@ -2708,13 +2553,13 @@ $(document).ready(function() {
 			/**
 			 * Adjust height to match container size
 			 */
-			adjustCellsHeight: function() {
-				$.each($(datatable.table).children(), function(part, tablePart) {
+			adjustCellsHeight: function () {
+				$.each($(datatable.table).children(), function (part, tablePart) {
 					var totalRows = $(tablePart).find('.m-datatable__row').first().parent().find('.m-datatable__row').length;
 					for (var i = 1; i <= totalRows; i++) {
 						var rows = $(tablePart).find('.m-datatable__row:nth-child(' + i + ')');
 						if ($(rows).length > 0) {
-							var maxHeight = Math.max.apply(null, $(rows).map(function() {
+							var maxHeight = Math.max.apply(null, $(rows).map(function () {
 								return $(this).height();
 							}).get());
 							$(rows).css('height', Math.ceil(parseInt(maxHeight)));
@@ -2726,14 +2571,14 @@ $(document).ready(function() {
 			/**
 			 * Setup table DOM and classes
 			 */
-			setupDOM: function(table) {
+			setupDOM: function (table) {
 				// set table classes
 				$(table).find('> thead').addClass('m-datatable__head');
 				$(table).find('> tbody').addClass('m-datatable__body');
 				$(table).find('> tfoot').addClass('m-datatable__foot');
 				$(table).find('tr').addClass('m-datatable__row');
 				$(table).find('tr > th, tr > td').addClass('m-datatable__cell');
-				$(table).find('tr > th, tr > td').each(function(i, td) {
+				$(table).find('tr > th, tr > td').each(function (i, td) {
 					if ($(td).find('span').length === 0) {
 						$(td).wrapInner($('<span/>').css('width', Plugin.offset));
 					}
@@ -2744,7 +2589,7 @@ $(document).ready(function() {
 			 * Default scrollbar
 			 * @returns {{tableLocked: null, init: init, onScrolling: onScrolling}}
 			 */
-			scrollbar: function() {
+			scrollbar: function () {
 				var scroll = {
 					scrollable: null,
 					tableLocked: null,
@@ -2764,9 +2609,18 @@ $(document).ready(function() {
 						},
 						theme: 'minimal-dark',
 					},
-					init: function() {
-						// destroy previous custom scrollbar
-						Plugin.destroyScroller(scroll.scrollable);
+					init: function () {
+						if (mUtil.isRTL()) {
+							$.fn.extend({
+								scrollRight: function (val) {
+									if (val === undefined) {
+										return this[0].scrollWidth - (this[0].scrollLeft + this[0].clientWidth) + 1;
+									}
+									return this.scrollLeft(this[0].scrollWidth - this[0].clientWidth - val);
+								}
+							});
+						}
+
 						var screen = mUtil.getViewPort().width;
 						// setup scrollable datatable
 						if (options.layout.scroll) {
@@ -2780,74 +2634,48 @@ $(document).ready(function() {
 								scroll.scrollHead = $(datatable.tableHead).find('> .m-datatable__lock--scroll > .m-datatable__row');
 								scroll.scrollFoot = $(datatable.tableFoot).find('> .m-datatable__lock--scroll > .m-datatable__row');
 								scroll.tableLocked = $(datatable.tableBody).find('.m-datatable__lock:not(.m-datatable__lock--scroll)');
-								if (screen > mUtil.getBreakpoint('lg')) {
-									scroll.mCustomScrollbar(scrollable);
+								if (Plugin.getOption('layout.customScrollbar') && mUtil.detectIE() != 10 && screen > mUtil.getBreakpoint('lg')) {
+									scroll.initCustomScrollbar(scrollable[0]);
 								} else {
-									scroll.defaultScrollbar(scrollable);
+									scroll.initDefaultScrollbar(scrollable);
 								}
 							} else if ($(datatable.tableBody).find('.m-datatable__row').length > 0) {
 								scroll.scrollHead = $(datatable.tableHead).find('> .m-datatable__row');
 								scroll.scrollFoot = $(datatable.tableFoot).find('> .m-datatable__row');
-								if (screen > mUtil.getBreakpoint('lg')) {
-									scroll.mCustomScrollbar(datatable.tableBody);
+								if (Plugin.getOption('layout.customScrollbar') && mUtil.detectIE() != 10 && screen > mUtil.getBreakpoint('lg')) {
+									scroll.initCustomScrollbar(datatable.tableBody);
 								} else {
-									scroll.defaultScrollbar(datatable.tableBody);
+									scroll.initDefaultScrollbar(datatable.tableBody);
 								}
 							}
 						} else {
-							$(datatable.table).
-								// css('height', 'auto').
-								css('overflow-x', 'auto');
+							$(datatable.table).// css('height', 'auto').
+							css('overflow-x', 'auto');
 						}
 					},
-					defaultScrollbar: function(scrollable) {
-						$(scrollable).
-							css('overflow', 'auto').
-							css('max-height', Plugin.getOption('layout.height')).
-							on('scroll', scroll.onScrolling);
+					initDefaultScrollbar: function (scrollable) {
+						$(scrollable).css('overflow', 'auto').off().on('scroll', scroll.onScrolling);
 					},
-					onScrolling: function(e) {
-						var left = $(this).scrollLeft();
+					onScrolling: function (e) {
 						var top = $(this).scrollTop();
-						$(scroll.scrollHead).css('left', -left);
-						$(scroll.scrollFoot).css('left', -left);
-						$(scroll.tableLocked).each(function(i, table) {
+						if (mUtil.isRTL()) {
+							var right = $(this).scrollRight();
+							$(scroll.scrollHead).css('right', -right);
+							$(scroll.scrollFoot).css('right', -right);
+						} else {
+							var left = $(this).scrollLeft();
+							$(scroll.scrollHead).css('left', -left);
+							$(scroll.scrollFoot).css('left', -left);
+						}
+						$(scroll.tableLocked).each(function (i, table) {
 							$(table).css('top', -top);
 						});
 					},
-					mCustomScrollbar: function(scrollable) {
+					initCustomScrollbar: function (scrollable) {
 						scroll.scrollable = scrollable;
-						var height = Plugin.getOption('layout.height');
-						// vertical and horizontal scrollbar
-						var axis = 'xy';
-						if (height === null) {
-							// horizontal scrollbar
-							axis = 'x';
-						}
-						var mcsOptions = $.extend({}, scroll.mcsOptions, {
-							axis: axis,
-							setHeight: $(datatable.tableBody).height(),
-							callbacks: {
-								whileScrolling: function() {
-									var mcs = this.mcs;
-									$(scroll.scrollHead).css('left', mcs.left);
-									$(scroll.scrollFoot).css('left', mcs.left);
-									$(scroll.tableLocked).each(function(i, table) {
-										$(table).css('top', mcs.top);
-									});
-									// stop hover when scrolling
-									clearTimeout(Plugin.hoverTimer);
-									Plugin.isScrolling = true;
-								},
-							},
-						});
-
-						if (Plugin.getOption('layout.smoothScroll.scrollbarShown') === true) {
-							$(scrollable).attr('data-scrollbar-shown', 'true');
-						}
-
 						// create a new instance for table body with scrollbar
-						Plugin.mCustomScrollbar(scrollable, mcsOptions);
+						Plugin.initScrollbar(scrollable);
+						$(scrollable).off().on('scroll', scroll.onScrolling);
 					},
 				};
 				scroll.init();
@@ -2859,42 +2687,57 @@ $(document).ready(function() {
 			 * @param element
 			 * @param options
 			 */
-			mCustomScrollbar: function(element, options) {
+			initScrollbar: function (element, options) {
 				$(datatable.tableBody).css('overflow', '');
-				// check if any custom scrollbar exist in the element
-				Plugin.destroyScroller($(datatable.table).find('.mCustomScrollbar'));
-				$(element).mCustomScrollbar(options);
+				if (mUtil.hasClass(element, 'ps')) {
+					$(element).data('ps').update();
+				} else {
+					var ps = new PerfectScrollbar(element);
+					$(element).data('ps', ps);
+				}
 			},
 
 			/**
 			 * Set column title from options.columns settings
 			 */
-			setHeadTitle: function(tablePart) {
+			setHeadTitle: function (tablePart) {
 				if (typeof tablePart === 'undefined') tablePart = datatable.tableHead;
+				tablePart = $(tablePart)[0];
 				var columns = options.columns;
-				var row = $(tablePart).find('.m-datatable__row');
-				var ths = $(tablePart).find('.m-datatable__cell');
-				if ($(row).length === 0) {
-					row = $('<tr/>').appendTo(tablePart);
+				var row = tablePart.getElementsByTagName('tr')[0];
+				var ths = tablePart.getElementsByTagName('td');
+
+				if (typeof row === 'undefined') {
+					row = document.createElement('tr');
+					tablePart.appendChild(row);
 				}
-				$.each(columns, function(i, column) {
-					var th = $(ths).eq(i);
-					if ($(th).length === 0) {
-						th = $('<th/>').appendTo(row);
+
+				$.each(columns, function (i, column) {
+					var th = ths[i];
+					if (typeof th === 'undefined') {
+						th = document.createElement('th');
+						row.appendChild(th);
 					}
+
 					// set column title
 					if (typeof column['title'] !== 'undefined') {
-						$(th).
-							addClass(column.class).
-							html(column['title']).
-							attr('data-field', column.field).
-							data(column);
+						th.innerHTML = column.title;
+						th.setAttribute('data-field', column.field);
+						mUtil.addClass(th, column.class);
+						$(th).data(column);
 					}
+
+					// set header attr option
+					if (typeof column.attr !== 'undefined') {
+						$.each(column.attr, function (key, val) {
+							th.setAttribute(key, val);
+						});
+					}
+
 					// apply text align to thead/tfoot
 					if (typeof column.textAlign !== 'undefined') {
-						var align = typeof datatable.textAlign[column.textAlign] !==
-						'undefined' ? datatable.textAlign[column.textAlign] : '';
-						$(th).addClass(align);
+						var align = typeof datatable.textAlign[column.textAlign] !== 'undefined' ? datatable.textAlign[column.textAlign] : '';
+						mUtil.addClass(th, align);
 					}
 				});
 				Plugin.setupDOM(tablePart);
@@ -2903,12 +2746,10 @@ $(document).ready(function() {
 			/**
 			 * Initiate to get remote or local data via ajax
 			 */
-			dataRender: function(action) {
-				$(datatable.table).
-					siblings('.m-datatable__pager').
-					removeClass('m-datatable--paging-loaded');
+			dataRender: function (action) {
+				$(datatable.table).siblings('.m-datatable__pager').removeClass('m-datatable--paging-loaded');
 
-				var buildMeta = function() {
+				var buildMeta = function () {
 					datatable.dataSet = datatable.dataSet || [];
 					Plugin.localDataUpdate();
 					// local pagination meta
@@ -2923,13 +2764,13 @@ $(document).ready(function() {
 					return meta;
 				};
 
-				var afterGetData = function(result) {
-					var localPagingCallback = function(ctx, meta) {
+				var afterGetData = function (result) {
+					var localPagingCallback = function (ctx, meta) {
 						if (!$(ctx.pager).hasClass('m-datatable--paging-loaded')) {
 							$(ctx.pager).remove();
 							ctx.init(meta);
 						}
-						$(ctx.pager).off().on('m-datatable--on-goto-page', function(e) {
+						$(ctx.pager).off().on('m-datatable--on-goto-page', function (e) {
 							$(ctx.pager).remove();
 							ctx.init(meta);
 						});
@@ -2971,8 +2812,7 @@ $(document).ready(function() {
 				// get local datasource
 				if (options.data.type === 'local'
 					// for remote json datasource
-					|| typeof options.data.source.read === 'undefined' &&
-					datatable.dataSet !== null
+					// || typeof options.data.source.read === 'undefined' && datatable.dataSet !== null
 					// for remote datasource, server sorting is disabled and data already received from remote
 					|| options.data.serverSorting === false && action === 'sort'
 					|| options.data.serverFiltering === false && action === 'search'
@@ -2988,7 +2828,7 @@ $(document).ready(function() {
 			/**
 			 * Process ajax data
 			 */
-			insertData: function() {
+			insertData: function () {
 				datatable.dataSet = datatable.dataSet || [];
 				var params = Plugin.getDataSourceParam();
 
@@ -3002,18 +2842,19 @@ $(document).ready(function() {
 				}
 
 				// todo; fix performance
-				var tableBody = $('<tbody/>').
-					addClass('m-datatable__body').
-					css('visibility', 'hidden');
+				var tableBody = document.createElement('tbody');
+				tableBody.style.visibility = 'hidden';
 				var colLength = options.columns.length;
 
-				$.each(datatable.dataSet, function(rowIndex, row) {
+				$.each(datatable.dataSet, function (rowIndex, row) {
+					var tr = document.createElement('tr');
+					tr.setAttribute('data-row', rowIndex);
 					// keep data object to row
-					var tr = $('<tr/>').attr('data-row', rowIndex).data('obj', row);
+					$(tr).data('obj', row);
 
 					if (typeof rowProps[rowIndex] !== 'undefined') {
-						$.each(rowProps[rowIndex], function() {
-							$(tr).attr(this.name, this.value);
+						$.each(rowProps[rowIndex], function () {
+							tr.setAttribute(this.name, this.value);
 						});
 					}
 
@@ -3034,26 +2875,27 @@ $(document).ready(function() {
 							classes.push(align);
 						}
 
-						var classAttr = '';
+						// var classAttr = '';
 						if (typeof column.class !== 'undefined') {
-							classAttr = ' class="' + column.class + '"';
+							classes.push(column.class);
 						}
-						tds[cellIndex++] = '<td' + classAttr + ' data-field="' + column.field + '"';
-						tds[cellIndex++] = ' class="' + classes.join(' ') + '"';
-						tds[cellIndex++] = '>';
-						tds[cellIndex++] = Plugin.getObject(column.field, row);
-						tds[cellIndex++] = '</td>';
+
+						var td = document.createElement('td');
+						mUtil.addClass(td, classes.join(' '));
+						td.setAttribute('data-field', column.field);
+						td.innerHTML = Plugin.getObject(column.field, row);
+						tr.appendChild(td);
 					}
-					$(tr).append(tds.join(''));
-					$(tableBody).append(tr);
+
+					tableBody.appendChild(tr);
 				});
 
 				// display no records message
 				if (datatable.dataSet.length === 0) {
-					Plugin.destroyScroller($(datatable.table).find('.mCustomScrollbar'));
-					$(tableBody).html($('<span/>').
-						addClass('m-datatable--error').
-						html(Plugin.getOption('translate.records.noRecords')));
+					var errorSpan = document.createElement('span');
+					mUtil.addClass(errorSpan, 'm-datatable--error');
+					errorSpan.innerHTML = Plugin.getOption('translate.records.noRecords');
+					tableBody.appendChild(errorSpan);
 					$(datatable.wrap).addClass('m-datatable--error m-datatable--loaded');
 					Plugin.spinnerCallback(false);
 				}
@@ -3069,7 +2911,7 @@ $(document).ready(function() {
 				Plugin.layoutUpdate();
 			},
 
-			updateTableComponents: function() {
+			updateTableComponents: function () {
 				datatable.tableHead = $(datatable.table).children('thead');
 				datatable.tableBody = $(datatable.table).children('tbody');
 				datatable.tableFoot = $(datatable.table).children('tfoot');
@@ -3078,7 +2920,7 @@ $(document).ready(function() {
 			/**
 			 * Call ajax for raw JSON data
 			 */
-			getData: function() {
+			getData: function () {
 				Plugin.spinnerCallback(true);
 
 				var ajaxParams = {
@@ -3110,21 +2952,18 @@ $(document).ready(function() {
 					ajaxParams.data = $.extend(true, ajaxParams.data, data, Plugin.getOption('data.source.read.params'));
 				}
 
-				return $.ajax(ajaxParams).done(function(response, textStatus, jqXHR) {
+				return $.ajax(ajaxParams).done(function (response, textStatus, jqXHR) {
 					datatable.lastResponse = response;
 					// extendible data map callback for custom datasource
 					datatable.dataSet = datatable.originalDataSet = Plugin.dataMapCallback(response);
 					Plugin.setAutoColumns();
 					$(datatable).trigger('m-datatable--on-ajax-done', [datatable.dataSet]);
-				}).fail(function(jqXHR, textStatus, errorThrown) {
-					Plugin.destroyScroller($(datatable.table).find('.mCustomScrollbar'));
+				}).fail(function (jqXHR, textStatus, errorThrown) {
 					$(datatable).trigger('m-datatable--on-ajax-fail', [jqXHR]);
-					$(datatable.tableBody).html($('<span/>').
-						addClass('m-datatable--error').
-						html(Plugin.getOption('translate.records.noRecords')));
+					$(datatable.tableBody).html($('<span/>').addClass('m-datatable--error').html(Plugin.getOption('translate.records.noRecords')));
 					$(datatable.wrap).addClass('m-datatable--error m-datatable--loaded');
 					Plugin.spinnerCallback(false);
-				}).always(function() {
+				}).always(function () {
 				});
 			},
 
@@ -3133,15 +2972,21 @@ $(document).ready(function() {
 			 * @param meta if null, local pagination, otherwise remote pagination
 			 * @param callback for update data when navigating page
 			 */
-			paging: function(meta, callback) {
+			paging: function (meta, callback) {
 				var pg = {
 					meta: null,
 					pager: null,
 					paginateEvent: null,
 					pagerLayout: {pagination: null, info: null},
 					callback: null,
-					init: function(meta) {
+					init: function (meta) {
 						pg.meta = meta;
+
+						// parse pagination meta to integer
+						pg.meta.page = parseInt(pg.meta.page);
+						pg.meta.pages = parseInt(pg.meta.pages);
+						pg.meta.perpage = parseInt(pg.meta.perpage);
+						pg.meta.total = parseInt(pg.meta.total);
 
 						// todo; if meta object not exist will cause error
 						// always recount total pages
@@ -3185,10 +3030,10 @@ $(document).ready(function() {
 						pg.pagingBreakpoint.call();
 						$(window).resize(pg.pagingBreakpoint);
 					},
-					serverCallback: function(ctx, meta) {
+					serverCallback: function (ctx, meta) {
 						Plugin.dataRender();
 					},
-					populate: function() {
+					populate: function () {
 						var icons = Plugin.getOption('layout.icons.pagination');
 						var title = Plugin.getOption('translate.toolbar.pagination.items.default');
 						// pager root element
@@ -3198,45 +3043,19 @@ $(document).ready(function() {
 						pg.pagerLayout['pagination'] = pagerNumber;
 
 						// pager first/previous button
-						$('<li/>').
-							append($('<a/>').
-								attr('title', title.first).
-								addClass('m-datatable__pager-link m-datatable__pager-link--first').
-								append($('<i/>').addClass(icons.first)).
-								on('click', pg.gotoMorePage).
-								attr('data-page', 1)).
-							appendTo(pagerNumber);
-						$('<li/>').
-							append($('<a/>').
-								attr('title', title.prev).
-								addClass('m-datatable__pager-link m-datatable__pager-link--prev').
-								append($('<i/>').addClass(icons.prev)).
-								on('click', pg.gotoMorePage)).
-							appendTo(pagerNumber);
+						$('<li/>').append($('<a/>').attr('title', title.first).addClass('m-datatable__pager-link m-datatable__pager-link--first').append($('<i/>').addClass(icons.first)).on('click', pg.gotoMorePage).attr('data-page', 1)).appendTo(pagerNumber);
+						$('<li/>').append($('<a/>').attr('title', title.prev).addClass('m-datatable__pager-link m-datatable__pager-link--prev').append($('<i/>').addClass(icons.prev)).on('click', pg.gotoMorePage)).appendTo(pagerNumber);
 
 						// more previous pages
-						$('<li/>').
-							append($('<a/>').
-								attr('title', title.more).
-								addClass('m-datatable__pager-link m-datatable__pager-link--more-prev').
-								html($('<i/>').addClass(icons.more)).
-								on('click', pg.gotoMorePage)).
-							appendTo(pagerNumber);
+						$('<li/>').append($('<a/>').attr('title', title.more).addClass('m-datatable__pager-link m-datatable__pager-link--more-prev').html($('<i/>').addClass(icons.more)).on('click', pg.gotoMorePage)).appendTo(pagerNumber);
 
-						$('<li/>').
-							append($('<input/>').
-								attr('type', 'text').
-								addClass('m-pager-input form-control').
-								attr('title', title.input).
-								on('keyup', function() {
-									// on keyup update [data-page]
-									$(this).attr('data-page', Math.abs($(this).val()));
-								}).
-								on('keypress', function(e) {
-									// on keypressed enter button
-									if (e.which === 13) pg.gotoMorePage(e);
-								})).
-							appendTo(pagerNumber);
+						$('<li/>').append($('<input/>').attr('type', 'text').addClass('m-pager-input form-control').attr('title', title.input).on('keyup', function () {
+							// on keyup update [data-page]
+							$(this).attr('data-page', Math.abs($(this).val()));
+						}).on('keypress', function (e) {
+							// on keypressed enter button
+							if (e.which === 13) pg.gotoMorePage(e);
+						})).appendTo(pagerNumber);
 
 						var pagesNumber = Plugin.getOption('toolbar.items.pagination.pages.desktop.pagesNumber');
 						var end = Math.ceil(pg.meta.page / pagesNumber) * pagesNumber;
@@ -3246,102 +3065,59 @@ $(document).ready(function() {
 						}
 						for (var x = start; x < end; x++) {
 							var pageNumber = x + 1;
-							$('<li/>').
-								append($('<a/>').
-									addClass('m-datatable__pager-link m-datatable__pager-link-number').
-									text(pageNumber).
-									attr('data-page', pageNumber).
-									attr('title', pageNumber).
-									on('click', pg.gotoPage)).
-								appendTo(pagerNumber);
+							$('<li/>').append($('<a/>').addClass('m-datatable__pager-link m-datatable__pager-link-number').text(pageNumber).attr('data-page', pageNumber).attr('title', pageNumber).on('click', pg.gotoPage)).appendTo(pagerNumber);
 						}
 
 						// more next pages
-						$('<li/>').
-							append($('<a/>').
-								attr('title', title.more).
-								addClass('m-datatable__pager-link m-datatable__pager-link--more-next').
-								html($('<i/>').addClass(icons.more)).
-								on('click', pg.gotoMorePage)).
-							appendTo(pagerNumber);
+						$('<li/>').append($('<a/>').attr('title', title.more).addClass('m-datatable__pager-link m-datatable__pager-link--more-next').html($('<i/>').addClass(icons.more)).on('click', pg.gotoMorePage)).appendTo(pagerNumber);
 
 						// pager next/last button
-						$('<li/>').
-							append($('<a/>').
-								attr('title', title.next).
-								addClass('m-datatable__pager-link m-datatable__pager-link--next').
-								append($('<i/>').addClass(icons.next)).
-								on('click', pg.gotoMorePage)).
-							appendTo(pagerNumber);
-						$('<li/>').
-							append($('<a/>').
-								attr('title', title.last).
-								addClass('m-datatable__pager-link m-datatable__pager-link--last').
-								append($('<i/>').addClass(icons.last)).
-								on('click', pg.gotoMorePage).
-								attr('data-page', pg.meta.pages)).
-							appendTo(pagerNumber);
+						$('<li/>').append($('<a/>').attr('title', title.next).addClass('m-datatable__pager-link m-datatable__pager-link--next').append($('<i/>').addClass(icons.next)).on('click', pg.gotoMorePage)).appendTo(pagerNumber);
+						$('<li/>').append($('<a/>').attr('title', title.last).addClass('m-datatable__pager-link m-datatable__pager-link--last').append($('<i/>').addClass(icons.last)).on('click', pg.gotoMorePage).attr('data-page', pg.meta.pages)).appendTo(pagerNumber);
 
 						// page info
 						if (Plugin.getOption('toolbar.items.info')) {
-							pg.pagerLayout['info'] = $('<div/>').
-								addClass('m-datatable__pager-info').
-								append($('<span/>').addClass('m-datatable__pager-detail'));
+							pg.pagerLayout['info'] = $('<div/>').addClass('m-datatable__pager-info').append($('<span/>').addClass('m-datatable__pager-detail'));
 						}
 
-						$.each(Plugin.getOption('toolbar.layout'), function(i, layout) {
+						$.each(Plugin.getOption('toolbar.layout'), function (i, layout) {
 							$(pg.pagerLayout[layout]).appendTo(pg.pager);
 						});
 
 						// page size select
-						var pageSizeSelect = $('<select/>').
-							addClass('selectpicker m-datatable__pager-size').
-							attr('title', Plugin.getOption('translate.toolbar.pagination.items.default.select')).
-							attr('data-width', '70px').
-							val(pg.meta.perpage).
-							on('change', pg.updatePerpage).
-							prependTo(pg.pagerLayout['info']);
+						var pageSizeSelect = $('<select/>').addClass('selectpicker m-datatable__pager-size').attr('title', Plugin.getOption('translate.toolbar.pagination.items.default.select')).attr('data-width', '70px').val(pg.meta.perpage).on('change', pg.updatePerpage).prependTo(pg.pagerLayout['info']);
 
 						var pageSizes = Plugin.getOption('toolbar.items.pagination.pageSizeSelect');
 						// default value here, to fix override option by user
 						if (pageSizes.length == 0) pageSizes = [10, 20, 30, 50, 100];
-						$.each(pageSizes, function(i, size) {
+						$.each(pageSizes, function (i, size) {
 							var display = size;
 							if (size === -1) display = 'All';
-							$('<option/>').
-								attr('value', size).
-								html(display).
-								appendTo(pageSizeSelect);
+							$('<option/>').attr('value', size).html(display).appendTo(pageSizeSelect);
 						});
 
 						// init selectpicker to dropdown
-						$(datatable).ready(function() {
-							$('.selectpicker').
-								selectpicker().
-								siblings('.dropdown-toggle').
-								attr('title', Plugin.getOption(
-									'translate.toolbar.pagination.items.default.select'));
+						$(datatable).ready(function () {
+							$('.selectpicker').selectpicker().siblings('.dropdown-toggle').attr('title', Plugin.getOption(
+								'translate.toolbar.pagination.items.default.select'));
 						});
 
 						pg.paste();
 					},
-					paste: function() {
+					paste: function () {
 						// insert pagination based on placement position, top|bottom
 						$.each($.unique(Plugin.getOption('toolbar.placement')),
-							function(i, position) {
+							function (i, position) {
 								if (position === 'bottom') {
 									$(pg.pager).clone(true).insertAfter(datatable.table);
 								}
 								if (position === 'top') {
 									// pager top need some extra space
-									$(pg.pager).
-										clone(true).
-										addClass('m-datatable__pager--top').
-										insertBefore(datatable.table);
+									$(pg.pager).clone(true).addClass('m-datatable__pager--top').insertBefore(datatable.table);
 								}
 							});
 					},
-					gotoMorePage: function(e) {
+					gotoMorePage: function (e) {
 						e.preventDefault();
 						// $(this) is a link of .m-datatable__pager-link
 
@@ -3357,14 +3133,14 @@ $(document).ready(function() {
 						pg.openPage(parseInt(page));
 						return false;
 					},
-					gotoPage: function(e) {
+					gotoPage: function (e) {
 						e.preventDefault();
 						// prevent from click same page number
 						if ($(this).hasClass('m-datatable__pager-link--active')) return;
 
 						pg.openPage(parseInt($(this).data('page')));
 					},
-					openPage: function(page) {
+					openPage: function (page) {
 						// currentPage is 1-based index
 						pg.meta.page = parseInt(page);
 
@@ -3374,26 +3150,21 @@ $(document).ready(function() {
 						// update page callback function
 						$(pg.pager).trigger('m-datatable--on-goto-page', pg.meta);
 					},
-					updatePerpage: function(e) {
+					updatePerpage: function (e) {
 						e.preventDefault();
-						if (Plugin.getOption('layout.height') === null) {
-							// fix white space, when perpage is set from many records to less records
-							$('html, body').animate({scrollTop: $(datatable).position().top});
-						}
+						// if (Plugin.getOption('layout.height') === null) {
+						// fix white space, when perpage is set from many records to less records
+						// $('html, body').animate({scrollTop: $(datatable).position().top});
+						// }
 
-						pg.pager = $(datatable.table).
-							siblings('.m-datatable__pager').
-							removeClass('m-datatable--paging-loaded');
+						pg.pager = $(datatable.table).siblings('.m-datatable__pager').removeClass('m-datatable--paging-loaded');
 
 						// on change select page size
 						if (e.originalEvent) {
 							pg.meta.perpage = parseInt($(this).val());
 						}
 
-						$(pg.pager).
-							find('select.m-datatable__pager-size').
-							val(pg.meta.perpage).
-							attr('data-selected', pg.meta.perpage);
+						$(pg.pager).find('select.m-datatable__pager-size').val(pg.meta.perpage).attr('data-selected', pg.meta.perpage);
 
 						// update datasource params
 						Plugin.setDataSourceParam('pagination', {
@@ -3411,111 +3182,85 @@ $(document).ready(function() {
 						// update pagination info
 						pg.updateInfo.call();
 					},
-					addPaginateEvent: function(e) {
+					addPaginateEvent: function (e) {
 						// pagination event
-						$(datatable).
-							off(pg.paginateEvent).
-							on(pg.paginateEvent, function(e, meta) {
-								Plugin.spinnerCallback(true);
+						$(datatable).off(pg.paginateEvent).on(pg.paginateEvent, function (e, meta) {
+							Plugin.spinnerCallback(true);
 
-								pg.pager = $(datatable.table).siblings('.m-datatable__pager');
-								var pagerNumber = $(pg.pager).find('.m-datatable__pager-nav');
+							pg.pager = $(datatable.table).siblings('.m-datatable__pager');
+							var pagerNumber = $(pg.pager).find('.m-datatable__pager-nav');
 
-								// set sync active page class
-								$(pagerNumber).
-									find('.m-datatable__pager-link--active').
-									removeClass('m-datatable__pager-link--active');
-								$(pagerNumber).
-									find('.m-datatable__pager-link-number[data-page="' + meta.page + '"]').
-									addClass('m-datatable__pager-link--active');
+							// set sync active page class
+							$(pagerNumber).find('.m-datatable__pager-link--active').removeClass('m-datatable__pager-link--active');
+							$(pagerNumber).find('.m-datatable__pager-link-number[data-page="' + meta.page + '"]').addClass('m-datatable__pager-link--active');
 
-								// set next and previous link page number
-								$(pagerNumber).
-									find('.m-datatable__pager-link--prev').
-									attr('data-page', Math.max(meta.page - 1, 1));
-								$(pagerNumber).
-									find('.m-datatable__pager-link--next').
-									attr('data-page', Math.min(meta.page + 1, meta.pages));
+							// set next and previous link page number
+							$(pagerNumber).find('.m-datatable__pager-link--prev').attr('data-page', Math.max(meta.page - 1, 1));
+							$(pagerNumber).find('.m-datatable__pager-link--next').attr('data-page', Math.min(meta.page + 1, meta.pages));
 
-								// current page input value sync
-								$(pg.pager).each(function() {
-									$(this).
-										find('.m-pager-input[type="text"]').
-										prop('value', meta.page);
-								});
-
-								$(pg.pager).find('.m-datatable__pager-nav').show();
-								if (meta.pages <= 1) {
-									// hide pager if has 1 page
-									$(pg.pager).find('.m-datatable__pager-nav').hide();
-								}
-
-								// update datasource params
-								Plugin.setDataSourceParam('pagination', {
-									page: pg.meta.page,
-									pages: pg.meta.pages,
-									perpage: pg.meta.perpage,
-									total: pg.meta.total,
-								});
-
-								$(pg.pager).
-									find('select.m-datatable__pager-size').
-									val(meta.perpage).
-									attr('data-selected', meta.perpage);
-
-								// clear active rows
-								$(datatable.table).
-									find('.m-checkbox > [type="checkbox"]').
-									prop('checked', false);
-								$(datatable.table).
-									find('.m-datatable__row--active').
-									removeClass('m-datatable__row--active');
-
-								pg.updateInfo.call();
-								pg.pagingBreakpoint.call();
-								// Plugin.resetScroll();
+							// current page input value sync
+							$(pg.pager).each(function () {
+								$(this).find('.m-pager-input[type="text"]').prop('value', meta.page);
 							});
+
+							$(pg.pager).find('.m-datatable__pager-nav').show();
+							if (meta.pages <= 1) {
+								// hide pager if has 1 page
+								$(pg.pager).find('.m-datatable__pager-nav').hide();
+							}
+
+							// update datasource params
+							Plugin.setDataSourceParam('pagination', {
+								page: pg.meta.page,
+								pages: pg.meta.pages,
+								perpage: pg.meta.perpage,
+								total: pg.meta.total,
+							});
+
+							$(pg.pager).find('select.m-datatable__pager-size').val(meta.perpage).attr('data-selected', meta.perpage);
+
+							// clear active rows
+							$(datatable.table).find('.m-checkbox > [type="checkbox"]').prop('checked', false);
+							$(datatable.table).find('.m-datatable__row--active').removeClass('m-datatable__row--active');
+
+							pg.updateInfo.call();
+							pg.pagingBreakpoint.call();
+							// Plugin.resetScroll();
+						});
 					},
-					updateInfo: function() {
+					updateInfo: function () {
 						var start = Math.max(pg.meta.perpage * (pg.meta.page - 1) + 1, 1);
 						var end = Math.min(start + pg.meta.perpage - 1, pg.meta.total);
 						// page info update
-						$(pg.pager).
-							find('.m-datatable__pager-info').
-							find('.m-datatable__pager-detail').
-							html(Plugin.dataPlaceholder(
-								Plugin.getOption('translate.toolbar.pagination.items.info'), {
-									start: start,
-									end: pg.meta.perpage === -1 ? pg.meta.total : end,
-									pageSize: pg.meta.perpage === -1 ||
-									pg.meta.perpage >= pg.meta.total
-										? pg.meta.total
-										: pg.meta.perpage,
-									total: pg.meta.total,
-								}));
+						$(pg.pager).find('.m-datatable__pager-info').find('.m-datatable__pager-detail').html(Plugin.dataPlaceholder(
+							Plugin.getOption('translate.toolbar.pagination.items.info'), {
+								start: start,
+								end: pg.meta.perpage === -1 ? pg.meta.total : end,
+								pageSize: pg.meta.perpage === -1 ||
+								pg.meta.perpage >= pg.meta.total
+									? pg.meta.total
+									: pg.meta.perpage,
+								total: pg.meta.total,
+							}));
 					},
 
 					/**
 					 * Update pagination layout breakpoint
 					 */
-					pagingBreakpoint: function() {
+					pagingBreakpoint: function () {
 						// keep page links reference
-						var pagerNumber = $(datatable.table).
-							siblings('.m-datatable__pager').
-							find('.m-datatable__pager-nav');
+						var pagerNumber = $(datatable.table).siblings('.m-datatable__pager').find('.m-datatable__pager-nav');
 						if ($(pagerNumber).length === 0) return;
 
 						var currentPage = Plugin.getCurrentPage();
-						var pagerInput = $(pagerNumber).
-							find('.m-pager-input').
-							closest('li');
+						var pagerInput = $(pagerNumber).find('.m-pager-input').closest('li');
 
 						// reset
 						$(pagerNumber).find('li').show();
 
 						// pagination update
 						$.each(Plugin.getOption('toolbar.items.pagination.pages'),
-							function(mode, option) {
+							function (mode, option) {
 								if (mUtil.isInResponsiveRange(mode)) {
 									switch (mode) {
 										case 'desktop':
@@ -3530,18 +3275,9 @@ $(document).ready(function() {
 
 										case 'mobile':
 											$(pagerInput).show();
-											$(pagerNumber).
-												find('.m-datatable__pager-link--more-prev').
-												closest('li').
-												hide();
-											$(pagerNumber).
-												find('.m-datatable__pager-link--more-next').
-												closest('li').
-												hide();
-											$(pagerNumber).
-												find('.m-datatable__pager-link-number').
-												closest('li').
-												hide();
+											$(pagerNumber).find('.m-datatable__pager-link--more-prev').closest('li').hide();
+											$(pagerNumber).find('.m-datatable__pager-link--more-next').closest('li').hide();
+											$(pagerNumber).find('.m-datatable__pager-link-number').closest('li').hide();
 											break;
 									}
 
@@ -3553,14 +3289,10 @@ $(document).ready(function() {
 					/**
 					 * Update pagination number and button display
 					 */
-					paginationUpdate: function() {
-						var pager = $(datatable.table).
-								siblings('.m-datatable__pager').
-								find('.m-datatable__pager-nav'),
-							pagerMorePrev = $(pager).
-								find('.m-datatable__pager-link--more-prev'),
-							pagerMoreNext = $(pager).
-								find('.m-datatable__pager-link--more-next'),
+					paginationUpdate: function () {
+						var pager = $(datatable.table).siblings('.m-datatable__pager').find('.m-datatable__pager-nav'),
+							pagerMorePrev = $(pager).find('.m-datatable__pager-link--more-prev'),
+							pagerMoreNext = $(pager).find('.m-datatable__pager-link--more-next'),
 							pagerFirst = $(pager).find('.m-datatable__pager-link--first'),
 							pagerPrev = $(pager).find('.m-datatable__pager-link--prev'),
 							pagerNext = $(pager).find('.m-datatable__pager-link--next'),
@@ -3571,7 +3303,7 @@ $(document).ready(function() {
 						// get page before of first visible
 						var morePrevPage = Math.max($(pagerNumber).first().data('page') - 1,
 							1);
-						$(pagerMorePrev).each(function(i, prev) {
+						$(pagerMorePrev).each(function (i, prev) {
 							$(prev).attr('data-page', morePrevPage);
 						});
 						// show/hide <li>
@@ -3584,7 +3316,7 @@ $(document).ready(function() {
 						// get page after of last visible
 						var moreNextPage = Math.min($(pagerNumber).last().data('page') + 1,
 							pg.meta.pages);
-						$(pagerMoreNext).each(function(i, prev) {
+						$(pagerMoreNext).each(function (i, prev) {
 							$(pagerMoreNext).attr('data-page', moreNextPage).show();
 						});
 
@@ -3599,34 +3331,18 @@ $(document).ready(function() {
 
 						// begin/end of pages
 						if (pg.meta.page === 1) {
-							$(pagerFirst).
-								attr('disabled', true).
-								addClass('m-datatable__pager-link--disabled');
-							$(pagerPrev).
-								attr('disabled', true).
-								addClass('m-datatable__pager-link--disabled');
+							$(pagerFirst).attr('disabled', true).addClass('m-datatable__pager-link--disabled');
+							$(pagerPrev).attr('disabled', true).addClass('m-datatable__pager-link--disabled');
 						} else {
-							$(pagerFirst).
-								removeAttr('disabled').
-								removeClass('m-datatable__pager-link--disabled');
-							$(pagerPrev).
-								removeAttr('disabled').
-								removeClass('m-datatable__pager-link--disabled');
+							$(pagerFirst).removeAttr('disabled').removeClass('m-datatable__pager-link--disabled');
+							$(pagerPrev).removeAttr('disabled').removeClass('m-datatable__pager-link--disabled');
 						}
 						if (pg.meta.page === pg.meta.pages) {
-							$(pagerNext).
-								attr('disabled', true).
-								addClass('m-datatable__pager-link--disabled');
-							$(pagerLast).
-								attr('disabled', true).
-								addClass('m-datatable__pager-link--disabled');
+							$(pagerNext).attr('disabled', true).addClass('m-datatable__pager-link--disabled');
+							$(pagerLast).attr('disabled', true).addClass('m-datatable__pager-link--disabled');
 						} else {
-							$(pagerNext).
-								removeAttr('disabled').
-								removeClass('m-datatable__pager-link--disabled');
-							$(pagerLast).
-								removeAttr('disabled').
-								removeClass('m-datatable__pager-link--disabled');
+							$(pagerNext).removeAttr('disabled').removeClass('m-datatable__pager-link--disabled');
+							$(pagerLast).removeAttr('disabled').removeClass('m-datatable__pager-link--disabled');
 						}
 
 						// display more buttons
@@ -3642,15 +3358,16 @@ $(document).ready(function() {
 			},
 
 			/**
-			 * Hide/show table cell defined by options[columns][i][responsive][visible/hidden]
+			 * Hide/show table cell defined by
+			 * options[columns][i][responsive][visible/hidden]
 			 */
-			columnHide: function() {
+			columnHide: function () {
 				var screen = mUtil.getViewPort().width;
 				// foreach columns setting
-				$.each(options.columns, function(i, column) {
+				$.each(options.columns, function (i, column) {
 					if (typeof column.responsive !== 'undefined') {
 						var field = column.field;
-						var tds = $.grep($(datatable.table).find('.m-datatable__cell'), function(n, i) {
+						var tds = $.grep($(datatable.table).find('.m-datatable__cell'), function (n, i) {
 							return field === $(n).data('field');
 						});
 						if (mUtil.getBreakpoint(column.responsive.hidden) >= screen) {
@@ -3670,7 +3387,7 @@ $(document).ready(function() {
 			/**
 			 * Setup sub datatable
 			 */
-			setupSubDatatable: function() {
+			setupSubDatatable: function () {
 				var subTableCallback = Plugin.getOption('detail.content');
 				if (typeof subTableCallback !== 'function') return;
 
@@ -3682,7 +3399,7 @@ $(document).ready(function() {
 				options.columns[0]['subtable'] = true;
 
 				// toggle on open sub table
-				var toggleSubTable = function(e) {
+				var toggleSubTable = function (e) {
 					e.preventDefault();
 					// get parent row of this subtable
 					var parentRow = $(this).closest('.m-datatable__row');
@@ -3691,12 +3408,7 @@ $(document).ready(function() {
 					var subTableRow = $(parentRow).next('.m-datatable__row-subtable');
 					if ($(subTableRow).length === 0) {
 						// prepare DOM for sub table, each <tr> as parent and add <tr> as child table
-						subTableRow = $('<tr/>').
-							addClass('m-datatable__row-subtable m-datatable__row-loading').
-							hide().
-							append($('<td/>').
-								addClass('m-datatable__subtable').
-								attr('colspan', Plugin.getTotalColumns()));
+						subTableRow = $('<tr/>').addClass('m-datatable__row-subtable m-datatable__row-loading').hide().append($('<td/>').addClass('m-datatable__subtable').attr('colspan', Plugin.getTotalColumns()));
 						$(parentRow).after(subTableRow);
 						// add class to even row
 						if ($(parentRow).hasClass('m-datatable__row--even')) {
@@ -3709,10 +3421,7 @@ $(document).ready(function() {
 					var subTable = $(subTableRow).find('.m-datatable__subtable');
 
 					// get id from first column of parent row
-					var primaryKey = $(this).
-						closest('[data-field]:first-child').
-						find('.m-datatable__toggle-subtable').
-						data('value');
+					var primaryKey = $(this).closest('[data-field]:first-child').find('.m-datatable__toggle-subtable').data('value');
 
 					var icon = $(this).find('i').removeAttr('class');
 
@@ -3735,7 +3444,8 @@ $(document).ready(function() {
 					// prevent duplicate datatable init
 					if ($(subTable).find('.m-datatable').length === 0) {
 						// get data by primary id
-						$.map(datatable.dataSet, function(n, i) {
+						$.map(datatable.dataSet, function (n, i) {
+							// primary id must be at the first column, otherwise e.data will be undefined
 							if (primaryKey === n[options.columns[0].field]) {
 								e.data = n;
 								return true;
@@ -3752,7 +3462,7 @@ $(document).ready(function() {
 						// run callback with event
 						subTableCallback(e);
 
-						$(subTable).children('.m-datatable').on('m-datatable--on-init', function(e) {
+						$(subTable).children('.m-datatable').on('m-datatable--on-init', function (e) {
 							$(subTableRow).removeClass('m-datatable__row-loading');
 						});
 						if (Plugin.getOption('data.type') === 'local') {
@@ -3762,34 +3472,24 @@ $(document).ready(function() {
 				};
 
 				var columns = options.columns;
-				$(datatable.tableBody).
-					find('.m-datatable__row').
-					each(function(tri, tr) {
-						$(tr).find('.m-datatable__cell').each(function(tdi, td) {
-							// get column settings by field
-							var column = $.grep(columns, function(n, i) {
-								return $(td).data('field') === n.field;
-							})[0];
-							if (typeof column !== 'undefined') {
-								var value = $(td).text();
-								// enable column subtable toggle
-								if (typeof column.subtable !== 'undefined' && column.subtable) {
-									// check if subtable toggle exist
-									if ($(td).find('.m-datatable__toggle-subtable').length > 0) return;
-									// append subtable toggle
-									$(td).html($('<a/>').
-										addClass('m-datatable__toggle-subtable').
-										attr('href', '#').
-										attr('data-value', value).
-										attr('title', Plugin.getOption('detail.title')).
-										on('click', toggleSubTable).
-										append($('<i/>').
-											css('width', $(td).data('width')).
-											addClass(Plugin.getOption('layout.icons.rowDetail.collapse'))));
-								}
+				$(datatable.tableBody).find('.m-datatable__row').each(function (tri, tr) {
+					$(tr).find('.m-datatable__cell').each(function (tdi, td) {
+						// get column settings by field
+						var column = $.grep(columns, function (n, i) {
+							return $(td).data('field') === n.field;
+						})[0];
+						if (typeof column !== 'undefined') {
+							var value = $(td).text();
+							// enable column subtable toggle
+							if (typeof column.subtable !== 'undefined' && column.subtable) {
+								// check if subtable toggle exist
+								if ($(td).find('.m-datatable__toggle-subtable').length > 0) return;
+								// append subtable toggle
+								$(td).html($('<a/>').addClass('m-datatable__toggle-subtable').attr('href', '#').attr('data-value', value).attr('title', Plugin.getOption('detail.title')).on('click', toggleSubTable).append($('<i/>').css('width', $(td).data('width')).addClass(Plugin.getOption('layout.icons.rowDetail.collapse'))));
 							}
-						});
+						}
 					});
+				});
 
 				// $(datatable.tableHead).find('.m-datatable__row').first()
 			},
@@ -3797,7 +3497,7 @@ $(document).ready(function() {
 			/**
 			 * Datasource mapping callback
 			 */
-			dataMapCallback: function(raw) {
+			dataMapCallback: function (raw) {
 				// static dataset array
 				var dataSet = raw;
 				// dataset mapping callback
@@ -3805,7 +3505,7 @@ $(document).ready(function() {
 					return Plugin.getOption('data.source.read.map')(raw);
 				} else {
 					// default data mapping fallback
-					if (typeof raw.data !== 'undefined') {
+					if (typeof raw !== 'undefined' && typeof raw.data !== 'undefined') {
 						dataSet = raw.data;
 					}
 				}
@@ -3817,7 +3517,7 @@ $(document).ready(function() {
 			 * BlockUI spinner callback
 			 * @param block
 			 */
-			spinnerCallback: function(block) {
+			spinnerCallback: function (block) {
 				if (block) {
 					if (!Plugin.isSpinning) {
 						// get spinner options
@@ -3846,21 +3546,20 @@ $(document).ready(function() {
 			 * @param column
 			 * @returns {*|Array.<T>|{sort, field}|{asc, desc}}
 			 */
-			sortCallback: function(data, sort, column) {
+			sortCallback: function (data, sort, column) {
 				var type = column['type'] || 'string';
 				var format = column['format'] || '';
 				var field = column['field'];
 
-				if (type === 'date' && typeof moment === 'undefined') {
-					throw new Error('Moment.js is required.');
-				}
-
-				return $(data).sort(function(a, b) {
+				return $(data).sort(function (a, b) {
 					var aField = a[field];
 					var bField = b[field];
 
 					switch (type) {
 						case 'date':
+							if (typeof moment === 'undefined') {
+								throw new Error('Moment.js is required.');
+							}
 							var diff = moment(aField, format).diff(moment(bField, format));
 							if (sort === 'asc') {
 								return diff > 0 ? 1 : diff < 0 ? -1 : 0;
@@ -3902,7 +3601,7 @@ $(document).ready(function() {
 			 * @param text
 			 * @param obj
 			 */
-			log: function(text, obj) {
+			log: function (text, obj) {
 				if (typeof obj === 'undefined') obj = '';
 				if (datatable.debug) {
 					console.log(text, obj);
@@ -3912,11 +3611,11 @@ $(document).ready(function() {
 			/**
 			 * Auto hide columnds overflow in row
 			 */
-			autoHide: function() {
+			autoHide: function () {
 				$(datatable.table).find('.m-datatable__cell').show();
-				$(datatable.tableBody).each(function() {
+				$(datatable.tableBody).each(function () {
 					while ($(this)[0].offsetWidth < $(this)[0].scrollWidth) {
-						$(datatable.table).find('.m-datatable__row').each(function(i) {
+						$(datatable.table).find('.m-datatable__row').each(function (i) {
 							var cell = $(this).find('.m-datatable__cell').not(':hidden').last();
 							$(cell).hide();
 						});
@@ -3924,69 +3623,45 @@ $(document).ready(function() {
 					}
 				});
 
-				var toggleHiddenColumns = function(e) {
+				var toggleHiddenColumns = function (e) {
 					e.preventDefault();
 
 					var row = $(this).closest('.m-datatable__row');
 					var detailRow = $(row).next();
 
 					if (!$(detailRow).hasClass('m-datatable__row-detail')) {
-						$(this).find('i').
-							removeClass(Plugin.getOption('layout.icons.rowDetail.collapse')).
-							addClass(Plugin.getOption('layout.icons.rowDetail.expand'));
+						$(this).find('i').removeClass(Plugin.getOption('layout.icons.rowDetail.collapse')).addClass(Plugin.getOption('layout.icons.rowDetail.expand'));
 
 						var hidden = $(row).find('.m-datatable__cell:hidden').clone().show();
 
 						detailRow = $('<tr/>').addClass('m-datatable__row-detail').insertAfter(row);
-						var detailRowTd = $('<td/>').
-							addClass('m-datatable__detail').
-							attr('colspan', Plugin.getTotalColumns()).appendTo(detailRow);
+						var detailRowTd = $('<td/>').addClass('m-datatable__detail').attr('colspan', Plugin.getTotalColumns()).appendTo(detailRow);
 
 						var detailSubTable = $('<table/>');
-						$(hidden).each(function() {
+						$(hidden).each(function () {
 							var field = $(this).data('field');
-							var column = $.grep(options.columns, function(n, i) {
+							var column = $.grep(options.columns, function (n, i) {
 								return field === n.field;
 							})[0];
-							$(detailSubTable).
-								append($('<tr class="m-datatable__row"></tr>').
-									append($('<td class="m-datatable__cell"></td>').
-										append($('<span/>').
-											css('width', Plugin.offset).
-											append(column.title))).
-									append(this));
+							$(detailSubTable).append($('<tr class="m-datatable__row"></tr>').append($('<td class="m-datatable__cell"></td>').append($('<span/>').css('width', Plugin.offset).append(column.title))).append(this));
 						});
 						$(detailRowTd).append(detailSubTable);
 
 					} else {
-						$(this).find('i').
-							removeClass(Plugin.getOption('layout.icons.rowDetail.expand')).
-							addClass(Plugin.getOption('layout.icons.rowDetail.collapse'));
+						$(this).find('i').removeClass(Plugin.getOption('layout.icons.rowDetail.expand')).addClass(Plugin.getOption('layout.icons.rowDetail.collapse'));
 						$(detailRow).remove();
 					}
 				};
 
 				// toggle show hidden columns
-				$(datatable.tableBody).find('.m-datatable__row').each(function() {
-					$(this).prepend($('<td/>').addClass('m-datatable__cell m-datatable__toggle--detail').
-						append($('<a/>').
-							addClass('m-datatable__toggle-detail').
-							attr('href', '#').
-							on('click', toggleHiddenColumns).
-							append($('<i/>').
-								css('width', '21px').// maintain width for both icons expand and collapse
-								addClass(Plugin.getOption('layout.icons.rowDetail.collapse')))));
+				$(datatable.tableBody).find('.m-datatable__row').each(function () {
+					$(this).prepend($('<td/>').addClass('m-datatable__cell m-datatable__toggle--detail').append($('<a/>').addClass('m-datatable__toggle-detail').attr('href', '').on('click', toggleHiddenColumns).append($('<i/>').css('width', '21px').// maintain width for both icons expand and collapse
+					addClass(Plugin.getOption('layout.icons.rowDetail.collapse')))));
 
 					// check if subtable toggle exist
 					if ($(datatable.tableHead).find('.m-datatable__toggle-detail').length === 0) {
-						$(datatable.tableHead).
-							find('.m-datatable__row').
-							first().
-							prepend('<th class="m-datatable__cell m-datatable__toggle-detail"><span style="width: 21px"></span></th>');
-						$(datatable.tableFoot).
-							find('.m-datatable__row').
-							first().
-							prepend('<th class="m-datatable__cell m-datatable__toggle-detail"><span style="width: 21px"></span></th>');
+						$(datatable.tableHead).find('.m-datatable__row').first().prepend('<th class="m-datatable__cell m-datatable__toggle-detail"><span style="width: 21px"></span></th>');
+						$(datatable.tableFoot).find('.m-datatable__row').first().prepend('<th class="m-datatable__cell m-datatable__toggle-detail"><span style="width: 21px"></span></th>');
 					} else {
 						$(datatable.tableHead).find('.m-datatable__toggle-detail').find('span').css('width', '21px');
 					}
@@ -3996,8 +3671,8 @@ $(document).ready(function() {
 			/**
 			 * todo; implement hover column
 			 */
-			hoverColumn: function() {
-				$(datatable.tableBody).on('mouseenter', '.m-datatable__cell', function() {
+			hoverColumn: function () {
+				$(datatable.tableBody).on('mouseenter', '.m-datatable__cell', function () {
 					var colIdx = $(Plugin.cell(this).nodes()).index();
 					$(Plugin.cells().nodes()).removeClass('m-datatable__cell--hover');
 					$(Plugin.column(colIdx).nodes()).addClass('m-datatable__cell--hover');
@@ -4007,10 +3682,10 @@ $(document).ready(function() {
 			/**
 			 * To enable auto columns features for remote data source
 			 */
-			setAutoColumns: function() {
+			setAutoColumns: function () {
 				if (Plugin.getOption('data.autoColumns')) {
-					$.each(datatable.dataSet[0], function(k, v) {
-						var found = $.grep(options.columns, function(n, i) {
+					$.each(datatable.dataSet[0], function (k, v) {
+						var found = $.grep(options.columns, function (n, i) {
 							return k === n.field;
 						});
 						if (found.length === 0) {
@@ -4033,30 +3708,17 @@ $(document).ready(function() {
 			/**
 			 * Check if table is a locked colums table
 			 */
-			isLocked: function() {
-				return $(datatable.wrap).hasClass('m-datatable--lock') || false;
+			isLocked: function () {
+				return mUtil.hasClass(datatable.wrap[0], 'm-datatable--lock') || false;
 			},
 
 			/**
-			 * Insert html into table content, take count mCustomScrollbar DOM to prevent replace
-			 * @param html
-			 * @param tablePart
-			 */
-			replaceTableContent: function(html, tablePart) {
-				if (typeof tablePart === 'undefined') tablePart = datatable.tableBody;
-				if ($(tablePart).hasClass('mCustomScrollbar')) {
-					$(tablePart).find('.mCSB_container').html(html);
-				} else {
-					$(tablePart).html(html);
-				}
-			},
-
-			/**
-			 * Get total extra space of an element for width calculation, including padding, margin, border
+			 * Get total extra space of an element for width calculation, including
+			 * padding, margin, border
 			 * @param element
 			 * @returns {number}
 			 */
-			getExtraSpace: function(element) {
+			getExtraSpace: function (element) {
 				var padding = parseInt($(element).css('paddingRight')) +
 					parseInt($(element).css('paddingLeft'));
 				var margin = parseInt($(element).css('marginRight')) +
@@ -4072,9 +3734,9 @@ $(document).ready(function() {
 			 * @param data
 			 * @returns {*}
 			 */
-			dataPlaceholder: function(template, data) {
+			dataPlaceholder: function (template, data) {
 				var result = template;
-				$.each(data, function(key, val) {
+				$.each(data, function (key, val) {
 					result = result.replace('{{' + key + '}}', val);
 				});
 				return result;
@@ -4086,7 +3748,7 @@ $(document).ready(function() {
 			 * @param suffix
 			 * @returns {*}
 			 */
-			getTableId: function(suffix) {
+			getTableId: function (suffix) {
 				if (typeof suffix === 'undefined') suffix = '';
 				var id = $(datatable).attr('id');
 				if (typeof id === 'undefined') {
@@ -4098,7 +3760,7 @@ $(document).ready(function() {
 			/**
 			 * Get table prefix with depth number
 			 */
-			getTablePrefix: function(suffix) {
+			getTablePrefix: function (suffix) {
 				if (typeof suffix !== 'undefined') suffix = '-' + suffix;
 				return Plugin.getTableId() + '-' + Plugin.getDepth() + suffix;
 			},
@@ -4107,7 +3769,7 @@ $(document).ready(function() {
 			 * Get current table depth of sub table
 			 * @returns {number}
 			 */
-			getDepth: function() {
+			getDepth: function () {
 				var depth = 0;
 				var table = datatable.table;
 				do {
@@ -4122,7 +3784,7 @@ $(document).ready(function() {
 			 * @param key
 			 * @param value
 			 */
-			stateKeep: function(key, value) {
+			stateKeep: function (key, value) {
 				key = Plugin.getTablePrefix(key);
 				if (Plugin.getOption('data.saveState') === false) return;
 				if (Plugin.getOption('data.saveState.webstorage') && localStorage) {
@@ -4138,7 +3800,7 @@ $(document).ready(function() {
 			 * @param key
 			 * @param defValue
 			 */
-			stateGet: function(key, defValue) {
+			stateGet: function (key, defValue) {
 				key = Plugin.getTablePrefix(key);
 				if (Plugin.getOption('data.saveState') === false) return;
 				var value = null;
@@ -4157,7 +3819,7 @@ $(document).ready(function() {
 			 * @param key
 			 * @param value
 			 */
-			stateUpdate: function(key, value) {
+			stateUpdate: function (key, value) {
 				var ori = Plugin.stateGet(key);
 				if (typeof ori === 'undefined' || ori === null) ori = {};
 				Plugin.stateKeep(key, $.extend({}, ori, value));
@@ -4167,7 +3829,7 @@ $(document).ready(function() {
 			 * Remove state item
 			 * @param key
 			 */
-			stateRemove: function(key) {
+			stateRemove: function (key) {
 				key = Plugin.getTablePrefix(key);
 				if (localStorage) {
 					localStorage.removeItem(key);
@@ -4178,12 +3840,9 @@ $(document).ready(function() {
 			/**
 			 * Get total columns.
 			 */
-			getTotalColumns: function(tablePart) {
+			getTotalColumns: function (tablePart) {
 				if (typeof tablePart === 'undefined') tablePart = datatable.tableBody;
-				return $(tablePart).
-					find('.m-datatable__row').
-					first().
-					find('.m-datatable__cell').length;
+				return $(tablePart).find('.m-datatable__row').first().find('.m-datatable__cell').length;
 			},
 
 			/**
@@ -4195,7 +3854,7 @@ $(document).ready(function() {
 			 * @param tdOnly Optional. Default true
 			 * @returns {*}
 			 */
-			getOneRow: function(tablePart, row, tdOnly) {
+			getOneRow: function (tablePart, row, tdOnly) {
 				if (typeof tdOnly === 'undefined') tdOnly = true;
 				// get list of <tr>
 				var result = $(tablePart).find('.m-datatable__row:not(.m-datatable__row-detail):nth-child(' + row + ')');
@@ -4211,12 +3870,12 @@ $(document).ready(function() {
 			 * @param element
 			 * @returns {boolean}
 			 */
-			hasOverflowY: function(element) {
+			hasOverflowY: function (element) {
 				var children = $(element).find('.m-datatable__row');
 				var maxHeight = 0;
 
 				if (children.length > 0) {
-					$(children).each(function(tdi, td) {
+					$(children).each(function (tdi, td) {
 						maxHeight += Math.floor($(td).innerHeight());
 					});
 
@@ -4231,9 +3890,10 @@ $(document).ready(function() {
 			 * todo; Not in use.
 			 * @param header Header sort clicked
 			 * @param sort asc|desc. Optional. Default asc
-			 * @param int Boolean. Optional. Comparison value parse to integer. Default false
+			 * @param int Boolean. Optional. Comparison value parse to integer.
+			 *     Default false
 			 */
-			sortColumn: function(header, sort, int) {
+			sortColumn: function (header, sort, int) {
 				if (typeof sort === 'undefined') sort = 'asc'; // desc
 				if (typeof int === 'undefined') int = false;
 
@@ -4241,13 +3901,11 @@ $(document).ready(function() {
 				var rows = $(datatable.tableBody).find('.m-datatable__row');
 				var hIndex = $(header).closest('.m-datatable__lock').index();
 				if (hIndex !== -1) {
-					rows = $(datatable.tableBody).
-						find('.m-datatable__lock:nth-child(' + (hIndex + 1) + ')').
-						find('.m-datatable__row');
+					rows = $(datatable.tableBody).find('.m-datatable__lock:nth-child(' + (hIndex + 1) + ')').find('.m-datatable__row');
 				}
 
 				var container = $(rows).parent();
-				$(rows).sort(function(a, b) {
+				$(rows).sort(function (a, b) {
 					var tda = $(a).find('td:nth-child(' + column + ')').text();
 					var tdb = $(b).find('td:nth-child(' + column + ')').text();
 
@@ -4268,27 +3926,21 @@ $(document).ready(function() {
 			/**
 			 * Perform sort remote and local
 			 */
-			sorting: function() {
+			sorting: function () {
 				var sortObj = {
-					init: function() {
+					init: function () {
 						if (options.sortable) {
-							$(datatable.tableHead).
-								find('.m-datatable__cell:not(.m-datatable__cell--check)').
-								addClass('m-datatable__cell--sort').
-								off('click').
-								on('click', sortObj.sortClick);
+							$(datatable.tableHead).find('.m-datatable__cell:not(.m-datatable__cell--check)').addClass('m-datatable__cell--sort').off('click').on('click', sortObj.sortClick);
 							// first init
 							sortObj.setIcon();
 						}
 					},
-					setIcon: function() {
+					setIcon: function () {
 						var meta = Plugin.getDataSourceParam('sort');
 						if ($.isEmptyObject(meta)) return;
 
 						// sort icon beside column header
-						var td = $(datatable.tableHead).
-							find('.m-datatable__cell[data-field="' + meta.field + '"]').
-							attr('data-sort', meta.sort);
+						var td = $(datatable.tableHead).find('.m-datatable__cell[data-field="' + meta.field + '"]').attr('data-sort', meta.sort);
 						var sorting = $(td).find('span');
 						var icon = $(sorting).find('i');
 
@@ -4300,7 +3952,7 @@ $(document).ready(function() {
 							$(sorting).append($('<i/>').addClass(icons[meta.sort]));
 						}
 					},
-					sortClick: function(e) {
+					sortClick: function (e) {
 						var meta = Plugin.getDataSourceParam('sort');
 						var field = $(this).data('field');
 						var column = Plugin.getColumnByField(field);
@@ -4308,9 +3960,7 @@ $(document).ready(function() {
 						if (typeof column.sortable !== 'undefined' &&
 							column.sortable === false) return;
 
-						$(datatable.tableHead).
-							find('.m-datatable__cell > span > i').
-							remove();
+						$(datatable.tableHead).find('.m-datatable__cell > span > i').remove();
 
 						if (options.sortable) {
 							Plugin.spinnerCallback(true);
@@ -4331,7 +3981,7 @@ $(document).ready(function() {
 
 							sortObj.setIcon();
 
-							setTimeout(function() {
+							setTimeout(function () {
 								Plugin.dataRender('sort');
 								$(datatable).trigger('m-datatable--on-sort', meta);
 							}, 300);
@@ -4346,7 +3996,7 @@ $(document).ready(function() {
 			 * Call this method, before using dataSet variable.
 			 * @returns {*|null}
 			 */
-			localDataUpdate: function() {
+			localDataUpdate: function () {
 				// todo; fix twice execution
 				var params = Plugin.getDataSourceParam();
 				if (typeof datatable.originalDataSet === 'undefined') {
@@ -4370,26 +4020,36 @@ $(document).ready(function() {
 				if (typeof params.query === 'object' && !Plugin.getOption('data.serverFiltering')) {
 					params.query = params.query || {};
 
+					var nestedSearch = function (obj) {
+						for (var field in obj) {
+							if (!obj.hasOwnProperty(field)) continue;
+							if (typeof obj[field] === 'string') {
+								if (obj[field].toLowerCase() == search || obj[field].toLowerCase().indexOf(search) !== -1) {
+									return true;
+								}
+							}
+							else if (typeof obj[field] === 'number') {
+								if (obj[field] === search) {
+									return true;
+								}
+							}
+							else if (typeof obj[field] === 'object') {
+								return nestedSearch(obj[field]);
+							}
+						}
+						return false;
+					};
+
 					var search = $(Plugin.getOption('search.input')).val();
 					if (typeof search !== 'undefined' && search !== '') {
 						search = search.toLowerCase();
-						datatable.dataSet = $.grep(datatable.dataSet, function(obj) {
-							for (var field in obj) {
-								if (!obj.hasOwnProperty(field)) continue;
-								if (typeof obj[field] === 'string') {
-									if (obj[field].toLowerCase().indexOf(search) > -1) {
-										return true;
-									}
-								}
-							}
-							return false;
-						});
+						datatable.dataSet = $.grep(datatable.dataSet, nestedSearch);
 						// remove generalSearch as we don't need this for next columns filter
 						delete params.query[Plugin.getGeneralSearchKey()];
 					}
 
 					// remove empty element from array
-					$.each(params.query, function(k, v) {
+					$.each(params.query, function (k, v) {
 						if (v === '') {
 							delete params.query[k];
 						}
@@ -4399,7 +4059,7 @@ $(document).ready(function() {
 					datatable.dataSet = Plugin.filterArray(datatable.dataSet, params.query);
 
 					// reset array index
-					datatable.dataSet = datatable.dataSet.filter(function() {
+					datatable.dataSet = datatable.dataSet.filter(function () {
 						return true;
 					});
 				}
@@ -4414,7 +4074,7 @@ $(document).ready(function() {
 			 * @param operator
 			 * @returns {*}
 			 */
-			filterArray: function(list, args, operator) {
+			filterArray: function (list, args, operator) {
 				if (typeof list !== 'object') {
 					return [];
 				}
@@ -4434,17 +4094,19 @@ $(document).ready(function() {
 				var count = Object.keys(args).length;
 				var filtered = [];
 
-				$.each(list, function(key, obj) {
+				$.each(list, function (key, obj) {
 					var to_match = obj;
 
 					var matched = 0;
-					$.each(args, function(m_key, m_value) {
+					$.each(args, function (m_key, m_value) {
 						m_value = m_value instanceof Array ? m_value : [m_value];
 						if (to_match.hasOwnProperty(m_key)) {
-							to_match[m_key] = to_match[m_key].toString();
-							if ($.inArray(to_match[m_key], m_value) !== -1) {
-								matched++;
-							}
+							var lhs = to_match[m_key].toString().toLowerCase();
+							m_value.forEach(function (item, index) {
+								if (item.toString().toLowerCase() == lhs || lhs.indexOf(item.toString().toLowerCase()) !== -1) {
+									matched++;
+								}
+							});
 						}
 					});
 
@@ -4463,9 +4125,13 @@ $(document).ready(function() {
 			/**
 			 * Reset lock column scroll to 0 when resize
 			 */
-			resetScroll: function() {
+			resetScroll: function () {
 				if (typeof options.detail === 'undefined' && Plugin.getDepth() === 1) {
-					$(datatable.table).find('.m-datatable__row').css('left', 0);
+					if (mUtil.isRTL()) {
+						$(datatable.table).find('.m-datatable__row').css('right', 0);
+					} else {
+						$(datatable.table).find('.m-datatable__row').css('left', 0);
+					}
 					$(datatable.table).find('.m-datatable__lock').css('top', 0);
 					$(datatable.tableBody).scrollTop(0);
 				}
@@ -4476,10 +4142,10 @@ $(document).ready(function() {
 			 * @param field
 			 * @returns {boolean}
 			 */
-			getColumnByField: function(field) {
+			getColumnByField: function (field) {
 				if (typeof field === 'undefined') return;
 				var result;
-				$.each(options.columns, function(i, column) {
+				$.each(options.columns, function (i, column) {
 					if (field === column.field) {
 						result = column;
 						return false;
@@ -4491,9 +4157,9 @@ $(document).ready(function() {
 			/**
 			 * Get default sort column
 			 */
-			getDefaultSortColumn: function() {
+			getDefaultSortColumn: function () {
 				var result;
-				$.each(options.columns, function(i, column) {
+				$.each(options.columns, function (i, column) {
 					if (typeof column.sortable !== 'undefined'
 						&& $.inArray(column.sortable, ['asc', 'desc']) !== -1) {
 						result = {sort: column.sortable, field: column.field};
@@ -4507,9 +4173,10 @@ $(document).ready(function() {
 			 * Helper to get element dimensions, when the element is hidden
 			 * @param element
 			 * @param includeMargin
-			 * @returns {{width: number, height: number, innerWidth: number, innerHeight: number, outerWidth: number, outerHeight: number}}
+			 * @returns {{width: number, height: number, innerWidth: number,
+			 *     innerHeight: number, outerWidth: number, outerHeight: number}}
 			 */
-			getHiddenDimensions: function(element, includeMargin) {
+			getHiddenDimensions: function (element, includeMargin) {
 				var props = {
 						position: 'absolute',
 						visibility: 'hidden',
@@ -4529,7 +4196,7 @@ $(document).ready(function() {
 					: false;
 
 				var oldProps = [];
-				hiddenParents.each(function() {
+				hiddenParents.each(function () {
 					var old = {};
 
 					for (var name in props) {
@@ -4547,7 +4214,7 @@ $(document).ready(function() {
 				dim.innerHeight = $(element).innerHeight();
 				dim.outerHeight = $(element).outerHeight(includeMargin);
 
-				hiddenParents.each(function(i) {
+				hiddenParents.each(function (i) {
 					var old = oldProps[i];
 					for (var name in props) {
 						this.style[name] = old[name];
@@ -4557,7 +4224,7 @@ $(document).ready(function() {
 				return dim;
 			},
 
-			getGeneralSearchKey: function() {
+			getGeneralSearchKey: function () {
 				var searchInput = $(Plugin.getOption('search.input'));
 				return $(searchInput).prop('name') || $(searchInput).prop('id');
 			},
@@ -4568,8 +4235,8 @@ $(document).ready(function() {
 			 * @param object Object to iterate
 			 * @returns {*}
 			 */
-			getObject: function(path, object) {
-				return path.split('.').reduce(function(obj, i) {
+			getObject: function (path, object) {
+				return path.split('.').reduce(function (obj, i) {
 					return obj !== null && typeof obj[i] !== 'undefined' ? obj[i] : null;
 				}, object);
 			},
@@ -4581,7 +4248,7 @@ $(document).ready(function() {
 			 * @param value
 			 * @returns {*}
 			 */
-			extendObj: function(obj, path, value) {
+			extendObj: function (obj, path, value) {
 				var levels = path.split('.'),
 					i = 0;
 
@@ -4606,6 +4273,16 @@ $(document).ready(function() {
 				return obj;
 			},
 
+			rowEvenOdd: function () {
+				// row even class
+				$(datatable.tableBody).find('.m-datatable__row').removeClass('m-datatable__row--even');
+				if ($(datatable.wrap).hasClass('m-datatable--subtable')) {
+					$(datatable.tableBody).find('.m-datatable__row:not(.m-datatable__row-detail):even').addClass('m-datatable__row--even');
+				} else {
+					$(datatable.tableBody).find('.m-datatable__row:nth-child(even)').addClass('m-datatable__row--even');
+				}
+			},
+
 			/********************
 			 ** PUBLIC API METHODS
 			 ********************/
@@ -4617,7 +4294,7 @@ $(document).ready(function() {
 			 * Redraw datatable by recalculating its DOM elements, etc.
 			 * @returns {jQuery}
 			 */
-			redraw: function() {
+			redraw: function () {
 				Plugin.adjustCellsWidth.call();
 				if (Plugin.isLocked()) {
 					// fix hiding cell width issue
@@ -4635,7 +4312,7 @@ $(document).ready(function() {
 			 * Shortcode to reload
 			 * @returns {jQuery}
 			 */
-			load: function() {
+			load: function () {
 				Plugin.reload();
 				return datatable;
 			},
@@ -4644,14 +4321,14 @@ $(document).ready(function() {
 			 * Datasource reload
 			 * @returns {jQuery}
 			 */
-			reload: function() {
-				var delay = (function() {
-					return function(callback, ms) {
+			reload: function () {
+				var delay = (function () {
+					return function (callback, ms) {
 						clearTimeout(Plugin.timer);
 						Plugin.timer = setTimeout(callback, ms);
 					};
 				})();
-				delay(function() {
+				delay(function () {
 					// local only. remote pagination will skip this block
 					if (!options.data.serverFiltering) {
 						Plugin.localDataUpdate();
@@ -4667,9 +4344,9 @@ $(document).ready(function() {
 			 * @param id
 			 * @returns {jQuery}
 			 */
-			getRecord: function(id) {
+			getRecord: function (id) {
 				if (typeof datatable.tableBody === 'undefined') datatable.tableBody = $(datatable.table).children('tbody');
-				$(datatable.tableBody).find('.m-datatable__cell:first-child').each(function(i, cell) {
+				$(datatable.tableBody).find('.m-datatable__cell:first-child').each(function (i, cell) {
 					if (id == $(cell).text()) {
 						var rowNumber = $(cell).closest('.m-datatable__row').index() + 1;
 						datatable.API.record = datatable.API.value = Plugin.getOneRow(datatable.tableBody, rowNumber);
@@ -4685,17 +4362,18 @@ $(document).ready(function() {
 			 * @param columnName
 			 * @returns {jQuery}
 			 */
-			getColumn: function(columnName) {
+			getColumn: function (columnName) {
 				Plugin.setSelectedRecords();
 				datatable.API.value = $(datatable.API.record).find('[data-field="' + columnName + '"]');
 				return datatable;
 			},
 
 			/**
-			 * Destroy datatable to original DOM state before datatable was initialized
+			 * Destroy datatable to original DOM state before datatable was
+			 * initialized
 			 * @returns {jQuery}
 			 */
-			destroy: function() {
+			destroy: function () {
 				$(datatable).parent().find('.m-datatable__pager').remove();
 				var initialDatatable = $(datatable.initialDatatable).addClass('m-datatable--destroyed').show();
 				$(datatable).replaceWith(initialDatatable);
@@ -4711,7 +4389,7 @@ $(document).ready(function() {
 			 * @param field
 			 * @param sort
 			 */
-			sort: function(field, sort) {
+			sort: function (field, sort) {
 				// toggle sort
 				sort = typeof sort === 'undefined' ? 'asc' : sort;
 
@@ -4721,12 +4399,10 @@ $(document).ready(function() {
 				var meta = {field: field, sort: sort};
 				Plugin.setDataSourceParam('sort', meta);
 
-				setTimeout(function() {
+				setTimeout(function () {
 					Plugin.dataRender('sort');
 					$(datatable).trigger('m-datatable--on-sort', meta);
-					$(datatable.tableHead).
-						find('.m-datatable__cell > span > i').
-						remove();
+					$(datatable.tableHead).find('.m-datatable__cell > span > i').remove();
 				}, 300);
 
 				return datatable;
@@ -4737,7 +4413,7 @@ $(document).ready(function() {
 			 * Get current selected column value
 			 * @returns {jQuery}
 			 */
-			getValue: function() {
+			getValue: function () {
 				return $(datatable.API.value).text();
 			},
 
@@ -4745,30 +4421,23 @@ $(document).ready(function() {
 			 * Set checkbox active
 			 * @param cell JQuery selector or checkbox ID
 			 */
-			setActive: function(cell) {
+			setActive: function (cell) {
 				if (typeof cell === 'string') {
 					// set by checkbox id
-					cell = $(datatable.tableBody).
-						find('.m-checkbox--single > [type="checkbox"][value="' + cell + '"]');
+					cell = $(datatable.tableBody).find('.m-checkbox--single > [type="checkbox"][value="' + cell + '"]');
 				}
 
 				$(cell).prop('checked', true);
 
 				// normal table
-				var row = $(cell).
-					closest('.m-datatable__row').
-					addClass('m-datatable__row--active');
+				var row = $(cell).closest('.m-datatable__row').addClass('m-datatable__row--active');
 
 				var index = $(row).index() + 1;
 				// lock table
-				$(row).
-					closest('.m-datatable__lock').
-					parent().
-					find('.m-datatable__row:nth-child(' + index + ')').
-					addClass('m-datatable__row--active');
+				$(row).closest('.m-datatable__lock').parent().find('.m-datatable__row:nth-child(' + index + ')').addClass('m-datatable__row--active');
 
 				var ids = [];
-				$(row).each(function(i, td) {
+				$(row).each(function (i, td) {
 					var id = $(td).find('.m-checkbox--single:not(.m-checkbox--all) > [type="checkbox"]').val();
 					if (typeof id !== 'undefined') {
 						ids.push(id);
@@ -4782,30 +4451,23 @@ $(document).ready(function() {
 			 * Set checkbox inactive
 			 * @param cell JQuery selector or checkbox ID
 			 */
-			setInactive: function(cell) {
+			setInactive: function (cell) {
 				if (typeof cell === 'string') {
 					// set by checkbox id
-					cell = $(datatable.tableBody).
-						find('.m-checkbox--single > [type="checkbox"][value="' + cell + '"]');
+					cell = $(datatable.tableBody).find('.m-checkbox--single > [type="checkbox"][value="' + cell + '"]');
 				}
 
 				$(cell).prop('checked', false);
 
 				// normal table
-				var row = $(cell).
-					closest('.m-datatable__row').
-					removeClass('m-datatable__row--active');
+				var row = $(cell).closest('.m-datatable__row').removeClass('m-datatable__row--active');
 				var index = $(row).index() + 1;
 
 				// lock table
-				$(row).
-					closest('.m-datatable__lock').
-					parent().
-					find('.m-datatable__row:nth-child(' + index + ')').
-					removeClass('m-datatable__row--active');
+				$(row).closest('.m-datatable__lock').parent().find('.m-datatable__row:nth-child(' + index + ')').removeClass('m-datatable__row--active');
 
 				var ids = [];
-				$(row).each(function(i, td) {
+				$(row).each(function (i, td) {
 					var id = $(td).find('.m-checkbox--single:not(.m-checkbox--all) > [type="checkbox"]').val();
 					if (typeof id !== 'undefined') {
 						ids.push(id);
@@ -4819,10 +4481,9 @@ $(document).ready(function() {
 			 * Set all checkboxes active or inactive
 			 * @param active
 			 */
-			setActiveAll: function(active) {
+			setActiveAll: function (active) {
 				// todo; check if child table also will set active?
-				var checkboxes = $(datatable.table).find('.m-datatable__body .m-datatable__row').
-					find('.m-datatable__cell .m-checkbox [type="checkbox"]');
+				var checkboxes = $(datatable.table).find('.m-datatable__body .m-datatable__row').find('.m-datatable__cell--check .m-checkbox [type="checkbox"]');
 				if (active) {
 					Plugin.setActive(checkboxes);
 				} else {
@@ -4835,7 +4496,7 @@ $(document).ready(function() {
 			 * Get selected rows which are active
 			 * @returns {jQuery}
 			 */
-			setSelectedRecords: function() {
+			setSelectedRecords: function () {
 				datatable.API.record = $(datatable.tableBody).find('.m-datatable__row--active');
 				return datatable;
 			},
@@ -4844,7 +4505,7 @@ $(document).ready(function() {
 			 * Get selected records
 			 * @returns {null}
 			 */
-			getSelectedRecords: function() {
+			getSelectedRecords: function () {
 				// support old method
 				Plugin.setSelectedRecords();
 				datatable.API.record = datatable.rows('.m-datatable__row--active').nodes();
@@ -4856,7 +4517,7 @@ $(document).ready(function() {
 			 * @param path String Dot notation path in string
 			 * @returns {*}
 			 */
-			getOption: function(path) {
+			getOption: function (path) {
 				return Plugin.getObject(path, options);
 			},
 
@@ -4865,7 +4526,7 @@ $(document).ready(function() {
 			 * @param path
 			 * @param object
 			 */
-			setOption: function(path, object) {
+			setOption: function (path, object) {
 				options = Plugin.extendObj(options, path, object);
 			},
 
@@ -4874,16 +4535,16 @@ $(document).ready(function() {
 			 * @param value
 			 * @param columns. Optional list of columns to be filtered.
 			 */
-			search: function(value, columns) {
+			search: function (value, columns) {
 				if (typeof columns !== 'undefined') columns = $.makeArray(columns);
-				var delay = (function() {
-					return function(callback, ms) {
+				var delay = (function () {
+					return function (callback, ms) {
 						clearTimeout(Plugin.timer);
 						Plugin.timer = setTimeout(callback, ms);
 					};
 				})();
 
-				delay(function() {
+				delay(function () {
 					// get query parameters
 					var query = Plugin.getDataSourceQuery();
 
@@ -4895,11 +4556,11 @@ $(document).ready(function() {
 
 					// search by columns, support multiple columns
 					if (typeof columns === 'object') {
-						$.each(columns, function(k, column) {
+						$.each(columns, function (k, column) {
 							query[column] = value;
 						});
 						// remove empty element from arrays
-						$.each(query, function(k, v) {
+						$.each(query, function (k, v) {
 							if (v === '' || $.isEmptyObject(v)) {
 								delete query[k];
 							}
@@ -4917,11 +4578,11 @@ $(document).ready(function() {
 			},
 
 			/**
-			 * Set datasource params
+			 * Set datasource paramsextractextract
 			 * @param param
 			 * @param value
 			 */
-			setDataSourceParam: function(param, value) {
+			setDataSourceParam: function (param, value) {
 				datatable.API.params = $.extend({}, {
 					pagination: {page: 1, perpage: Plugin.getOption('data.pageSize')},
 					sort: Plugin.getDefaultSortColumn(),
@@ -4937,7 +4598,7 @@ $(document).ready(function() {
 			 * Get datasource params
 			 * @param param
 			 */
-			getDataSourceParam: function(param) {
+			getDataSourceParam: function (param) {
 				datatable.API.params = $.extend({}, {
 					pagination: {page: 1, perpage: Plugin.getOption('data.pageSize')},
 					sort: Plugin.getDefaultSortColumn(),
@@ -4955,7 +4616,7 @@ $(document).ready(function() {
 			 * Shortcode to datatable.getDataSourceParam('query');
 			 * @returns {*}
 			 */
-			getDataSourceQuery: function() {
+			getDataSourceQuery: function () {
 				return Plugin.getDataSourceParam('query') || {};
 			},
 
@@ -4963,7 +4624,7 @@ $(document).ready(function() {
 			 * Shortcode to datatable.setDataSourceParam('query', query);
 			 * @param query
 			 */
-			setDataSourceQuery: function(query) {
+			setDataSourceQuery: function (query) {
 				Plugin.setDataSourceParam('query', query);
 			},
 
@@ -4971,31 +4632,22 @@ $(document).ready(function() {
 			 * Get current page number
 			 * @returns {number}
 			 */
-			getCurrentPage: function() {
-				return $(datatable.table).
-					siblings('.m-datatable__pager').
-					last().
-					find('.m-datatable__pager-nav').
-					find('.m-datatable__pager-link.m-datatable__pager-link--active').
-					data('page') || 1;
+			getCurrentPage: function () {
+				return $(datatable.table).siblings('.m-datatable__pager').last().find('.m-datatable__pager-nav').find('.m-datatable__pager-link.m-datatable__pager-link--active').data('page') || 1;
 			},
 
 			/**
 			 * Get selected dropdown page size
 			 * @returns {*|number}
 			 */
-			getPageSize: function() {
-				return $(datatable.table).
-					siblings('.m-datatable__pager').
-					last().
-					find('select.m-datatable__pager-size').
-					val() || 10;
+			getPageSize: function () {
+				return $(datatable.table).siblings('.m-datatable__pager').last().find('select.m-datatable__pager-size').val() || 10;
 			},
 
 			/**
 			 * Get total rows
 			 */
-			getTotalRows: function() {
+			getTotalRows: function () {
 				return datatable.API.params.pagination.total;
 			},
 
@@ -5003,7 +4655,7 @@ $(document).ready(function() {
 			 * Get full dataset in grid
 			 * @returns {*|null|Array}
 			 */
-			getDataSet: function() {
+			getDataSet: function () {
 				return datatable.originalDataSet;
 			},
 
@@ -5012,16 +4664,16 @@ $(document).ready(function() {
 			 * Hide column by column's field name
 			 * @param fieldName
 			 */
-			hideColumn: function(fieldName) {
+			hideColumn: function (fieldName) {
 				// add hide option for this column
-				$.map(options.columns, function(column) {
+				$.map(options.columns, function (column) {
 					if (fieldName === column.field) {
 						column.responsive = {hidden: 'xl'};
 					}
 					return column;
 				});
 				// hide current displayed column
-				var tds = $.grep($(datatable.table).find('.m-datatable__cell'), function(n, i) {
+				var tds = $.grep($(datatable.table).find('.m-datatable__cell'), function (n, i) {
 					return fieldName === $(n).data('field');
 				});
 				$(tds).hide();
@@ -5032,44 +4684,27 @@ $(document).ready(function() {
 			 * Show column by column's field name
 			 * @param fieldName
 			 */
-			showColumn: function(fieldName) {
+			showColumn: function (fieldName) {
 				// add hide option for this column
-				$.map(options.columns, function(column) {
+				$.map(options.columns, function (column) {
 					if (fieldName === column.field) {
 						delete column.responsive;
 					}
 					return column;
 				});
 				// hide current displayed column
-				var tds = $.grep($(datatable.table).find('.m-datatable__cell'), function(n, i) {
+				var tds = $.grep($(datatable.table).find('.m-datatable__cell'), function (n, i) {
 					return fieldName === $(n).data('field');
 				});
 				$(tds).show();
 			},
-
-			destroyScroller: function(element) {
-				if (typeof element === 'undefined') element = datatable.tableBody;
-				$(element).each(function() {
-					if ($(this).hasClass('mCustomScrollbar')) {
-						try {
-							mApp.destroyScroller($(this));
-						} catch (e) {
-							console.log(e);
-						}
-					}
-				});
-			},
-
-			/**
-			 * NEW API
-			 */
 
 			nodeTr: [],
 			nodeTd: [],
 			nodeCols: [],
 			recentNode: [],
 
-			table: function() {
+			table: function () {
 				return datatable.table;
 			},
 
@@ -5078,7 +4713,7 @@ $(document).ready(function() {
 			 * @param selector
 			 * @returns {jQuery}
 			 */
-			row: function(selector) {
+			row: function (selector) {
 				Plugin.rows(selector);
 				Plugin.nodeTr = Plugin.recentNode = $(Plugin.nodeTr).first();
 				return datatable;
@@ -5089,8 +4724,12 @@ $(document).ready(function() {
 			 * @param selector
 			 * @returns {jQuery}
 			 */
-			rows: function(selector) {
-				Plugin.nodeTr = Plugin.recentNode = $(datatable.tableBody).find(selector).filter('.m-datatable__row');
+			rows: function (selector) {
+				if (Plugin.isLocked()) {
+					Plugin.nodeTr = Plugin.recentNode = $(datatable.tableBody).children().first().find(selector).filter('.m-datatable__row');
+				} else {
+					Plugin.nodeTr = Plugin.recentNode = $(datatable.tableBody).find(selector).filter('.m-datatable__row');
+				}
 				return datatable;
 			},
 
@@ -5099,8 +4738,12 @@ $(document).ready(function() {
 			 * @param index zero-based index
 			 * @returns {jQuery}
 			 */
-			column: function(index) {
-				Plugin.nodeCols = Plugin.recentNode = $(datatable.tableBody).find('.m-datatable__cell:nth-child(' + (index + 1) + ')');
+			column: function (index) {
+				if (Plugin.isLocked()) {
+					Plugin.nodeCols = Plugin.recentNode = $(datatable.tableBody).children().first().find('.m-datatable__cell:nth-child(' + (index + 1) + ')');
+				} else {
+					Plugin.nodeCols = Plugin.recentNode = $(datatable.tableBody).find('.m-datatable__cell:nth-child(' + (index + 1) + ')');
+				}
 				return datatable;
 			},
 
@@ -5109,7 +4752,7 @@ $(document).ready(function() {
 			 * @param selector
 			 * @returns {jQuery}
 			 */
-			columns: function(selector) {
+			columns: function (selector) {
 				var context = datatable.table;
 				if (Plugin.nodeTr === Plugin.recentNode) {
 					context = Plugin.nodeTr;
@@ -5123,13 +4766,13 @@ $(document).ready(function() {
 				return datatable;
 			},
 
-			cell: function(selector) {
+			cell: function (selector) {
 				Plugin.cells(selector);
 				Plugin.nodeTd = Plugin.recentNode = $(Plugin.nodeTd).first();
 				return datatable;
 			},
 
-			cells: function(selector) {
+			cells: function (selector) {
 				var cells = $(datatable.tableBody).find('.m-datatable__cell');
 				if (typeof selector !== 'undefined') {
 					cells = $(cells).filter(selector);
@@ -5142,7 +4785,7 @@ $(document).ready(function() {
 			 * Delete the selected row from the table
 			 * @returns {jQuery}
 			 */
-			remove: function() {
+			remove: function () {
 				if ($(Plugin.nodeTr.length) && Plugin.nodeTr === Plugin.recentNode) {
 					$(Plugin.nodeTr).remove();
 				}
@@ -5153,7 +4796,7 @@ $(document).ready(function() {
 			/**
 			 * Show or hide the columns or rows
 			 */
-			visible: function(bool) {
+			visible: function (bool) {
 				if ($(Plugin.recentNode.length)) {
 					var locked = Plugin.lockEnabledColumns();
 					if (Plugin.recentNode === Plugin.nodeCols) {
@@ -5190,7 +4833,7 @@ $(document).ready(function() {
 			 * Get the the DOM element for the selected rows or columns
 			 * @returns {Array}
 			 */
-			nodes: function() {
+			nodes: function () {
 				return Plugin.recentNode;
 			},
 
@@ -5198,7 +4841,7 @@ $(document).ready(function() {
 			 * will be implemented soon
 			 * @returns {jQuery}
 			 */
-			dataset: function() {
+			dataset: function () {
 				return datatable;
 			},
 
@@ -5207,7 +4850,7 @@ $(document).ready(function() {
 		/**
 		 * Public API methods can be used directly by datatable
 		 */
-		$.each(Plugin, function(funcName, func) {
+		$.each(Plugin, function (funcName, func) {
 			datatable[funcName] = func;
 		});
 
@@ -5284,11 +4927,7 @@ $(document).ready(function() {
 			minHeight: 300,
 			footer: false, // display/hide footer
 			header: true, // display/hide header
-
-			// datatable custom scroll params
-			smoothScroll: {
-				scrollbarShown: true,
-			},
+			customScrollbar: true, // set false to disable custom scrollbar
 
 			// datatable spinner
 			spinner: {
@@ -5341,11 +4980,14 @@ $(document).ready(function() {
 
 		rows: {
 			// deprecated
-			callback: function() {},
+			callback: function () {
+			},
 			// call before row template
-			beforeTemplate: function() {},
+			beforeTemplate: function () {
+			},
 			// call after row template
-			afterTemplate: function() {},
+			afterTemplate: function () {
+			},
 			// auto hide columns, if rows overflow. work on non locked columns
 			autoHide: false,
 		},
@@ -5426,6 +5068,38 @@ $(document).ready(function() {
 	};
 
 }(jQuery));
+var defaults = {
+	layout: {
+		icons: {
+			pagination: {
+				next: 'la la-angle-right',
+				prev: 'la la-angle-left',
+				first: 'la la-angle-double-left',
+				last: 'la la-angle-double-right',
+				more: 'la la-ellipsis-h',
+			},
+			rowDetail: {expand: 'fa fa-caret-down', collapse: 'fa fa-caret-right'},
+		}
+	}
+};
+
+if (mUtil.isRTL()) {
+	defaults = {
+		layout: {
+			icons: {
+				pagination: {
+					next: 'la la-angle-left',
+					prev: 'la la-angle-right',
+					last: 'la la-angle-double-left',
+					first: 'la la-angle-double-right',
+				},
+				rowDetail: {collapse: 'fa fa-caret-down', expand: 'fa fa-caret-right'},
+			}
+		}
+	}
+}
+
+$.extend(true, $.fn.mDatatable.defaults, defaults);
 var mDropdown = function(elementId, options) {
     //== Main object
     var the = this;
@@ -5520,7 +5194,7 @@ var mDropdown = function(elementId, options) {
             }
 
             if (the.options.toggle == 'hover') {    
-                mUtil.addEvent(element, 'mouseout', Plugin.hide);
+                mUtil.addEvent(element, 'mouseout', Plugin.hideMouseout);
             } 
 
             // set zindex
@@ -5590,6 +5264,9 @@ var mDropdown = function(elementId, options) {
             element.focus();
             element.setAttribute('aria-expanded', 'true');
             the.open = true;
+
+            //== Update scrollers
+            mUtil.scrollersUpdate(element);
 
             Plugin.eventTrigger('afterShow');
 
@@ -5666,7 +5343,7 @@ var mDropdown = function(elementId, options) {
                 return the;
             }
 
-            if (the.options.toggle == 'hover') {
+            if (mUtil.isDesktopDevice() && the.options.toggle == 'hover') {
                 Plugin.hideHovered(force);
             } else {
                 Plugin.hideClicked();
@@ -5679,6 +5356,15 @@ var mDropdown = function(elementId, options) {
             }
 
             return the;
+        },
+
+        /**
+         * Hide on mouseout
+         */
+        hideMouseout: function() {
+            if (mUtil.isDesktopDevice()) {
+                Plugin.hide();
+            }
         },
 
         /**
@@ -5708,6 +5394,7 @@ var mDropdown = function(elementId, options) {
                     
                     mUtil.css(the.layout.arrow, 'right', 'auto');
                     mUtil.css(the.layout.arrow, 'left', pos + 'px');
+                    
                     mUtil.css(the.layout.arrow, 'margin-left', 'auto');
                     mUtil.css(the.layout.arrow, 'margin-right', 'auto');
                 } else if (mUtil.hasClass(the.layout.arrow, 'm-dropdown__arrow--adjust')) {
@@ -5717,11 +5404,21 @@ var mDropdown = function(elementId, options) {
                     }
 
                     if (alignment == 'right') {
-                        mUtil.css(the.layout.arrow, 'left', 'auto');
-                        mUtil.css(the.layout.arrow, 'right', pos + 'px');
+                        if (mUtil.isRTL()) {
+                            mUtil.css(the.layout.arrow, 'right', 'auto');
+                            mUtil.css(the.layout.arrow, 'left', pos + 'px');
+                        } else {
+                            mUtil.css(the.layout.arrow, 'left', 'auto');
+                            mUtil.css(the.layout.arrow, 'right', pos + 'px');
+                        }
                     } else {
-                        mUtil.css(the.layout.arrow, 'right', 'auto');
-                        mUtil.css(the.layout.arrow, 'left', pos + 'px');
+                        if (mUtil.isRTL()) {
+                            mUtil.css(the.layout.arrow, 'left', 'auto');
+                            mUtil.css(the.layout.arrow, 'right', pos + 'px');
+                        } else {
+                            mUtil.css(the.layout.arrow, 'right', 'auto');
+                            mUtil.css(the.layout.arrow, 'left', pos + 'px');
+                        }                       
                     }
                 }
             }
@@ -5731,11 +5428,13 @@ var mDropdown = function(elementId, options) {
          * Get zindex
          */
         setZindex: function() {
-            var oldZindex = mUtil.css(the.layout.wrapper, 'z-index');
+            var zIndex = 101; //mUtil.css(the.layout.wrapper, 'z-index');
             var newZindex = mUtil.getHighestZindex(element);
-            if (newZindex > oldZindex) {
-                mUtil.css(the.layout.wrapper, 'z-index', zindex);
+            if (newZindex >= zIndex) {
+                zIndex = newZindex + 1;
             }
+            
+            mUtil.css(the.layout.wrapper, 'z-index', zIndex);
         },
 
         /**
@@ -5888,7 +5587,11 @@ mUtil.on(document, '[m-dropdown-toggle="click"] .m-dropdown__toggle', 'click', f
 });
 
 mUtil.on(document, '[m-dropdown-toggle="hover"] .m-dropdown__toggle', 'click', function(e) {
-    if (mUtil.isMobileDevice()) {
+    if (mUtil.isDesktopDevice()) {
+        if (mUtil.attr(this, 'href') == '#') {
+            e.preventDefault();
+        }
+    } else if (mUtil.isMobileDevice()) {
         var element = this.closest('.m-dropdown');
         var dropdown;
 
@@ -6150,16 +5853,11 @@ var mMenu = function(elementId, options) {
     }
 
     //== Default options
-    var defaultOptions = {        
-        // autoscroll on accordion submenu tog
-        autoscroll: {
-            speed: 1200
-        },
-
+    var defaultOptions = {       
         // accordion submenu mode
         accordion: {
             slideSpeed: 200, // accordion toggle slide speed in milliseconds
-            autoScroll: true, // enable auto scrolling(focus) to the clicked menu item
+            autoScroll: false, // enable auto scrolling(focus) to the clicked menu item
             autoScrollSpeed: 1200,
             expandAll: true // allow having multiple expanded accordions in the menu
         },
@@ -6229,9 +5927,10 @@ var mMenu = function(elementId, options) {
          * @returns {mMenu}
          */
         build: function() {
+            //== General accordion submenu toggle
             the.eventHandlers['event_1'] = mUtil.on( element, '.m-menu__toggle', 'click', Plugin.handleSubmenuAccordion);
 
-            // dropdown mode(hoverable)
+            //== Dropdown mode(hoverable)
             if (Plugin.getSubmenuMode() === 'dropdown' || Plugin.isConditionalSubmenuDropdown()) {
                 // dropdown submenu - hover toggle
                 the.eventHandlers['event_2'] = mUtil.on( element, '[m-menu-submenu-toggle="hover"]', 'mouseover', Plugin.handleSubmenuDrodownHoverEnter);
@@ -6242,7 +5941,13 @@ var mMenu = function(elementId, options) {
                 the.eventHandlers['event_5'] = mUtil.on( element, '[m-menu-submenu-toggle="tab"] > .m-menu__toggle, [m-menu-submenu-toggle="tab"] > .m-menu__link .m-menu__toggle', 'click', Plugin.handleSubmenuDropdownTabClick);
             }
 
+            //== General link click
             the.eventHandlers['event_6'] = mUtil.on(element, '.m-menu__item:not(.m-menu__item--submenu) > .m-menu__link:not(.m-menu__toggle):not(.m-menu__link--toggle-skip)', 'click', Plugin.handleLinkClick);
+
+            //== Init scrollable menu
+            if (the.options.scroll && the.options.scroll.height) {
+                Plugin.scrollerInit();
+            }
         },
 
         /**
@@ -6264,11 +5969,43 @@ var mMenu = function(elementId, options) {
         },
 
         /**
+         * Init scroll menu
+         *
+        */
+        scrollerInit: function() {
+            if ( the.options.scroll && the.options.scroll.height ) {
+                mUtil.scrollerInit(element, {disableForMobile: true, resetHeightOnDestroy: true, handleWindowResize: true, height: the.options.scroll.height});
+            }            
+        },
+
+        /**
+         * Update scroll menu
+        */
+        scrollerUpdate: function() {
+            if ( the.options.scroll && the.options.scroll.height ) {
+                mUtil.scrollerUpdate(element);
+            }
+        },
+
+        /**
+         * Scroll top
+        */
+        scrollerTop: function() {
+            if ( the.options.scroll && the.options.scroll.height ) {
+                mUtil.scrollerTop(element);
+            }
+        },
+
+        /**
          * Get submenu mode for current breakpoint and menu state
          * @returns {mMenu}
          */
-        getSubmenuMode: function() {
+        getSubmenuMode: function(el) {
             if ( mUtil.isInResponsiveRange('desktop') ) {
+                if (el && mUtil.hasAttr(el, 'm-menu-submenu-toggle')) {
+                    return mUtil.attr(el, 'm-menu-submenu-toggle');
+                }
+
                 if ( mUtil.isset(the.options.submenu, 'desktop.state.body') ) {
                     if ( mUtil.hasClass(body, the.options.submenu.desktop.state.body) ) {
                         return the.options.submenu.desktop.state.mode;
@@ -6308,7 +6045,7 @@ var mMenu = function(elementId, options) {
                 e.preventDefault();
             };
 
-            if ( Plugin.getSubmenuMode() === 'dropdown' || Plugin.isConditionalSubmenuDropdown() ) {
+            if ( Plugin.getSubmenuMode(this) === 'dropdown' || Plugin.isConditionalSubmenuDropdown() ) {
                 Plugin.handleSubmenuDropdownClose(e, this);
             }
         },
@@ -6318,7 +6055,7 @@ var mMenu = function(elementId, options) {
          * @returns {mMenu}
          */
         handleSubmenuDrodownHoverEnter: function(e) {
-            if ( Plugin.getSubmenuMode() === 'accordion' ) {
+            if ( Plugin.getSubmenuMode(this) === 'accordion' ) {
                 return;
             }
 
@@ -6347,7 +6084,7 @@ var mMenu = function(elementId, options) {
                 return;
             }
 
-            if ( Plugin.getSubmenuMode() === 'accordion' ) {
+            if ( Plugin.getSubmenuMode(this) === 'accordion' ) {
                 return;
             }
 
@@ -6369,7 +6106,7 @@ var mMenu = function(elementId, options) {
          * @returns {mMenu}
          */
         handleSubmenuDropdownClick: function(e) {
-            if ( Plugin.getSubmenuMode() === 'accordion' ) {
+            if ( Plugin.getSubmenuMode(this) === 'accordion' ) {
                 return;
             }
  
@@ -6395,7 +6132,7 @@ var mMenu = function(elementId, options) {
          * @returns {mMenu}
          */
         handleSubmenuDropdownTabClick: function(e) {
-            if (Plugin.getSubmenuMode() === 'accordion') {
+            if (Plugin.getSubmenuMode(this) === 'accordion') {
                 return;
             }
 
@@ -6419,7 +6156,7 @@ var mMenu = function(elementId, options) {
          */
         handleSubmenuDropdownClose: function(e, el) {
             // exit if its not submenu dropdown mode
-            if (Plugin.getSubmenuMode() === 'accordion') {
+            if (Plugin.getSubmenuMode(el) === 'accordion') {
                 return;
             }
 
@@ -6442,7 +6179,7 @@ var mMenu = function(elementId, options) {
             var query;
             var item = el ? el : this;
 
-            if ( Plugin.getSubmenuMode() === 'dropdown' && (query = item.closest('.m-menu__item') ) ) {
+            if ( Plugin.getSubmenuMode(el) === 'dropdown' && (query = item.closest('.m-menu__item') ) ) {
                 if (query.getAttribute('m-menu-submenu-mode') != 'accordion' ) {
                     e.preventDefault();
                     return;
@@ -6473,6 +6210,7 @@ var mMenu = function(elementId, options) {
                                 var submenu_ = mUtil.child(el_, '.m-menu__submenu');
                                 if ( submenu_ ) {
                                     mUtil.slideUp(submenu_, speed, function() {
+                                        Plugin.scrollerUpdate();
                                         mUtil.removeClass(el_, 'm-menu__item--open');
                                     });                    
                                 }
@@ -6482,6 +6220,9 @@ var mMenu = function(elementId, options) {
 
                     mUtil.slideDown(submenu, speed, function() {
                         Plugin.scrollToItem(item);
+                        Plugin.scrollerUpdate();
+                        
+                        Plugin.eventTrigger('submenuToggle', submenu);
                     });
                 
                     mUtil.addClass(li, 'm-menu__item--open');
@@ -6489,6 +6230,7 @@ var mMenu = function(elementId, options) {
                 } else {
                     mUtil.slideUp(submenu, speed, function() {
                         Plugin.scrollToItem(item);
+                        Plugin.eventTrigger('submenuToggle', submenu);
                     });
 
                     mUtil.removeClass(li, 'm-menu__item--open');       
@@ -6503,7 +6245,7 @@ var mMenu = function(elementId, options) {
         scrollToItem: function(item) {
             // handle auto scroll for accordion submenus
             if ( mUtil.isInResponsiveRange('desktop') && the.options.accordion.autoScroll && element.getAttribute('m-menu-scrollable') !== '1' ) {
-                mUtil.scrollToCenter(item, the.options.accordion.autoScrollSpeed);
+                mUtil.scrollTo(item, the.options.accordion.autoScrollSpeed);
             }
         },
 
@@ -6558,7 +6300,6 @@ var mMenu = function(elementId, options) {
             }
         },
 
-
         /**
          * Handles submenu slide toggle
          * @returns {mMenu}
@@ -6588,7 +6329,7 @@ var mMenu = function(elementId, options) {
             var arrow = mUtil.child( submenu, '.m-menu__arrow.m-menu__arrow--adjust');
             var subnav = mUtil.child( submenu, '.m-menu__subnav');
 
-            if ( arrow ) {
+            if ( arrow ) { 
                 var pos = 0; 
                 var link = mUtil.child(item, '.m-menu__link');
 
@@ -6596,23 +6337,40 @@ var mMenu = function(elementId, options) {
                     if ( mUtil.hasClass(submenu, 'm-menu__submenu--right')) {
                         pos = mUtil.outerWidth(item) / 2;
                         if (mUtil.hasClass(submenu, 'm-menu__submenu--pull')) {
-                            pos = pos + Math.abs( parseFloat(mUtil.css(submenu, 'margin-right')) );
+                            if (mUtil.isRTL()) {
+                                pos = pos + Math.abs( parseFloat(mUtil.css(submenu, 'margin-left')) );
+                            } else {
+                                pos = pos + Math.abs( parseFloat(mUtil.css(submenu, 'margin-right')) );
+                            }
                         }
                         pos = parseInt(mUtil.css(submenu, 'width')) - pos;
                     } else if ( mUtil.hasClass(submenu, 'm-menu__submenu--left') ) {
                         pos = mUtil.outerWidth(item) / 2;
                         if ( mUtil.hasClass(submenu, 'm-menu__submenu--pull')) {
-                            pos = pos + Math.abs( parseFloat(mUtil.css(submenu, 'margin-left')) );
+                            if (mUtil.isRTL()) {
+                                pos = pos + Math.abs( parseFloat(mUtil.css(submenu, 'margin-right')) );
+                            } else {
+                                pos = pos + Math.abs( parseFloat(mUtil.css(submenu, 'margin-left')) );
+                            }
                         }
+                    }
+
+                    if (mUtil.isRTL()) {
+                        mUtil.css(arrow, 'right', pos + 'px');  
+                    } else {
+                        mUtil.css(arrow, 'left', pos + 'px');  
                     }
                 } else {
                     if ( mUtil.hasClass(submenu, 'm-menu__submenu--center') || mUtil.hasClass(submenu, 'm-menu__submenu--full') ) {
                         pos = mUtil.offset(item).left - ((mUtil.getViewPort().width - parseInt(mUtil.css(submenu, 'width'))) / 2);
                         pos = pos + (mUtil.outerWidth(item) / 2);
+
+                        mUtil.css(arrow, 'left', pos + 'px');
+                        if (mUtil.isRTL()) {
+                            mUtil.css(arrow, 'right', 'auto');
+                        }                        
                     }
                 }
-
-                mUtil.css(arrow, 'left', pos + 'px');  
             }
         },
 
@@ -6765,6 +6523,19 @@ var mMenu = function(elementId, options) {
         defaultOptions = options;
     };
 
+    /**
+     * Set active menu item
+     */
+    the.scrollerUpdate = function() {
+        return Plugin.scrollerUpdate();
+    };
+
+    /**
+     * Set active menu item
+     */
+    the.scrollerTop = function() {
+        return Plugin.scrollerTop();
+    };
 
     /**
      * Set active menu item
@@ -6794,8 +6565,8 @@ var mMenu = function(elementId, options) {
     /**
      * Get submenu mode
      */
-    the.getSubmenuMode = function() {
-        return Plugin.getSubmenuMode();
+    the.getSubmenuMode = function(el) {
+        return Plugin.getSubmenuMode(el);
     };
 
     /**
@@ -7177,6 +6948,10 @@ var mPortlet = function(elementId, options) {
                 on: 'Fullscreen',
                 off: 'Exit Fullscreen'
             }
+        },
+        sticky: {
+            offset: 300,
+            zIndex: 101
         }
     };
 
@@ -7215,6 +6990,7 @@ var mPortlet = function(elementId, options) {
             // merge default and user defined options
             the.options = mUtil.deepExtend({}, defaultOptions, options);
             the.head = mUtil.child(element, '.m-portlet__head');
+            the.foot = mUtil.child(element, '.m-portlet__foot');
 
             if (mUtil.child(element, '.m-portlet__body')) {
                 the.body = mUtil.child(element, '.m-portlet__body');
@@ -7264,6 +7040,120 @@ var mPortlet = function(elementId, options) {
             }
 
             Plugin.setupTooltips();
+        },
+
+        /**
+         * Window scroll handle event for sticky portlet
+         */
+        onScrollSticky: function() {
+            var st = window.pageYOffset;
+            var offset = the.options.sticky.offset;
+
+
+            if (st > offset) {
+                if (mUtil.hasClass(body, 'm-portlet--sticky') === false) {
+                    Plugin.eventTrigger('stickyOn');
+
+                    mUtil.addClass(body, 'm-portlet--sticky');
+                    mUtil.addClass(element, 'm-portlet--sticky');
+
+                    Plugin.updateSticky();
+                }
+            } else { // back scroll mode
+                if (mUtil.hasClass(body, 'm-portlet--sticky')) {
+                    Plugin.eventTrigger('stickyOff');
+
+                    mUtil.removeClass(body, 'm-portlet--sticky');
+                    mUtil.removeClass(element, 'm-portlet--sticky');
+
+                    Plugin.resetSticky();
+                }
+            }
+        },
+
+        /**
+         * Init sticky portlet
+         */
+        initSticky: function() {
+            if (!the.head) {
+                return;
+            }
+
+            window.addEventListener('scroll', Plugin.onScrollSticky);
+        },
+
+        /**
+         * Update sticky portlet positions
+         */
+        updateSticky: function() {
+            if (!the.head) {
+                return;
+            }
+
+            var top;
+
+            if (mUtil.hasClass(body, 'm-portlet--sticky')) {
+                if (the.options.sticky.position.top instanceof Function) {
+                    top = parseInt(the.options.sticky.position.top.call());
+                } else {
+                    top = parseInt(the.options.sticky.position.top);
+                }
+
+                var left;
+                if (the.options.sticky.position.left instanceof Function) {
+                    left = parseInt(the.options.sticky.position.left.call());
+                } else {
+                    left = parseInt(the.options.sticky.position.left);
+                }
+
+                var right;
+                if (the.options.sticky.position.right instanceof Function) {
+                    right = parseInt(the.options.sticky.position.right.call());
+                } else {
+                    right = parseInt(the.options.sticky.position.right);
+                }
+
+                mUtil.css(the.head, 'z-index', the.options.sticky.zIndex);
+                mUtil.css(the.head, 'top', top + 'px');
+
+                if (mUtil.isRTL()) {
+                    mUtil.css(the.head, 'left', right + 'px');
+                    mUtil.css(the.head, 'right',left  + 'px');
+                } else {
+                    mUtil.css(the.head, 'left', left + 'px');
+                    mUtil.css(the.head, 'right', right + 'px');
+                }
+                
+            }
+        },
+
+        /**
+         * Reset sticky portlet positions
+         */
+        resetSticky: function() {
+            if (!the.head) {
+                return;
+            }
+
+            if (mUtil.hasClass(body, 'm-portlet--sticky') === false) {
+                mUtil.css(the.head, 'z-index', '');
+                mUtil.css(the.head, 'top', '');
+                mUtil.css(the.head, 'left', '');
+                mUtil.css(the.head, 'right', '');
+            }
+        },
+
+        /**
+         * Destroy sticky portlet
+         */
+        destroySticky: function() {
+            if (!the.head) {
+                return;
+            }
+
+            Plugin.resetSticky();
+
+            window.removeEventListener('scroll', Plugin.onScrollSticky);
         },
 
         /**
@@ -7331,7 +7221,7 @@ var mPortlet = function(elementId, options) {
                         </div>'
                     });
 
-                    mUtil.data(remove).set('tooltip', tip);                   
+                    mUtil.data(remove).set('tooltip', tip);
                 }
 
                 //== Reload
@@ -7349,7 +7239,7 @@ var mPortlet = function(elementId, options) {
                         </div>'
                     });
 
-                    mUtil.data(reload).set('tooltip', tip);                   
+                    mUtil.data(reload).set('tooltip', tip);
                 }
 
                 //== Toggle
@@ -7367,7 +7257,7 @@ var mPortlet = function(elementId, options) {
                         </div>'
                     });
 
-                    mUtil.data(toggle).set('tooltip', tip);                   
+                    mUtil.data(toggle).set('tooltip', tip);
                 }
 
                 //== Fullscreen
@@ -7385,7 +7275,7 @@ var mPortlet = function(elementId, options) {
                         </div>'
                     });
 
-                    mUtil.data(fullscreen).set('tooltip', tip);                   
+                    mUtil.data(fullscreen).set('tooltip', tip);
                 }
             }
         },
@@ -7496,6 +7386,11 @@ var mPortlet = function(elementId, options) {
                 Plugin.removeTooltips();
                 Plugin.setupTooltips();
 
+                if (the.foot) {
+                    mUtil.css(the.body, 'margin-bottom', '');
+                    mUtil.css(the.foot, 'margin-top', '');
+                }
+
                 Plugin.eventTrigger('afterFullscreenOff');
             } else {
                 Plugin.eventTrigger('beforeFullscreenOn');
@@ -7505,6 +7400,14 @@ var mPortlet = function(elementId, options) {
 
                 Plugin.removeTooltips();
                 Plugin.setupTooltips();
+
+
+                if (the.foot) {
+                    var height1 = parseInt(mUtil.css(the.foot, 'height'));
+                    var height2 = parseInt(mUtil.css(the.foot, 'height')) + parseInt(mUtil.css(the.head, 'height'));
+                    mUtil.css(the.body, 'margin-bottom', height1 + 'px');
+                    mUtil.css(the.foot, 'margin-top', '-' + height2 + 'px');
+                }
 
                 Plugin.eventTrigger('afterFullscreenOn');
             }
@@ -7560,6 +7463,38 @@ var mPortlet = function(elementId, options) {
      */
     the.remove = function() {
         return Plugin.remove(html);
+    };
+
+    /**
+     * Init sticky portlet
+     * @returns {mPortlet}
+     */
+    the.initSticky = function() {
+        return Plugin.initSticky();
+    };
+
+    /**
+     * Update sticky portlet scroll event
+     * @returns {mPortlet}
+     */
+    the.updateSticky = function() {
+        return Plugin.updateSticky();
+    };
+
+    /**
+     * Reset sticky portlet positions
+     * @returns {mPortlet}
+     */
+    the.resetSticky = function() {
+        return Plugin.resetSticky();
+    };
+
+    /**
+     * Destroy sticky portlet scroll event
+     * @returns {mPortlet}
+     */
+    the.destroySticky = function() {
+        return Plugin.destroySticky();
     };
 
     /**
@@ -8087,7 +8022,7 @@ var mScrollTop = function(elementId, options) {
         scroll: function(e) {
             e.preventDefault();
 
-            mUtil.scrollTop(the.options.speed);
+            mUtil.scrollTop(0, the.options.speed);
         },
 
 
@@ -8445,6 +8380,7 @@ var mWizard = function(elementId, options) {
             //== Variables
             the.events = [];
             the.currentStep = 1;
+            the.stopped = false;
             the.totalSteps = the.steps.length;
 
             //== Init current step
@@ -8514,7 +8450,7 @@ var mWizard = function(elementId, options) {
          */
         goTo: function(number) {
             //== Skip if this step is already shown
-            if (number === the.currentStep) {
+            if (number === the.currentStep || number > the.totalSteps || number < 0) {
                 return;
             }
 
@@ -8533,17 +8469,26 @@ var mWizard = function(elementId, options) {
             } else {
                 callback = Plugin.eventTrigger('beforePrev');
             }
+            
+            //== Skip if stopped
+            if (the.stopped === true) {
+                the.stopped = false;
+                return;
+            }
 
             //== Continue if no exit
             if (callback !== false) {
-                //== Set current step
+                //== Before change
+                Plugin.eventTrigger('beforeChange');
+
+                //== Set current step 
                 the.currentStep = number;
 
                 //== Update UI
                 Plugin.updateUI();
 
                 //== Trigger change event
-                Plugin.eventTrigger('change')
+                Plugin.eventTrigger('change');
             }
 
             //== After next and prev events
@@ -8554,6 +8499,29 @@ var mWizard = function(elementId, options) {
             }
 
             return the;
+        },
+
+        /**
+         * Set step class
+         */
+        setStepClass: function() {
+            if (Plugin.isLastStep()) {
+                mUtil.addClass(element, 'm-wizard--step-last');
+            } else {
+                mUtil.removeClass(element, 'm-wizard--step-last');
+            }
+
+            if (Plugin.isFirstStep()) {
+                mUtil.addClass(element, 'm-wizard--step-first');
+            } else {
+                mUtil.removeClass(element, 'm-wizard--step-first');
+            }
+
+            if (Plugin.isBetweenStep()) {
+                mUtil.addClass(element, 'm-wizard--step-between');
+            } else {
+                mUtil.removeClass(element, 'm-wizard--step-between');
+            }
         },
 
         updateUI: function(argument) {
@@ -8579,6 +8547,20 @@ var mWizard = function(elementId, options) {
         },
 
         /**
+         * Cancel
+         */
+        stop: function() {
+            the.stopped = true;
+        },
+
+        /**
+         * Resume
+         */
+        start: function() {
+            the.stopped = false;
+        },
+
+        /**
          * Check last step
          */
         isLastStep: function() {
@@ -8597,29 +8579,6 @@ var mWizard = function(elementId, options) {
          */
         isBetweenStep: function() {
             return Plugin.isLastStep() === false && Plugin.isFirstStep() === false;
-        },
-
-        /**
-         * Set step class
-         */
-        setStepClass: function() {
-            if (Plugin.isLastStep()) {
-                mUtil.addClass(element, 'm-wizard--step-last');
-            } else {
-                mUtil.removeClass(element, 'm-wizard--step-last');
-            }
-
-            if (Plugin.isFirstStep()) {
-                mUtil.addClass(element, 'm-wizard--step-first');
-            } else {
-                mUtil.removeClass(element, 'm-wizard--step-first');
-            }
-
-            if (Plugin.isBetweenStep()) {
-                mUtil.addClass(element, 'm-wizard--step-between');
-            } else {
-                mUtil.removeClass(element, 'm-wizard--step-between');
-            }
         },
 
         /**
@@ -8783,6 +8742,20 @@ var mWizard = function(elementId, options) {
     };
 
     /**
+     * Cancel step 
+     */
+    the.stop = function() {
+        return Plugin.stop();
+    };
+
+    /**
+     * Resume step 
+     */
+    the.start = function() {
+        return Plugin.start();
+    };
+
+    /**
      * Go to the first step 
      */
     the.goFirst = function() {
@@ -8836,7 +8809,7 @@ var mWizard = function(elementId, options) {
 
     return the;
 };
-(function($) {
+(function ($) {
 
 	$.fn.mDatatable = $.fn.mDatatable || {};
 
@@ -8845,31 +8818,67 @@ var mWizard = function(elementId, options) {
 	 * @param options Extension options
 	 * @returns {*}
 	 */
-	$.fn.mDatatable.checkbox = function(datatable, options) {
+	$.fn.mDatatable.checkbox = function (datatable, options) {
 
 		var Extension = {
 			selectedAllRows: false,
 			selectedRows: [],
 			unselectedRows: [],
 
-			init: function() {
+			init: function () {
 				if (Extension.selectorEnabled()) {
+					// reset
+					datatable.setDataSourceParam(options.vars.selectedAllRows, false);
+					datatable.stateRemove('checkbox');
+
 					// requestIds is not null
 					if (options.vars.requestIds) {
 						// request ids in response
 						datatable.setDataSourceParam(options.vars.requestIds, true);
 					}
 
+					// remove selected checkbox on datatable reload
+					$(datatable).on('m-datatable--on-reloaded', function () {
+						datatable.stateRemove('checkbox');
+						datatable.setDataSourceParam(options.vars.selectedAllRows, false);
+						Extension.selectedAllRows = false;
+						Extension.selectedRows = [];
+						Extension.unselectedRows = [];
+					});
+
 					// select all on extension init
 					Extension.selectedAllRows = datatable.getDataSourceParam(options.vars.selectedAllRows);
 
-					$(datatable).on('m-datatable--on-layout-updated', function(e, args) {
+					$(datatable).on('m-datatable--on-layout-updated', function (e, args) {
 						if (args.table != $(datatable.wrap).attr('id')) return;
-						datatable.ready(function() {
+						datatable.ready(function () {
 							Extension.initVars();
 							Extension.initEvent();
 							Extension.initSelect();
 						});
+					});
+
+					$(datatable).on('m-datatable--on-check', function (e, ids) {
+						ids.forEach(function (id) {
+							Extension.selectedRows.push(id);
+							// // remove from unselected rows
+							Extension.unselectedRows = Extension.remove(Extension.unselectedRows, id);
+						});
+						var storage = {};
+						storage['selectedRows'] = $.unique(Extension.selectedRows);
+						storage['unselectedRows'] = $.unique(Extension.unselectedRows);
+						datatable.stateKeep('checkbox', storage);
+					});
+					$(datatable).on('m-datatable--on-uncheck', function (e, ids) {
+						ids.forEach(function (id) {
+							Extension.unselectedRows.push(id);
+							// // remove from selected rows
+							Extension.selectedRows = Extension.remove(Extension.selectedRows, id);
+						});
+						var storage = {};
+						storage['selectedRows'] = $.unique(Extension.selectedRows);
+						storage['unselectedRows'] = $.unique(Extension.unselectedRows);
+						datatable.stateKeep('checkbox', storage);
 					});
 				}
 			},
@@ -8877,9 +8886,9 @@ var mWizard = function(elementId, options) {
 			/**
 			 * Init checkbox clicks event
 			 */
-			initEvent: function() {
+			initEvent: function () {
 				// select all checkbox click
-				$(datatable.tableHead).find('.m-checkbox--all > [type="checkbox"]').click(function(e) {
+				$(datatable.tableHead).find('.m-checkbox--all > [type="checkbox"]').click(function (e) {
 					// clear selected and unselected rows
 					Extension.selectedRows = Extension.unselectedRows = [];
 					datatable.stateRemove('checkbox');
@@ -8894,10 +8903,9 @@ var mWizard = function(elementId, options) {
 					// local select all current page rows
 					if (!options.vars.requestIds) {
 						if ($(this).is(':checked')) {
-							Extension.selectedRows = $.makeArray($(datatable.tableBody).find('.m-checkbox--single > [type="checkbox"]').
-								map(function(i, chk) {
-									return $(chk).val();
-								}));
+							Extension.selectedRows = $.makeArray($(datatable.tableBody).find('.m-checkbox--single > [type="checkbox"]').map(function (i, chk) {
+								return $(chk).val();
+							}));
 						}
 						var storage = {};
 						storage['selectedRows'] = $.unique(Extension.selectedRows);
@@ -8911,7 +8919,7 @@ var mWizard = function(elementId, options) {
 				});
 
 				// single row checkbox click
-				$(datatable.tableBody).find('.m-checkbox--single > [type="checkbox"]').click(function(e) {
+				$(datatable.tableBody).find('.m-checkbox--single > [type="checkbox"]').click(function (e) {
 					var id = $(this).val();
 					if ($(this).is(':checked')) {
 						Extension.selectedRows.push(id);
@@ -8938,7 +8946,7 @@ var mWizard = function(elementId, options) {
 				});
 			},
 
-			initSelect: function() {
+			initSelect: function () {
 				// selected all rows from server
 				if (Extension.selectedAllRows && options.vars.requestIds) {
 					if (!datatable.hasClass('m-datatable--error')) {
@@ -8950,13 +8958,13 @@ var mWizard = function(elementId, options) {
 					datatable.setActiveAll(true);
 
 					// remove unselected rows
-					Extension.unselectedRows.forEach(function(id) {
+					Extension.unselectedRows.forEach(function (id) {
 						datatable.setInactive(id);
 					});
 
 				} else {
 					// single check for server and local
-					Extension.selectedRows.forEach(function(id) {
+					Extension.selectedRows.forEach(function (id) {
 						datatable.setActive(id);
 					});
 
@@ -8971,13 +8979,13 @@ var mWizard = function(elementId, options) {
 			/**
 			 * Check if selector is enabled from options
 			 */
-			selectorEnabled: function() {
-				return $.grep(datatable.options.columns, function(n, i) {
+			selectorEnabled: function () {
+				return $.grep(datatable.options.columns, function (n, i) {
 					return n.selector || false;
 				})[0];
 			},
 
-			initVars: function() {
+			initVars: function () {
 				// get single select/unselect from localstorage
 				var storage = datatable.stateGet('checkbox');
 				if (typeof storage !== 'undefined') {
@@ -8986,7 +8994,7 @@ var mWizard = function(elementId, options) {
 				}
 			},
 
-			getSelectedId: function(path) {
+			getSelectedId: function (path) {
 				Extension.initVars();
 
 				// server selected all rows
@@ -8998,7 +9006,7 @@ var mWizard = function(elementId, options) {
 
 					if (selectedAllRows.length > 0) {
 						// remove single unselected rows from selectedAllRows ids from server response emta
-						Extension.unselectedRows.forEach(function(id) {
+						Extension.unselectedRows.forEach(function (id) {
 							selectedAllRows = Extension.remove(selectedAllRows, parseInt(id));
 						});
 					}
@@ -9009,15 +9017,15 @@ var mWizard = function(elementId, options) {
 				return Extension.selectedRows;
 			},
 
-			remove: function(array, element) {
-				return array.filter(function(e) {
+			remove: function (array, element) {
+				return array.filter(function (e) {
 					return e !== element;
 				});
 			},
 		};
 
 		// make the extension accessible from datatable init
-		datatable.checkbox = function() {
+		datatable.checkbox = function () {
 			return Extension;
 		};
 
@@ -9041,227 +9049,6 @@ var mWizard = function(elementId, options) {
 	};
 
 }(jQuery));
-//== Set defaults
-
-$.notifyDefaults({
-	template: '' +
-	'<div data-notify="container" class="alert alert-{0} m-alert" role="alert">' +
-	'<button type="button" aria-hidden="true" class="close" data-notify="dismiss"></button>' +
-	'<span data-notify="icon"></span>' +
-	'<span data-notify="title">{1}</span>' +
-	'<span data-notify="message">{2}</span>' +
-	'<div class="progress" data-notify="progressbar">' +
-	'<div class="progress-bar progress-bar-animated bg-{0}" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>' +
-	'</div>' +
-	'<a href="{3}" target="{4}" data-notify="url"></a>' +
-	'</div>'
-});
-//== Set defaults
-swal.setDefaults({
-	width: 400,
-	padding: '2.5rem',
-	buttonsStyling: false,
-	confirmButtonClass: 'btn btn-success m-btn m-btn--custom',
-	confirmButtonColor: null,
-	cancelButtonClass: 'btn btn-secondary m-btn m-btn--custom',
-	cancelButtonColor: null
-});
-Chart.elements.Rectangle.prototype.draw = function() {    
-    var ctx = this._chart.ctx;
-    var vm = this._view;
-    var left, right, top, bottom, signX, signY, borderSkipped, radius;
-    var borderWidth = vm.borderWidth;
-
-    // Set Radius Here
-    // If radius is large enough to cause drawing errors a max radius is imposed
-    var cornerRadius = this._chart.options.barRadius ? this._chart.options.barRadius : 0;
-
-    if (!vm.horizontal) {
-        // bar
-        left = vm.x - vm.width / 2;
-        right = vm.x + vm.width / 2;
-
-        if (vm.y > 2 * cornerRadius) {
-        	top = vm.y - cornerRadius;        
-        } else {
-        	top = vm.y;        
-        }
-
-        bottom = vm.base;
-        signX = 1;
-        signY = bottom > top? 1: -1;
-        borderSkipped = vm.borderSkipped || 'bottom';
-        //console.log(vm.base + '-' + vm.y);
-    } else {
-        // horizontal bar
-        left = vm.base;
-        right = vm.x;
-        top = vm.y - vm.height / 2;
-        bottom = vm.y + vm.height / 2;
-        signX = right > left? 1: -1;
-        signY = 1;
-        borderSkipped = vm.borderSkipped || 'left';
-    }
-
-    // Canvas doesn't allow us to stroke inside the width so we can
-    // adjust the sizes to fit if we're setting a stroke on the line
-    if (borderWidth) {
-        // borderWidth shold be less than bar width and bar height.
-        var barSize = Math.min(Math.abs(left - right), Math.abs(top - bottom));
-        borderWidth = borderWidth > barSize? barSize: borderWidth;
-        var halfStroke = borderWidth / 2;
-        // Adjust borderWidth when bar top position is near vm.base(zero).
-        var borderLeft = left + (borderSkipped !== 'left'? halfStroke * signX: 0);
-        var borderRight = right + (borderSkipped !== 'right'? -halfStroke * signX: 0);
-        var borderTop = top + (borderSkipped !== 'top'? halfStroke * signY: 0);
-        var borderBottom = bottom + (borderSkipped !== 'bottom'? -halfStroke * signY: 0);
-        // not become a vertical line?
-        if (borderLeft !== borderRight) {
-            top = borderTop;
-            bottom = borderBottom;
-        }
-        // not become a horizontal line?
-        if (borderTop !== borderBottom) {
-            left = borderLeft;
-            right = borderRight;
-        }
-    }
-
-    ctx.beginPath();
-    ctx.fillStyle = vm.backgroundColor;
-    ctx.strokeStyle = vm.borderColor;
-    ctx.lineWidth = borderWidth;
-
-    // Corner points, from bottom-left to bottom-right clockwise
-    // | 1 2 |
-    // | 0 3 |
-    var corners = [
-        [left, bottom],
-        [left, top],
-        [right, top],
-        [right, bottom]
-    ];
-
-    // Find first (starting) corner with fallback to 'bottom'
-    var borders = ['bottom', 'left', 'top', 'right'];
-    var startCorner = borders.indexOf(borderSkipped, 0);
-    if (startCorner === -1) {
-        startCorner = 0;
-    }
-
-    function cornerAt(index) {
-        return corners[(startCorner + index) % 4];
-    }
-
-    // Draw rectangle from 'startCorner'
-    var corner = cornerAt(0);
-    ctx.moveTo(corner[0], corner[1]);
-
-    for (var i = 1; i < 4; i++) {
-        corner = cornerAt(i);
-        nextCornerId = i+1;
-        if(nextCornerId == 4){
-            nextCornerId = 0
-        }
-
-        nextCorner = cornerAt(nextCornerId);
-
-        width = corners[2][0] - corners[1][0];
-        height = corners[0][1] - corners[1][1];
-        x = corners[1][0];
-        y = corners[1][1];
-        
-        var radius = cornerRadius;
-        
-        // Fix radius being too large
-        if(radius > height/2){
-            radius = height/2;
-        }if(radius > width/2){
-            radius = width/2;
-        }
-
-        ctx.moveTo(x + radius, y);
-        ctx.lineTo(x + width - radius, y);
-        ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-        ctx.lineTo(x + width, y + height - radius);
-        ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-        ctx.lineTo(x + radius, y + height);
-        ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-        ctx.lineTo(x, y + radius);
-        ctx.quadraticCurveTo(x, y, x + radius, y);
-    }
-
-    ctx.fill();
-    if (borderWidth) {
-        ctx.stroke();
-    }
-}; 
-
-  $.fn.markdown.defaults.iconlibrary = 'fa';
-//$.fn.bootstrapSwitch.defaults.size = 'large';
-//$.fn.bootstrapSwitch.defaults.onColor = 'success';
-$.fn.timepicker.defaults = $.extend(true, {}, $.fn.timepicker.defaults, {
-    icons: {
-        up: 'la la-angle-up',
-        down: 'la la-angle-down'  
-    }
-});
-jQuery.validator.setDefaults({
-    errorElement: 'div', //default input error message container
-    errorClass: 'form-control-feedback', // default input error message class
-    focusInvalid: false, // do not focus the last invalid input
-    ignore: "",  // validate all fields including form hidden input
-
-    errorPlacement: function(error, element) { // render error placement for each input type
-        var group = $(element).closest('.m-form__group-sub').length > 0 ? $(element).closest('.m-form__group-sub') : $(element).closest('.m-form__group');
-        var help = group.find('.m-form__help');
-
-        if (group.find('.form-control-feedback').length !== 0) {
-            return;
-        }
-
-        if (help.length > 0) {
-            help.before(error);
-        } else {
-            if ($(element).closest('.input-group').length > 0) {
-                $(element).closest('.input-group').after(error);
-            } else {
-                if ($(element).is(':checkbox')) {
-                    $(element).closest('.m-checkbox').find('>span').after(error);
-                } else {
-                    $(element).after(error);
-                }                
-            }            
-        }
-    },
-
-    highlight: function(element) { // hightlight error inputs
-        var group = $(element).closest('.m-form__group-sub').length > 0  ? $(element).closest('.m-form__group-sub') : $(element).closest('.m-form__group');
-        group.addClass('has-danger'); // set error class to the control groupx
-    },
-
-    unhighlight: function(element) { // revert the change done by hightlight
-        var group = $(element).closest('.m-form__group-sub').length > 0  ? $(element).closest('.m-form__group-sub') : $(element).closest('.m-form__group');
-
-        group.removeClass('has-danger'); // set error class to the control group
-    },
-
-    success: function(label, element) {
-        var group = $(label).closest('.m-form__group-sub').length > 0  ? $(label).closest('.m-form__group-sub') : $(label).closest('.m-form__group');
-
-        //group.addClass('has-success').removeClass('has-danger'); // set success class and hide error class
-        group.removeClass('has-danger'); // hide error class
-        group.find('.form-control-feedback').remove();
-    }
-});
-
-jQuery.validator.addMethod("email", function(value, element) {
-    if (/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/.test(value)) {
-        return true;
-    } else {
-        return false;
-    }
-}, "Please enter a valid Email.");
 var mLayout = function() {
     var header;
     var horMenu;
@@ -9269,8 +9056,10 @@ var mLayout = function() {
     var asideMenuOffcanvas;
     var horMenuOffcanvas;
     var asideLeftToggle;
+    var asideLeftHide;
     var scrollTop;
     var quicksearch;
+    var mainPortlet;
 
     //== Header
     var initStickyHeader = function() {
@@ -9278,7 +9067,7 @@ var mLayout = function() {
         var headerEl = mUtil.get('m_header');
         var options = {
             offset: {},
-            minimize:{}       
+            minimize: {}
         };
 
         if (mUtil.attr(headerEl, 'm-minimize-mobile') == 'hide') {
@@ -9303,13 +9092,13 @@ var mLayout = function() {
 
         if (tmp = mUtil.attr(headerEl, 'm-minimize-mobile-offset')) {
             options.offset.mobile = tmp;
-        }        
+        }
 
         header = new mHeader('m_header', options);
     }
 
     //== Hor menu
-    var initHorMenu = function() { 
+    var initHorMenu = function() {
         // init aside left offcanvas
         horMenuOffcanvas = new mOffcanvas('m_header_menu', {
             overlay: true,
@@ -9318,30 +9107,41 @@ var mLayout = function() {
             toggleBy: {
                 target: 'm_aside_header_menu_mobile_toggle',
                 state: 'm-brand__toggler--active'
-            }            
+            }
         });
-        
+
         horMenu = new mMenu('m_header_menu', {
             submenu: {
                 desktop: 'dropdown',
                 tablet: 'accordion',
                 mobile: 'accordion'
             },
-            accordion: {   
-                slideSpeed: 200,  // accordion toggle slide speed in milliseconds
-                autoScroll: true, // enable auto scrolling(focus) to the clicked menu item
-                expandAll: false   // allow having multiple expanded accordions in the menu
+            accordion: {
+                slideSpeed: 200, // accordion toggle slide speed in milliseconds
+                expandAll: false // allow having multiple expanded accordions in the menu
             }
         });
     }
 
     //== Aside menu
     var initLeftAsideMenu = function() {
-        // init aside menu
-        var menu = $('#m_ver_menu');
-        var menuDesktopMode = (menu.data('m-menu-dropdown') === '1' ? 'dropdown' : 'accordion');
+        //== Init aside menu
+        var menu = mUtil.get('m_ver_menu');
+        var menuDesktopMode = (mUtil.attr(menu, 'm-menu-dropdown') === '1' ? 'dropdown' : 'accordion');
+
+        var scroll;
+        if (mUtil.attr(menu, 'm-menu-scrollable') === '1') {
+            scroll = {
+                height: function() {
+                    return mUtil.getViewPort().height - parseInt(mUtil.css('m_header', 'height'));
+                }
+            };
+        }
 
         asideMenu = new mMenu('m_ver_menu', {
+            // vertical scroll
+            scroll: scroll,
+
             // submenu setup
             submenu: {
                 desktop: {
@@ -9349,47 +9149,26 @@ var mLayout = function() {
                     default: menuDesktopMode,
                     // whenever body has this class switch the menu mode to dropdown
                     state: {
-                        body: 'm-aside-left--minimize',  
+                        body: 'm-aside-left--minimize',
                         mode: 'dropdown'
                     }
                 },
                 tablet: 'accordion', // menu set to accordion in tablet mode
-                mobile: 'accordion'  // menu set to accordion in mobile mode
+                mobile: 'accordion' // menu set to accordion in mobile mode
             },
 
             //accordion setup
             accordion: {
-                autoScroll: true,
-                expandAll: false
-            }            
-        });
-
-        // handle fixed aside menu
-        if (menu.data('m-menu-scrollable') === '1') {
-            function initScrollableMenu(obj) {    
-                if (mUtil.isInResponsiveRange('tablet-and-mobile')) {
-                    // destroy if the instance was previously created
-                    mApp.destroyScroller(obj);
-                    return;
-                }
-
-                var height = mUtil.getViewPort().height - mUtil.css('m_header', 'height');
-
-                // create/re-create a new instance
-                mApp.initScroller(obj, {height: height});
+                autoScroll: false, // enable auto scrolling(focus) to the clicked menu item
+                expandAll: false // allow having multiple expanded accordions in the menu
             }
-
-            initScrollableMenu(menu);
-            
-            mUtil.addResizeHandler(function() {            
-                initScrollableMenu(asideMenu);
-            });   
-        }      
+        });
     }
 
     //== Aside
     var initLeftAside = function() {
         // init aside left offcanvas
+        var body = mUtil.get('body');
         var asideLeft = mUtil.get('m_aside_left');
         var asideOffcanvasClass = mUtil.hasClass(asideLeft, 'm-aside-left--offcanvas-default') ? 'm-aside-left--offcanvas-default' : 'm-aside-left';
 
@@ -9399,14 +9178,52 @@ var mLayout = function() {
             closeBy: 'm_aside_left_close_btn',
             toggleBy: {
                 target: 'm_aside_left_offcanvas_toggle',
-                state: 'm-brand__toggler--active'                
-            }            
-        });        
+                state: 'm-brand__toggler--active'
+            }
+        });
+
+        //== Handle minimzied aside hover
+        if (mUtil.hasClass(body, 'm-aside-left--fixed')) {
+            var insideTm;
+            var outsideTm;
+
+            mUtil.addEvent(asideLeft, 'mouseenter', function() {
+                if (outsideTm) {
+                    clearTimeout(outsideTm);
+                    outsideTm = null;
+                }
+
+                insideTm = setTimeout(function() {
+                    if (mUtil.hasClass(body, 'm-aside-left--minimize') && mUtil.isInResponsiveRange('desktop')) {
+                        mUtil.removeClass(body, 'm-aside-left--minimize');
+                        mUtil.addClass(body, 'm-aside-left--minimize-hover');
+                        asideMenu.scrollerUpdate();
+                        asideMenu.scrollerTop();
+                    }
+                }, 300);
+            });
+
+            mUtil.addEvent(asideLeft, 'mouseleave', function() {
+                if (insideTm) {
+                    clearTimeout(insideTm);
+                    insideTm = null;
+                }
+
+                outsideTm = setTimeout(function() {
+                    if (mUtil.hasClass(body, 'm-aside-left--minimize-hover') && mUtil.isInResponsiveRange('desktop')) {
+                        mUtil.removeClass(body, 'm-aside-left--minimize-hover');
+                        mUtil.addClass(body, 'm-aside-left--minimize');
+                        asideMenu.scrollerUpdate();
+                        asideMenu.scrollerTop();
+                    }
+                }, 500);
+            });
+        }
     }
 
     //== Sidebar toggle
     var initLeftAsideToggle = function() {
-        if ($('#m_aside_left_minimize_toggle').length === 0 ) {
+        if ($('#m_aside_left_minimize_toggle').length === 0) {
             return;
         }
 
@@ -9414,9 +9231,11 @@ var mLayout = function() {
             target: 'body',
             targetState: 'm-brand--minimize m-aside-left--minimize',
             togglerState: 'm-brand__toggler--active'
-        });
+        }); 
 
-        asideLeftToggle.on('toggle', function(toggle) {
+        asideLeftToggle.on('toggle', function(toggle) {     
+            mainPortlet.updateSticky();       
+            
             horMenu.pauseDropdownHover(800);
             asideMenu.pauseDropdownHover(800);
 
@@ -9428,13 +9247,38 @@ var mLayout = function() {
         });
     }
 
+    //== Sidebar hide
+    var initLeftAsideHide = function() {
+        if ($('#m_aside_left_hide_toggle').length === 0 ) {
+            return;
+        }
+
+        initLeftAsideHide = new mToggle('m_aside_left_hide_toggle', {
+            target: 'body',
+            targetState: 'm-aside-left--hide',
+            togglerState: 'm-brand__toggler--active'
+        });
+
+        initLeftAsideHide.on('toggle', function(toggle) {
+            horMenu.pauseDropdownHover(800);
+            asideMenu.pauseDropdownHover(800);
+
+            //== Remember state in cookie
+            Cookies.set('sidebar_hide_state', toggle.getState());
+            // to set default minimized left aside use this cookie value in your 
+            // server side code and add "m-brand--minimize m-aside-left--minimize" classes to 
+            // the body tag in order to initialize the minimized left aside mode during page loading.
+        });
+    }
+
     //== Topbar
     var initTopbar = function() {
         $('#m_aside_header_topbar_mobile_toggle').click(function() {
             $('body').toggleClass('m-topbar--on');
-        });                                  
+        });
 
         // Animated Notification Icon 
+        /*
         setInterval(function() {
             $('#m_topbar_notification_icon .m-nav__link-icon').addClass('m-animate-shake');
             $('#m_topbar_notification_icon .m-nav__link-badge').addClass('m-animate-blink');
@@ -9444,38 +9288,41 @@ var mLayout = function() {
             $('#m_topbar_notification_icon .m-nav__link-icon').removeClass('m-animate-shake');
             $('#m_topbar_notification_icon .m-nav__link-badge').removeClass('m-animate-blink');
         }, 6000);
+        */
     }
 
     //== Quicksearch
     var initQuicksearch = function() {
-        if ($('#m_quicksearch').length === 0 ) {
+        if ($('#m_quicksearch').length === 0) {
             return;
         }
 
         quicksearch = new mQuicksearch('m_quicksearch', {
-            mode: mUtil.attr( 'm_quicksearch', 'm-quicksearch-mode' ), // quick search type
+            mode: mUtil.attr('m_quicksearch', 'm-quicksearch-mode'), // quick search type
             minLength: 1
-        });    
+        });
 
         //<div class="m-search-results m-search-results--skin-light"><span class="m-search-result__message">Something went wrong</div></div>
 
         quicksearch.on('search', function(the) {
-            the.showProgress();  
-                      
+            the.showProgress();
+
             $.ajax({
                 url: 'inc/api/quick_search.php',
-                data: {query: the.query},
+                data: {
+                    query: the.query
+                },
                 dataType: 'html',
                 success: function(res) {
                     the.hideProgress();
-                    the.showResult(res);                     
+                    the.showResult(res);
                 },
                 error: function(res) {
                     the.hideProgress();
-                    the.showError('Connection error. Pleae try again later.');      
+                    the.showError('Connection error. Pleae try again later.');
                 }
             });
-        });  
+        });
     }
 
     //== Scrolltop
@@ -9486,10 +9333,62 @@ var mLayout = function() {
         });
     }
 
+    //== Main portlet(sticky portlet)
+    var createMainPortlet = function() {
+        return new mPortlet('main_portlet', {
+            sticky: {
+                offset: parseInt(mUtil.css( mUtil.get('m_header'), 'height')),
+                zIndex: 90,
+                position: {
+                    top: function() {
+                        return parseInt(mUtil.css( mUtil.get('m_header'), 'height') );
+                    },
+                    left: function() {
+                        var left = parseInt(mUtil.css( mUtil.getByClass('m-content'), 'paddingLeft'));
+                        
+                        if (mUtil.isInResponsiveRange('desktop')) {
+                            //left += parseInt(mUtil.css(mUtil.get('m_aside_left'), 'width') );
+                            if (mUtil.hasClass(mUtil.get('body'), 'm-aside-left--minimize')) {
+                                left += 78; // need to use hardcoded width of the minimize aside
+                            } else {
+                                left += 255; // need to use hardcoded width of the aside
+                            }
+                        } 
+
+                        return left; 
+                    },
+                    right: function() {
+                        return parseInt(mUtil.css( mUtil.getByClass('m-content'), 'paddingRight') );
+                    }
+                }
+            }
+        });
+    }
+
     return {
-        init: function() {  
+        init: function() {
             this.initHeader();
             this.initAside();
+            this.initMainPortlet();
+        },
+
+        initMainPortlet: function() {
+            if (!mUtil.get('main_portlet')) {
+                return;
+            }
+            
+            mainPortlet = createMainPortlet();
+            mainPortlet.initSticky();
+            
+            mUtil.addResizeHandler(function(){
+                mainPortlet.updateSticky();
+            });
+        },
+
+        resetMainPortlet: function() {
+            mainPortlet.destroySticky();
+            mainPortlet = createMainPortlet();
+            mainPortlet.initSticky();
         },
 
         initHeader: function() {
@@ -9500,17 +9399,25 @@ var mLayout = function() {
             initScrollTop();
         },
 
-        initAside: function() {
+        initAside: function() { 
             initLeftAside();
-            initLeftAsideMenu();            
+            initLeftAsideMenu();
             initLeftAsideToggle();
+            initLeftAsideHide();
 
             this.onLeftSidebarToggle(function(e) {
-              var datatables = $('.m-datatable');
+                //== Update sticky portlet
+                if (mainPortlet) {
+                    mainPortlet.updateSticky();
+                }
 
-                $(datatables).each(function() {
-                    $(this).mDatatable('redraw');
-                });
+                //== Reload datatable
+                var datatables = $('.m-datatable');
+                if (datatables) {
+                    datatables.each(function() {
+                        $(this).mDatatable('redraw');
+                    });
+                }                
             });
         },
 
@@ -9521,7 +9428,7 @@ var mLayout = function() {
         onLeftSidebarToggle: function(handler) {
             if (asideLeftToggle) {
                 asideLeftToggle.on('toggle', handler);
-            }            
+            }
         },
 
         closeMobileAsideMenuOffcanvas: function() {
@@ -9544,79 +9451,61 @@ $(document).ready(function() {
     }
 });
 
-
 var mQuickSidebar = function() {
     var topbarAside = $('#m_quick_sidebar');
     var topbarAsideTabs = $('#m_quick_sidebar_tabs');    
     var topbarAsideContent = topbarAside.find('.m-quick-sidebar__content');
 
     var initMessages = function() {
-        var messenger = $('#m_quick_sidebar_tabs_messenger');  
+        var messages = mUtil.find( mUtil.get('m_quick_sidebar_tabs_messenger'),  '.m-messenger__messages'); 
+        var form = $('#m_quick_sidebar_tabs_messenger .m-messenger__form');
 
-        if (messenger.length === 0) {
-            return;
-        }
+        mUtil.scrollerInit(messages, {
+            disableForMobile: true, 
+            resetHeightOnDestroy: false, 
+            handleWindowResize: true, 
+            height: function() {
+                var height = topbarAside.outerHeight(true) - 
+                    topbarAsideTabs.outerHeight(true) - 
+                    form.outerHeight(true) - 120;
 
-        var messengerMessages = messenger.find('.m-messenger__messages');
-
-        var init = function() {
-            var height = topbarAside.outerHeight(true) - 
-                topbarAsideTabs.outerHeight(true) - 
-                messenger.find('.m-messenger__form').outerHeight(true) - 120;
-            
-            // init messages scrollable content
-            messengerMessages.css('height', height);
-            mApp.initScroller(messengerMessages, {});
-        }
-
-        init();        
-        
-        // reinit on window resize
-        mUtil.addResizeHandler(init);
+                return height;                    
+            }
+        });
     }
 
     var initSettings = function() { 
-        var settings = $('#m_quick_sidebar_tabs_settings');
+        var settings = mUtil.find( mUtil.get('m_quick_sidebar_tabs_settings'),  '.m-list-settings'); 
 
-        if (settings.length === 0) {
+        if (!settings) {
             return;
         }
 
-        // init dropdown tabbable content
-        var init = function() {
-            var height = mUtil.getViewPort().height - topbarAsideTabs.outerHeight(true) - 60;
-
-            // init settings scrollable content
-            settings.css('height', height);
-            mApp.initScroller(settings, {});
-        }
-
-        init();
-
-        // reinit on window resize
-        mUtil.addResizeHandler(init);
+        mUtil.scrollerInit(settings, {
+            disableForMobile: true, 
+            resetHeightOnDestroy: false, 
+            handleWindowResize: true, 
+            height: function() {
+                return mUtil.getViewPort().height - topbarAsideTabs.outerHeight(true) - 60;            
+            }
+        });
     }
 
     var initLogs = function() {
-        // init dropdown tabbable content
-        var logs = $('#m_quick_sidebar_tabs_logs');
+        var logs = mUtil.find( mUtil.get('m_quick_sidebar_tabs_logs'),  '.m-list-timeline'); 
 
-        if (logs.length === 0) {
+        if (!logs) {
             return;
         }
 
-        var init = function() {
-            var height = mUtil.getViewPort().height - topbarAsideTabs.outerHeight(true) - 60;
-
-            // init settings scrollable content
-            logs.css('height', height);
-            mApp.initScroller(logs, {});
-        }
-
-        init();
-
-        // reinit on window resize
-        mUtil.addResizeHandler(init);
+        mUtil.scrollerInit(logs, {
+            disableForMobile: true, 
+            resetHeightOnDestroy: false, 
+            handleWindowResize: true, 
+            height: function() {
+                return mUtil.getViewPort().height - topbarAsideTabs.outerHeight(true) - 60;            
+            }
+        });
     }
 
     var initOffcanvasTabs = function() {

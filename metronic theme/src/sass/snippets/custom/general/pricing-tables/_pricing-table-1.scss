@@ -5,7 +5,8 @@
 //== Snippet Base
 @mixin m-build-snippet--pricing-tables-base() {	 
 	.m-pricing-table-1 {
-
+		overflow: hidden;
+		
 		&.m-pricing-table-1--fixed {
 			width: 75%;
 			margin: 0 auto;

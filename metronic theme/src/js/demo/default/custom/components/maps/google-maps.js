@@ -140,7 +140,7 @@ var GoogleMapsDemo = function() {
         });
         $('#m_gmap_7_btn').click(function(e) {
             e.preventDefault();
-            mApp.scrollTo($(this), 400);
+            mUtil.scrollTo('m_gmap_7_btn', 400);
             map.travelRoute({
                 origin: [-12.044012922866312, -77.02470665341184],
                 destination: [-12.090814532191756, -77.02271108990476],
@@ -180,7 +180,7 @@ var GoogleMapsDemo = function() {
                             lat: latlng.lat(),
                             lng: latlng.lng()
                         });
-                        mApp.scrollTo($('#m_gmap_8'));
+                        mUtil.scrollTo('m_gmap_8');
                     }
                 }
             });

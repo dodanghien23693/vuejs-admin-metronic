@@ -14,8 +14,8 @@
 			.m-wizard__nav {
 				.m-wizard__steps {									 
 					.m-wizard__step {						 
-						margin-bottom: 2rem;						 
-						@include border-radius(2.3rem);  						
+						margin-bottom: 2rem;		
+						@include border-radius(2.3rem);  
 
 						.m-wizard__step-info {
 							display: table;						 												 							 						 
@@ -60,7 +60,16 @@
 									font-weight: get-font-weight(boldest);
 								}
 							}
-						}					
+						}
+
+						//== Current 
+						&.m-wizard__step--current {
+							.m-wizard__step-info {
+								.m-wizard__step-icon {
+									display: none;
+								}	
+							}
+						}				
 					}
 				}
 			}	
@@ -94,6 +103,14 @@
 				padding: 3rem 4rem 0 4rem;
 			}
 		}		
+	}
+
+	@include responsive-below(1300px) {
+		.m-wizard.m-wizard--4 {	
+			.m-wizard__head {
+				padding: 3rem 1rem;
+			}
+		}
 	}
 
 	@include minimal-desktop-and-below {

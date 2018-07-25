@@ -8,7 +8,9 @@
 @mixin m-build-component--recaptcha-base() {
     .m-recaptcha {
         padding: 15px;
-        @include border-radius(array-get($m--border-radius, general));
+        @include rounded {
+            @include border-radius(array-get($m--border-radius, general));
+        }
 
         .m-recaptcha__img {
             margin-bottom: 10px;
@@ -16,8 +18,10 @@
 
         .input-group {
             .form-control {
-                @include border-top-left-radius(array-get($m--forms, input, layout, self, size, default, border-radius), '!important');
-                @include border-bottom-left-radius(array-get($m--forms, input, layout, self, size, default, border-radius), '!important');
+                @include rounded {
+                    @include border-top-left-radius(array-get($m--forms, input, layout, self, size, default, border-radius), '!important');
+                    @include border-bottom-left-radius(array-get($m--forms, input, layout, self, size, default, border-radius), '!important');
+                }
             }
         }
     }

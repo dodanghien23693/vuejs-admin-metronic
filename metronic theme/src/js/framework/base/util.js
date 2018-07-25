@@ -1,44 +1,46 @@
 /**
  * @class mUtil  Metronic base utilize class that privides helper functions
  */
-
 //== Polyfill
-
 // matches polyfill
 this.Element && function(ElementPrototype) {
     ElementPrototype.matches = ElementPrototype.matches ||
-    ElementPrototype.matchesSelector ||
-    ElementPrototype.webkitMatchesSelector ||
-    ElementPrototype.msMatchesSelector ||
-    function(selector) {
-        var node = this, nodes = (node.parentNode || node.document).querySelectorAll(selector), i = -1;
-        while (nodes[++i] && nodes[i] != node);
-        return !!nodes[i];
-    }
+        ElementPrototype.matchesSelector ||
+        ElementPrototype.webkitMatchesSelector ||
+        ElementPrototype.msMatchesSelector ||
+        function(selector) {
+            var node = this,
+                nodes = (node.parentNode || node.document).querySelectorAll(selector),
+                i = -1;
+            while (nodes[++i] && nodes[i] != node);
+            return !!nodes[i];
+        }
 }(Element.prototype);
 
 // closest polyfill
 this.Element && function(ElementPrototype) {
     ElementPrototype.closest = ElementPrototype.closest ||
-    function(selector) {
-        var el = this;
-        while (el.matches && !el.matches(selector)) el = el.parentNode;
-        return el.matches ? el : null;
-    }
+        function(selector) {
+            var el = this;
+            while (el.matches && !el.matches(selector)) el = el.parentNode;
+            return el.matches ? el : null;
+        }
 }(Element.prototype);
 
 
 // matches polyfill
 this.Element && function(ElementPrototype) {
     ElementPrototype.matches = ElementPrototype.matches ||
-    ElementPrototype.matchesSelector ||
-    ElementPrototype.webkitMatchesSelector ||
-    ElementPrototype.msMatchesSelector ||
-    function(selector) {
-        var node = this, nodes = (node.parentNode || node.document).querySelectorAll(selector), i = -1;
-        while (nodes[++i] && nodes[i] != node);
-        return !!nodes[i];
-    }
+        ElementPrototype.matchesSelector ||
+        ElementPrototype.webkitMatchesSelector ||
+        ElementPrototype.msMatchesSelector ||
+        function(selector) {
+            var node = this,
+                nodes = (node.parentNode || node.document).querySelectorAll(selector),
+                i = -1;
+            while (nodes[++i] && nodes[i] != node);
+            return !!nodes[i];
+        }
 }(Element.prototype);
 
 //
@@ -77,35 +79,34 @@ this.Element && function(ElementPrototype) {
 }());
 
 // Source: https://github.com/jserz/js_piece/blob/master/DOM/ParentNode/prepend()/prepend().md
-(function (arr) {
-  arr.forEach(function (item) {
-    if (item.hasOwnProperty('prepend')) {
-      return;
-    }
-    Object.defineProperty(item, 'prepend', {
-      configurable: true,
-      enumerable: true,
-      writable: true,
-      value: function prepend() {
-        var argArr = Array.prototype.slice.call(arguments),
-          docFrag = document.createDocumentFragment();
-        
-        argArr.forEach(function (argItem) {
-          var isNode = argItem instanceof Node;
-          docFrag.appendChild(isNode ? argItem : document.createTextNode(String(argItem)));
+(function(arr) {
+    arr.forEach(function(item) {
+        if (item.hasOwnProperty('prepend')) {
+            return;
+        }
+        Object.defineProperty(item, 'prepend', {
+            configurable: true,
+            enumerable: true,
+            writable: true,
+            value: function prepend() {
+                var argArr = Array.prototype.slice.call(arguments),
+                    docFrag = document.createDocumentFragment();
+
+                argArr.forEach(function(argItem) {
+                    var isNode = argItem instanceof Node;
+                    docFrag.appendChild(isNode ? argItem : document.createTextNode(String(argItem)));
+                });
+
+                this.insertBefore(docFrag, this.firstChild);
+            }
         });
-        
-        this.insertBefore(docFrag, this.firstChild);
-      }
     });
-  });
 })([Element.prototype, Document.prototype, DocumentFragment.prototype]);
 
 //== Global variables 
 window.mUtilElementDataStore = {};
 window.mUtilElementDataStoreID = 0;
 window.mUtilDelegatedEventHandlers = {};
-window.noZensmooth = true;
 
 var mUtil = function() {
 
@@ -167,10 +168,35 @@ var mUtil = function() {
         },
 
         /**
+         * Removes window resize event handler.
+         * @param {function} callback function.
+         */
+        removeResizeHandler: function(callback) {
+            for (var i = 0; i < resizeHandlers.length; i++) {
+                if (callback === resizeHandlers[i]) {
+                    delete resizeHandlers[i];
+                }
+            }
+        },
+
+        /**
          * Trigger window resize handlers.
          */
         runResizeHandlers: function() {
             _runResizeHandlers();
+        },
+
+        resize: function() {
+            if (typeof(Event) === 'function') {
+                // modern browsers
+                window.dispatchEvent(new Event('resize'));
+            } else {
+                // for IE and other old browsers
+                // causes deprecation warning on modern browsers
+                var evt = window.document.createEvent('UIEvents'); 
+                evt.initUIEvent('resize', true, false, window, 0); 
+                window.dispatchEvent(evt);
+            }
         },
 
         /**
@@ -209,7 +235,8 @@ var mUtil = function() {
         },
 
         /**
-         * Gets browser window viewport size. Ref: http://andylangton.co.uk/articles/javascript/get-viewport-size-javascript/
+         * Gets browser window viewport size. Ref:
+         * http://andylangton.co.uk/articles/javascript/get-viewport-size-javascript/
          * @returns {object}  
          */
         getViewPort: function() {
@@ -228,7 +255,8 @@ var mUtil = function() {
 
         /**
          * Checks whether given device mode is currently activated.
-         * @param {string} mode Responsive mode name(e.g: desktop, desktop-and-tablet, tablet, tablet-and-mobile, mobile)
+         * @param {string} mode Responsive mode name(e.g: desktop,
+         *     desktop-and-tablet, tablet, tablet-and-mobile, mobile)
          * @returns {boolean}  
          */
         isInResponsiveRange: function(mode) {
@@ -306,57 +334,37 @@ var mUtil = function() {
             return true;
         },
 
-        getHighestZindex1: function(el) {
-            var position, value;
-
-            while (el && el !== document && el !== window) {
-                // Ignore z-index if position is set to a value where z-index is ignored by the browser
-                // This makes behavior of this function consistent across browsers
-                // WebKit always returns auto if the element is positioned
-                position = mUtil.css(el, 'position');
-
-                if (position === "absolute" || position === "relative" || position === "fixed") {
-                    // IE returns 0 when zIndex is not specified
-                    // other browsers return a string
-                    // we ignore the case of nested elements with an explicit value of 0
-                    // <div style="z-index: -10;"><div style="z-index: 0;"></div></div>
-                    value = parseInt(elem.css("zIndex"), 10);
-                    if (!isNaN(value) && value !== 0) {
-                        return value;
-                    }
-                }
-
-                el = el.parentNode;
-            }
-        },
-
         /**
-        * Gets highest z-index of the given element parents
-        * @param {object} el jQuery element object
-        * @returns {number}  
-        */
+         * Gets highest z-index of the given element parents
+         * @param {object} el jQuery element object
+         * @returns {number}  
+         */
         getHighestZindex: function(el) {
             var elem = mUtil.get(el),
                 position, value;
 
-            while (elem.length && elem[0] !== document) {
+            while (elem && elem !== document) {
                 // Ignore z-index if position is set to a value where z-index is ignored by the browser
                 // This makes behavior of this function consistent across browsers
                 // WebKit always returns auto if the element is positioned
-                position = elem.css("position");
+                position = mUtil.css(elem, 'position');
 
                 if (position === "absolute" || position === "relative" || position === "fixed") {
                     // IE returns 0 when zIndex is not specified
                     // other browsers return a string
                     // we ignore the case of nested elements with an explicit value of 0
                     // <div style="z-index: -10;"><div style="z-index: 0;"></div></div>
-                    value = parseInt(elem.css("zIndex"), 10);
+                    value = parseInt(mUtil.css(elem, 'z-index'));
+
                     if (!isNaN(value) && value !== 0) {
                         return value;
                     }
                 }
-                elem = elem.parent();
+
+                elem = elem.parentNode;
             }
+
+            return null;
         },
 
         /**
@@ -472,6 +480,16 @@ var mUtil = function() {
             }
         },
 
+        getByClass: function(query) {
+            var el;
+            
+            if (el = document.getElementsByClassName(query)) {
+                return el[0];
+            } else {
+                return null;
+            }
+        },
+
         /**
          * Checks whether the element has given classes
          * @param {object} el jQuery element object
@@ -498,12 +516,12 @@ var mUtil = function() {
             if (!el) {
                 return;
             }
-            
-            return el.classList ? el.classList.contains(className) : new RegExp('\\b'+ className+'\\b').test(el.className);
+
+            return el.classList ? el.classList.contains(className) : new RegExp('\\b' + className + '\\b').test(el.className);
         },
 
         addClass: function(el, className) {
-            if (!el) {
+            if (!el || typeof className === 'undefined') {
                 return;
             }
 
@@ -515,7 +533,7 @@ var mUtil = function() {
                         el.classList.add(mUtil.trim(classNames[i]));
                     }
                 }
-            } else if (!hasClass(el, className)) {
+            } else if (!mUtil.hasClass(el, className)) {
                 for (var i = 0; i < classNames.length; i++) {
                     el.className += ' ' + mUtil.trim(classNames[i]);
                 }
@@ -570,7 +588,7 @@ var mUtil = function() {
         remove: function(el) {
             if (el && el.parentNode) {
                 el.parentNode.removeChild(el);
-            }            
+            }
         },
 
         find: function(parent, query) {
@@ -611,7 +629,7 @@ var mUtil = function() {
         children: function(el, selector, log) {
             if (!el || !el.childNodes) {
                 return;
-            } 
+            }
 
             var result = [],
                 i = 0,
@@ -620,7 +638,7 @@ var mUtil = function() {
             for (var i; i < l; ++i) {
                 if (el.childNodes[i].nodeType == 1 && mUtil.matches(el.childNodes[i], selector, log)) {
                     result.push(el.childNodes[i]);
-                } 
+                }
             }
 
             return result;
@@ -657,7 +675,7 @@ var mUtil = function() {
 
                     if (mUtilElementDataStore[element.customDataTag] === undefined) {
                         mUtilElementDataStore[element.customDataTag] = {};
-                    }                    
+                    }
 
                     mUtilElementDataStore[element.customDataTag][name] = data;
                 },
@@ -667,13 +685,13 @@ var mUtil = function() {
                 },
 
                 has: function(name) {
-                    return (mUtilElementDataStore[element.customDataTag] && mUtilElementDataStore[element.customDataTag][name]) ? true : false; 
+                    return (mUtilElementDataStore[element.customDataTag] && mUtilElementDataStore[element.customDataTag][name]) ? true : false;
                 },
 
                 remove: function(name) {
                     if (this.has(name)) {
                         delete mUtilElementDataStore[element.customDataTag][name];
-                    } 
+                    }
                 }
             };
         },
@@ -693,13 +711,31 @@ var mUtil = function() {
             }
         },
 
-        offset: function(el) {
-            var rect = el.getBoundingClientRect();
+        offset: function(elem) {
+            var rect, win;
+            elem = mUtil.get(elem);
+
+            if ( !elem ) {
+                return;
+            }
+
+            // Return zeros for disconnected and hidden (display: none) elements (gh-2310)
+            // Support: IE <=11 only
+            // Running getBoundingClientRect on a
+            // disconnected node in IE throws an error
+
+            if ( !elem.getClientRects().length ) {
+                return { top: 0, left: 0 };
+            }
+
+            // Get document-relative position by adding viewport scroll to viewport-relative gBCR
+            rect = elem.getBoundingClientRect();
+            win = elem.ownerDocument.defaultView;
 
             return {
-                top: rect.top + document.body.scrollTop,
-                left: rect.left + document.body.scrollLeft
-            }
+                top: rect.top + win.pageYOffset,
+                left: rect.left + win.pageXOffset
+            };
         },
 
         height: function(el) {
@@ -724,7 +760,7 @@ var mUtil = function() {
             }
         },
 
-        hasAttr: function(el, name)   {
+        hasAttr: function(el, name) {
             el = mUtil.get(el);
 
             if (el == undefined) {
@@ -734,7 +770,7 @@ var mUtil = function() {
             return el.getAttribute(name) ? true : false;
         },
 
-        removeAttr: function(el, name)   {
+        removeAttr: function(el, name) {
             el = mUtil.get(el);
 
             if (el == undefined) {
@@ -750,155 +786,13 @@ var mUtil = function() {
              *  Adapted from jQuery Easing
              */
             var easings = {};
+            var easing;
 
             easings.linear = function(t, b, c, d) {
                 return c * t / d + b;
             };
 
-            /*
-            easings.easeInQuad = function(t, b, c, d) {
-                return c * (t /= d) * t + b;
-            };
-            easings.easeOutQuad = function(t, b, c, d) {
-                return -c * (t /= d) * (t - 2) + b;
-            };
-            easings.easeInOutQuad = function(t, b, c, d) {
-                if ((t /= d / 2) < 1) return c / 2 * t * t + b;
-                return -c / 2 * ((--t) * (t - 2) - 1) + b;
-            };
-            easings.easeInCubic = function(t, b, c, d) {
-                return c * (t /= d) * t * t + b;
-            };
-            easings.easeOutCubic = function(t, b, c, d) {
-                return c * ((t = t / d - 1) * t * t + 1) + b;
-            };
-            easings.easeInOutCubic = function(t, b, c, d) {
-                if ((t /= d / 2) < 1) return c / 2 * t * t * t + b;
-                return c / 2 * ((t -= 2) * t * t + 2) + b;
-            };
-            easings.easeInQuart = function(t, b, c, d) {
-                return c * (t /= d) * t * t * t + b;
-            };
-            easings.easeOutQuart = function(t, b, c, d) {
-                return -c * ((t = t / d - 1) * t * t * t - 1) + b;
-            };
-            easings.easeInOutQuart = function(t, b, c, d) {
-                if ((t /= d / 2) < 1) return c / 2 * t * t * t * t + b;
-                return -c / 2 * ((t -= 2) * t * t * t - 2) + b;
-            };
-            easings.easeInQuint = function(t, b, c, d) {
-                return c * (t /= d) * t * t * t * t + b;
-            };
-            easings.easeOutQuint = function(t, b, c, d) {
-                return c * ((t = t / d - 1) * t * t * t * t + 1) + b;
-            };
-            easings.easeInOutQuint = function(t, b, c, d) {
-                if ((t /= d / 2) < 1) return c / 2 * t * t * t * t * t + b;
-                return c / 2 * ((t -= 2) * t * t * t * t + 2) + b;
-            };
-            easings.easeInSine = function(t, b, c, d) {
-                return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
-            };
-            easings.easeOutSine = function(t, b, c, d) {
-                return c * Math.sin(t / d * (Math.PI / 2)) + b;
-            };
-            easings.easeInOutSine = function(t, b, c, d) {
-                return -c / 2 * (Math.cos(Math.PI * t / d) - 1) + b;
-            };
-            easings.easeInExpo = function(t, b, c, d) {
-                return (t == 0) ? b : c * Math.pow(2, 10 * (t / d - 1)) + b;
-            };
-            easings.easeOutExpo = function(t, b, c, d) {
-                return (t == d) ? b + c : c * (-Math.pow(2, -10 * t / d) + 1) + b;
-            };
-            easings.easeInOutExpo = function(t, b, c, d) {
-                if (t == 0) return b;
-                if (t == d) return b + c;
-                if ((t /= d / 2) < 1) return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
-                return c / 2 * (-Math.pow(2, -10 * --t) + 2) + b;
-            };
-            easings.easeInCirc = function(t, b, c, d) {
-                return -c * (Math.sqrt(1 - (t /= d) * t) - 1) + b;
-            };
-            easings.easeOutCirc = function(t, b, c, d) {
-                return c * Math.sqrt(1 - (t = t / d - 1) * t) + b;
-            };
-            easings.easeInOutCirc = function(t, b, c, d) {
-                if ((t /= d / 2) < 1) return -c / 2 * (Math.sqrt(1 - t * t) - 1) + b;
-                return c / 2 * (Math.sqrt(1 - (t -= 2) * t) + 1) + b;
-            };
-            easings.easeInElastic = function(t, b, c, d) {
-                var p = 0;
-                var a = c;
-                if (t == 0) return b;
-                if ((t /= d) == 1) return b + c;
-                if (!p) p = d * .3;
-                if (a < Math.abs(c)) {
-                    a = c;
-                    var s = p / 4;
-                }
-                else var s = p / (2 * Math.PI) * Math.asin(c / a);
-                return -(a * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
-            };
-            easings.easeOutElastic = function(t, b, c, d) {
-                var p = 0;
-                var a = c;
-                if (t == 0) return b;
-                if ((t /= d) == 1) return b + c;
-                if (!p) p = d * .3;
-                if (a < Math.abs(c)) {
-                    a = c;
-                    var s = p / 4;
-                }
-                else var s = p / (2 * Math.PI) * Math.asin(c / a);
-                return a * Math.pow(2, -10 * t) * Math.sin((t * d - s) * (2 * Math.PI) / p) + c + b;
-            };
-            easings.easeInOutElastic = function(t, b, c, d) {
-                var p = 0;
-                var a = c;
-                if (t == 0) return b;
-                if ((t /= d / 2) == 2) return b + c;
-                if (!p) p = d * (.3 * 1.5);
-                if (a < Math.abs(c)) {
-                    a = c;
-                    var s = p / 4;
-                }
-                else var s = p / (2 * Math.PI) * Math.asin(c / a);
-                if (t < 1) return -.5 * (a * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
-                return a * Math.pow(2, -10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p) * .5 + c + b;
-            };
-            easings.easeInBack = function(t, b, c, d, s) {
-                if (s == undefined) s = 1.70158;
-                return c * (t /= d) * t * ((s + 1) * t - s) + b;
-            };
-            easings.easeOutBack = function(t, b, c, d, s) {
-                if (s == undefined) s = 1.70158;
-                return c * ((t = t / d - 1) * t * ((s + 1) * t + s) + 1) + b;
-            };
-            easings.easeInOutBack = function(t, b, c, d, s) {
-                if (s == undefined) s = 1.70158;
-                if ((t /= d / 2) < 1) return c / 2 * (t * t * (((s *= (1.525)) + 1) * t - s)) + b;
-                return c / 2 * ((t -= 2) * t * (((s *= (1.525)) + 1) * t + s) + 2) + b;
-            };
-            easings.easeInBounce = function(t, b, c, d) {
-                return c - easings.easeOutBounce(d - t, 0, c, d) + b;
-            };
-            easings.easeOutBounce = function(t, b, c, d) {
-                if ((t /= d) < (1 / 2.75)) {
-                    return c * (7.5625 * t * t) + b;
-                } else if (t < (2 / 2.75)) {
-                    return c * (7.5625 * (t -= (1.5 / 2.75)) * t + .75) + b;
-                } else if (t < (2.5 / 2.75)) {
-                    return c * (7.5625 * (t -= (2.25 / 2.75)) * t + .9375) + b;
-                } else {
-                    return c * (7.5625 * (t -= (2.625 / 2.75)) * t + .984375) + b;
-                }
-            };
-            easings.easeInOutBounce = function(t, b, c, d) {
-                if (t < d / 2) return easings.easeInBounce(t * 2, 0, c, d) * .5 + b;
-                return easings.easeOutBounce(t * 2 - d, 0, c, d) * .5 + c * .5 + b;
-            };
-            */
+            easing = easings.linear;
 
             // Early bail out if called incorrectly
             if (typeof from !== 'number' ||
@@ -906,15 +800,6 @@ var mUtil = function() {
                 typeof duration !== 'number' ||
                 typeof update !== 'function') {
                 return;
-            }
-                
-
-            // Determine easing
-            if (typeof easing === 'string' && easings[easing]) {
-                easing = easings[easing];
-            }
-            if (typeof easing !== 'function') {
-                easing = easings.linear;
             }
 
             // Create mock done() function if necessary
@@ -924,7 +809,7 @@ var mUtil = function() {
 
             // Pick implementation (requestAnimationFrame | setTimeout)
             var rAF = window.requestAnimationFrame || function(callback) {
-                window.setTimeout(callback, 1000 / 60);
+                window.setTimeout(callback, 1000 / 50);
             };
 
             // Animation loop
@@ -944,6 +829,7 @@ var mUtil = function() {
                     rAF(loop);
                 }
             }
+
             update(from);
 
             // Start animation loop
@@ -963,15 +849,15 @@ var mUtil = function() {
                 // the element is hidden so:
                 // making the el block so we can meassure its height but still be hidden
                 el.style.cssText = 'position: absolute; visibility: hidden; display: block;';
-                
+
                 if (prop == 'width') {
                     value = el.offsetWidth;
                 } else if (prop == 'height') {
                     value = el.offsetHeight;
-                } 
+                }
 
                 el.style.cssText = '';
-                    
+
                 // store it in cache
                 el.setAttribute('m-hidden-' + prop, value);
 
@@ -990,7 +876,7 @@ var mUtil = function() {
             return mUtil.actualCss(el, 'width', cache);
         },
 
-        getScroll: function (element, method) {
+        getScroll: function(element, method) {
             // The passed in `method` value should be 'Top' or 'Left'
             method = 'scroll' + method;
             return (element == window || element == document) ? (
@@ -1002,7 +888,11 @@ var mUtil = function() {
 
         css: function(el, styleProp, value) {
             el = mUtil.get(el);
-            
+
+            if (!el) {
+                return;
+            }
+
             if (value !== undefined) {
                 el.style[styleProp] = value;
             } else {
@@ -1020,9 +910,10 @@ var mUtil = function() {
                     });
                     value = el.currentStyle[styleProp];
                     // convert other units to pixels on IE
-                    if (/^\d+(em|pt|%|ex)?$/i.test(value)) { 
+                    if (/^\d+(em|pt|%|ex)?$/i.test(value)) {
                         return (function(value) {
-                            var oldLeft = el.style.left, oldRsLeft = el.runtimeStyle.left;
+                            var oldLeft = el.style.left,
+                                oldRsLeft = el.runtimeStyle.left;
                             el.runtimeStyle.left = el.currentStyle.left;
                             el.style.left = value || 0;
                             value = el.style.pixelLeft + "px";
@@ -1037,11 +928,11 @@ var mUtil = function() {
         },
 
         slide: function(el, dir, speed, callback, recalcMaxHeight) {
-            if ( !el || (dir == 'up' && mUtil.visible(el) === false) || (dir == 'down' && mUtil.visible(el) === true) )  {
+            if (!el || (dir == 'up' && mUtil.visible(el) === false) || (dir == 'down' && mUtil.visible(el) === true)) {
                 return;
             }
 
-            speed = (speed ? speed : 600); 
+            speed = (speed ? speed : 600);
             var calcHeight = mUtil.actualHeight(el);
             var calcPaddingTop = false;
             var calcPaddingBottom = false;
@@ -1063,7 +954,7 @@ var mUtil = function() {
             }
 
             if (dir == 'up') { // up          
-                el.style.cssText = 'display: block; overflow: hidden;';  
+                el.style.cssText = 'display: block; overflow: hidden;';
 
                 if (calcPaddingTop) {
                     mUtil.animate(0, calcPaddingTop, speed, function(value) {
@@ -1086,7 +977,7 @@ var mUtil = function() {
                 });
 
 
-            } else if(dir == 'down') { // down
+            } else if (dir == 'down') { // down
                 el.style.cssText = 'display: block; overflow: hidden;';
 
                 if (calcPaddingTop) {
@@ -1104,7 +995,7 @@ var mUtil = function() {
                         el.style.paddingBottom = '';
                     });
                 }
-                
+
                 mUtil.animate(0, calcHeight, speed, function(value) {
                     el.style.height = value + 'px';
                 }, 'linear', function() {
@@ -1130,12 +1021,12 @@ var mUtil = function() {
 
         hide: function(el) {
             el.style.display = 'none';
-        }, 
+        },
 
         addEvent: function(el, type, handler, one) {
             el = mUtil.get(el);
-            if(typeof el !=='undefined'){
-	            el.addEventListener(type, handler);
+            if (typeof el !== 'undefined') {
+                el.addEventListener(type, handler);
             }
         },
 
@@ -1155,7 +1046,7 @@ var mUtil = function() {
                 var targets = element.querySelectorAll(selector);
                 var target = e.target;
 
-                while(target && target !== element) {                    
+                while (target && target !== element) {
                     for (var i = 0, j = targets.length; i < j; i++) {
                         if (target === targets[i]) {
                             handler.call(target, e);
@@ -1176,7 +1067,7 @@ var mUtil = function() {
                 return;
             }
 
-            mUtil.removeEvent(element, event, mUtilDelegatedEventHandlers[eventId]);   
+            mUtil.removeEvent(element, event, mUtilDelegatedEventHandlers[eventId]);
 
             delete mUtilDelegatedEventHandlers[eventId];
         },
@@ -1193,29 +1084,30 @@ var mUtil = function() {
         },
 
         hash: function(str) {
-            var hash = 0, i, chr;
+            var hash = 0,
+                i, chr;
 
             if (str.length === 0) return hash;
             for (i = 0; i < str.length; i++) {
-                chr   = str.charCodeAt(i);
-                hash  = ((hash << 5) - hash) + chr;
+                chr = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + chr;
                 hash |= 0; // Convert to 32bit integer
             }
-            
+
             return hash;
         },
 
         animateClass: function(el, animationName, callback) {
             var animationEnd = 'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend';
-            
+
             mUtil.addClass(el, 'animated ' + animationName);
-            
+
             mUtil.one(el, animationEnd, function() {
                 mUtil.removeClass(el, 'animated ' + animationName);
             });
 
             if (callback) {
-                mUtil.one(el. animationEnd, callback);
+                mUtil.one(el.animationEnd, callback);
             }
         },
 
@@ -1233,27 +1125,37 @@ var mUtil = function() {
             }
         },
 
-        scrollTo: function(el, offset, speed) {   
-            if (!speed) speed = 600;
-            zenscroll.toY(el, speed);
+        scrollTo: function(target, offset, duration) {
+            var duration = duration ? duration : 500;
+            var target = mUtil.get(target);
+            var targetPos = target ? mUtil.offset(target).top : 0;
+            var scrollPos = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+            var from, to;
+
+            if (targetPos > scrollPos) {
+                from = targetPos;
+                to = scrollPos;
+            } else {
+                from = scrollPos;
+                to = targetPos;
+            }
+
+            if (offset) {
+                to += offset;
+            }
+
+            mUtil.animate(from, to, duration, function(value) {
+                document.documentElement.scrollTop = value;
+                document.body.parentNode.scrollTop = value;
+                document.body.scrollTop = value;
+            }); //, easing, done
         },
 
-        scrollToViewport: function(el, speed) {
-            if (!speed) speed = 1200;
-            zenscroll.intoView(el, speed);
+        scrollTop: function(offset, duration) {
+            mUtil.scrollTo(null, offset, duration);
         },
 
-        scrollToCenter: function(el, speed) {
-            if (!speed) speed = 1200;
-            zenscroll.center(el, speed);
-        },
-
-        scrollTop: function(speed) {
-            if (!speed) speed = 600;
-            zenscroll.toY(0, speed);
-        },
-
-        isArray: function(obj){
+        isArray: function(obj) {
             return obj && Array.isArray(obj);
         },
 
@@ -1262,6 +1164,171 @@ var mUtil = function() {
                 callback();
             } else {
                 document.addEventListener('DOMContentLoaded', callback);
+            }
+        },
+
+        isEmpty: function(obj) {
+            for (var prop in obj) {
+                if (obj.hasOwnProperty(prop)) {
+                    return false;
+                }
+            }
+
+            return true;
+        },
+
+        numberString: function(nStr) {
+            nStr += '';
+            var x = nStr.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return x1 + x2;
+        },
+
+        detectIE: function() {
+            var ua = window.navigator.userAgent;
+
+            // Test values; Uncomment to check result …
+
+            // IE 10
+            // ua = 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0)';
+
+            // IE 11
+            // ua = 'Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko';
+
+            // Edge 12 (Spartan)
+            // ua = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36 Edge/12.0';
+
+            // Edge 13
+            // ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2486.0 Safari/537.36 Edge/13.10586';
+
+            var msie = ua.indexOf('MSIE ');
+            if (msie > 0) {
+                // IE 10 or older => return version number
+                return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
+            }
+
+            var trident = ua.indexOf('Trident/');
+            if (trident > 0) {
+                // IE 11 => return version number
+                var rv = ua.indexOf('rv:');
+                return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
+            }
+
+            var edge = ua.indexOf('Edge/');
+            if (edge > 0) {
+                // Edge (IE 12+) => return version number
+                return parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
+            }
+
+            // other browser
+            return false;
+        },
+
+        isRTL: function() {
+            return (mUtil.attr(mUtil.get('html'), 'direction') == 'rtl');
+        },
+
+        //== Scroller
+        scrollerInit: function(element, options) {
+            //== Define init function
+            function init() {
+                var ps;
+                var height;
+
+                if (options.height instanceof Function) {
+                    height = parseInt(options.height.call());
+                } else {
+                    height = parseInt(options.height);
+                }
+
+                //== Destroy scroll on table and mobile modes
+                if (options.disableForMobile && mUtil.isInResponsiveRange('tablet-and-mobile')) {
+                    if (ps = mUtil.data(element).get('ps')) {
+                        if (options.resetHeightOnDestroy) {
+                            mUtil.css(element, 'height', 'auto');
+                        } else {
+                            mUtil.css(element, 'overflow', 'auto');
+                            if (height > 0) {
+                                mUtil.css(element, 'height', height + 'px');
+                            }
+                        }
+
+                        ps.destroy();
+                        ps = mUtil.data(element).remove('ps');
+                    } else if (height > 0){
+                        mUtil.css(element, 'overflow', 'auto');
+                        mUtil.css(element, 'height', height + 'px');
+                    }
+
+                    return;
+                }
+
+                if (height > 0) {
+                    mUtil.css(element, 'height', height + 'px');
+                }
+
+                mUtil.css(element, 'overflow', 'hidden');
+
+                //== Init scroll
+                if (ps = mUtil.data(element).get('ps')) {
+                    ps.update();
+                } else {
+                    mUtil.addClass(element, 'm-scroller');
+                    ps = new PerfectScrollbar(element, {
+                        wheelSpeed: 0.5,
+                        swipeEasing: true,
+                        wheelPropagation: false,
+                        minScrollbarLength: 40,
+                        suppressScrollX: true
+                    });
+
+                    mUtil.data(element).set('ps', ps);
+                }
+            }
+
+            //== Init
+            init();
+
+            //== Handle window resize
+            if (options.handleWindowResize) {
+                mUtil.addResizeHandler(function() {
+                    init();
+                });
+            }
+        },
+
+        scrollerUpdate: function(element) {
+            var ps;
+            if (ps = mUtil.data(element).get('ps')) {
+                console.log('update!');
+                ps.update();
+            }
+        },
+
+        scrollersUpdate: function(parent) {
+            var scrollers = mUtil.findAll(parent, '.ps');
+            for (var i = 0, len = scrollers.length; i < len; i++) {
+                mUtil.scrollerUpdate(scrollers[i]);
+            }
+        },
+
+        scrollerTop: function(element) {
+            var ps;
+            if (ps = mUtil.data(element).get('ps')) {
+                element.scrollTop = 0;
+            }
+        },
+
+        scrollerDestroy: function(element) {
+            var ps;
+            if (ps = mUtil.data(element).get('ps')) {
+                ps.destroy();
+                ps = mUtil.data(element).remove('ps');
             }
         }
     }

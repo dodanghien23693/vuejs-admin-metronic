@@ -97,7 +97,7 @@
                         color: #fff;
 
                         &.active {             
-                            background-color: darken(get-state-color(primary, base), 2%);                                                              
+                            background-color: #456ADC;                                                              
                         } 
                     }    
                 }
@@ -129,10 +129,8 @@
             }
         }
 
-        .m-widget28__pic {
-            &.m-widget28__pic--primary {
-                background-color: lighten(get-state-color(primary, base), 3%);  
-            }
+        .m-widget28__pic {             
+            background-color: #5075E4;              
         }                               
     }
 } 

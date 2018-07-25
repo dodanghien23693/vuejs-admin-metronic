@@ -10,12 +10,24 @@
         padding: 10px;
         margin-top: 5px;
 
+        @include not-rounded {
+            @include border-radius(0 !important);
+        }
+
    	    .daterangepicker_input {
             .input-mini {
                 height: auto;
                 padding: array-get($m--forms, input, layout, self, size, default, padding, y) array-get($m--forms, input, layout, self, size, default, padding, x);
                 padding-left: array-get($m--forms, input, layout, self, size, default, padding, x) + 1.2rem;
                 line-height: array-get($m--forms, input, layout, self, size, default, line-height);  
+
+                @include not-rounded {
+                    @include border-radius(0 !important);
+                }
+            }
+
+            i {
+                top: 10px;
             }
         }	
 
@@ -23,6 +35,9 @@
             width: 35px;
             height: 35px;
             @include border-radius(3px);
+            @include not-rounded {
+                @include border-radius(0 !important);
+            }
             font-weight: get-font-weight(regular);
             border: 0;
             vertical-align: middle;
@@ -44,11 +59,11 @@
             }
 
             .fa.fa-chevron-left:before {
-                content: "\f111";
+                content: "\f111"#{'/*rtl:"\f112"*/'};
             }
 
             .fa.fa-chevron-right:before {
-                content: "\f112";
+                content: "\f112"#{'/*rtl:"\f111"*/'};
             }
 
             th {
@@ -112,6 +127,10 @@
             @include border-radius(3px);
             padding: array-get($m--forms, input, layout, self, size, sm, padding, y) array-get($m--forms, input, layout, self, size, sm, padding, x);
             outline: none !important;
+
+            @include not-rounded {
+                @include border-radius(0 !important);
+            }
         }
 
         .calendar-time {
@@ -121,6 +140,10 @@
             select.minuteselect,
             select.ampmselect {
                 width: 70px;
+
+                @include not-rounded {
+                    @include border-radius(0 !important);
+                }
             }
 
             i {
@@ -151,6 +174,10 @@
 
                 li {
                     @include border-radius(3px);
+
+                    @include not-rounded {
+                        @include border-radius(0 !important);
+                    }
                     background: transparent;
                     padding: 8px 12px;
                     margin-bottom: 10px;
@@ -160,11 +187,19 @@
             } 
 
             .range_inputs {
-                margin-top: 15px;
+                margin-top: 0;
+
+                @include not-rounded {
+                    @include border-radius(0 !important);
+                }
 
                 .btn {
                     padding: 0.6rem 1.6rem;
                     @include border-radius(40px);
+
+                    @include not-rounded {
+                        @include border-radius(0 !important);
+                    }
                     margin-right: 6px;
                 }
             }

@@ -30,6 +30,7 @@ var CalendarExternalEvents = function() {
         var calendar = $('#m_calendar');
 
         calendar.fullCalendar({
+            isRTL: mUtil.isRTL(),
             header: {
                 left: 'prev,next today',
                 center: 'title',

@@ -4,13 +4,13 @@
 
 //== Component Base
 @mixin m-build-component--widget27-base() {
-    .m-widget27 {         
+    .m-widget27 {             
         .m-widget27__pic {
-            position: relative;
+            position: relative;                  
 
             > img {
                 width: 100%;
-                height: 286px;
+                height: 286px;                 
             }           
 
             .m-widget27__title {
@@ -43,12 +43,23 @@
                     padding: 1rem 2.5rem;
                 }
             }
+
+            &:before {
+                content: '';
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                background: linear-gradient(to right, #990099 20%, #4F30A2 120%);
+                opacity: 0.6;
+            }
         }
 
         .m-widget27__container {
             margin-top: 3rem;
             width: 100%;
-            padding: 1rem 1.5rem 0 1.5rem;
+            padding: 1rem 0.5rem 0 0.5rem;
 
             .m-widget27__nav-items {
                 display: table;
@@ -60,12 +71,66 @@
                     display: table-cell;                                       
 
                     > a {
-                        text-align: center;                         
-                        font-size: get-font-size(regular, '+');
+                        text-align: center;                       
                         font-weight: get-font-weight(bolder); 
                         padding: 0.8rem 0 0.8rem 0;
                     }                                        
                 }
+            }
+
+            .m-widget27__tab {
+                padding: 0 1rem;
+
+                // widget header
+                .m-widget27__header {
+                    padding: 1.1rem 0;
+                    margin-bottom: 0.5rem;
+
+                    .m-widget27__title {
+                        font-size: get-font-size(regular, '+++');
+                        font-weight: get-font-weight(bolder);
+                        margin-bottom: 0;
+                    }
+                    .m-widget27__desc {
+                        display: inline-block;
+                        margin-top: 0.2rem;
+                        font-size: get-font-size(regular);
+                        font-weight: get-font-weight(regular);
+                    }             
+                }
+
+                // widget legend
+                .m-widget27__legend {
+                    margin-bottom: 0.9rem;
+
+                    &:last-child {
+                        margin-bottom: 0;
+                    }
+                        
+                    .m-widget27__legend-bullet {
+                        width: 1.5rem;
+                        height: 0.45rem;
+                        display: inline-block;
+                        border-radius: 1.1rem; 
+                        margin: 0 1rem 0.1rem 0;                                               
+                    }                    
+                        
+                    .m-widget27__legend-text {                
+                        display: inline-block;
+                        font-weight: get-font-weight(bolder);
+                    }
+                }
+
+                .m-widget27__chart {
+                    position: relative;
+                    margin-top: 0.5rem;
+
+                    .m-widget27__stat {
+                        font-size: 2.4rem;
+                        font-weight: get-font-weight(boldest);
+                        @include vertical-horizontal-center();
+                    }           
+                }               
             }
         }     
     } 
@@ -97,6 +162,26 @@
                             color: get-state-color(focus, inverse);
                         } 
                     }    
+                }
+            }
+
+            .m-widget27__tab {
+                .m-widget27__title {
+                    color: get-color($skin, regular);
+                }
+
+                .m-widget27__desc {
+                    color: get-color($skin, regular, '----');            
+                }
+
+                .m-widget27__legend-text {                
+                    color: get-color($skin, regular, '-----');      
+                }          
+
+                .m-widget27__chart {
+                    .m-widget27__stat {
+                        color: get-color($skin, muted, '--');  
+                    } 
                 }
             }
         }             

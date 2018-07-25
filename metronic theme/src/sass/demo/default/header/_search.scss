@@ -98,6 +98,7 @@
 	@include tablet-and-mobile {
 		.m-header-search {			
 			.m-header-search__form {
+				padding: array-get($layout, self, padding, mobile);
 				float: none;
 				
 				// form input spinner

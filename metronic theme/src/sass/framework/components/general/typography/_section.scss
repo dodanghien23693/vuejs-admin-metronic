@@ -39,7 +39,7 @@
 
         .m-section__content {
             margin: 0 0 10px 0;
-            font-size: get-font-size(regular);
+            font-size: get-font-size(regular);            
         }
 
         .m-section__seperator {
@@ -73,6 +73,19 @@
 
         .m-section__content {
             color: get-color($skin, regular);
+
+            .m-demo__component {
+                > span {
+
+                    &:first-child {
+                        background-color: get-color($skin, panel);
+                    }
+
+                    &:last-child {
+                        background-color: get-color($skin, panel);
+                    }
+                }    
+            }
         }
     } 
 }

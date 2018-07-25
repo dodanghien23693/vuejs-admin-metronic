@@ -9,6 +9,8 @@
     $space: array-get($m--portlet, layout, self, space);
     $height: 5.1rem;
     $height-sm: 4.1rem;
+    $height-lg: 7rem;
+
     $body-padding: $space $space;
     $footer-padding: 1.1rem $space;
     $responsive-head-padding-y: 0.9rem;
@@ -17,26 +19,46 @@
     .m-portlet  {
         margin-bottom: $space;
 
+        &.m-portlet--bottom-fit {
+            margin-bottom: 0;
+        }
+
         .m-portlet__head  {            
-            display: table; 
+            display: flex; 
+            flex-direction: row;
+            align-items: stretch;
+            justify-content: space-between;
             padding: 0;
-            width: 100%;
             padding: 0 $space;
             height: $height;
+            position:relative;
+
+            .m-portlet__head-progress {
+                position: absolute; 
+                left: 0; 
+                right: 0; 
+            }
+
+            .m-portlet__head-wrapper {
+                display: flex; 
+                flex-direction: row;
+                align-items: stretch;
+                justify-content: space-between; 
+                flex-grow: 1;
+            }
 
             .m-portlet__head-caption  {
-                display: table-cell;
-                vertical-align: middle;
-                text-align: left;
+                display: flex;
+                align-items: center;
+                align-content: flex-start;
 
                 .m-portlet__head-title  {
-                    display: table;
-                    table-layout: fixed;
-                    height: 100%;
+                    display: flex;
+                    align-items: center;
 
                     .m-portlet__head-icon  {
-                        display: table-cell;
-                        vertical-align: middle;
+                        display: flex;
+                        align-items: center;
                         line-height: 0;
                         padding: 0 13px 0 0;
 
@@ -46,16 +68,17 @@
                             vertical-align: middle;
                             line-height: 0;
                             display: inline-block;  
-                            //margin-right: 0.5rem;
                         }  
                     }
 
                     .m-portlet__head-text  {
-                        display: table-cell;
-                        vertical-align: middle;
+                        display: flex;
+                        align-items: center;
                         font-size: get-font-size(regular, '+++');
                         font-weight: get-font-weight(bolder);
                         font-family: #{get-heading-font-family()};
+                        margin: 0;
+                        padding: 0;
 
                         small {
                             display: inline-block;
@@ -77,35 +100,34 @@
             }
 
             .m-portlet__head-tools  {
-                text-align: right;
-                display: table-cell;
-                vertical-align: middle;
+                display: flex;
+                align-items: center;
+                align-content: flex-end;
+
+                // buttons
+                .btn {
+                    margin-top: 5px;
+                    margin-bottom: 5px;
+                }
 
                 // portlet nac
                 .m-portlet__nav {
-                    display: table;
-                    text-align: right;
-                    float: right;
+                    display: flex;
+                    align-items: center;
                     padding: 0;
                     margin: 0;
-                    height: 100%;
                     list-style: none;
 
                     .m-portlet__nav-item {
-                        height: 100%;
-                        display: table-cell;
-                        vertical-align: middle;
-                        text-align: center;
-                        padding: 0 5px;
+                        display: flex;
+                        padding: 8px 5px;
+                        align-items: center;
 
                         &.m-portlet__nav-item--last {
                             padding-right: 0;
                         }
 
                         .m-portlet__nav-link {
-                            display: inline-block; 
-                            vertical-align: middle;
-
                             &.m-portlet__nav-link--icon {
                                 padding: 0 2px;
                                 @include icons-attr(font-size, (fontawesome: 1.4rem, lineawesome: 1.4rem, metronic: 1.8rem) );
@@ -119,10 +141,7 @@
                                 }
 
                                 i {
-                                    vertical-align: middle;
-                                    line-height: 0;
                                     display: inline-block;  
-                                    //margin-right: 0.5rem;
                                 }  
                             }  
 
@@ -182,7 +201,7 @@
             padding: $footer-padding;
 
             &.m-portlet__foot--fit {
-                padding: 0; 
+                padding: 0 !important; 
             } 
         }
 
@@ -264,9 +283,20 @@
                 overflow: auto; 
             } 
 
+            > .m-portlet__foot  {
+                position: relative;
+                top: 100%;
+            }
+
             &.m-portlet--head-sm {
                 > .m-portlet__body  {
                     top: $height-sm;   
+                }
+            }
+
+            &.m-portlet--head-lg {
+                > .m-portlet__body  {
+                    top: $height-lg;   
                 }
             }
         }
@@ -324,18 +354,25 @@
 
                 .m-portlet__head-tools  {
                     padding: 0;
+                    align-items: stretch;
 
                     // portlet tabs
                     .m-tabs-line {
                         position: relative;
-                        height: 100%;
                         margin: 0; 
                         border-bottom-color: transparent;
                         bottom: -1px;
+                        display:flex;
+                        align-items: stretch;
+
+                        .m-tabs__item {
+                            display:flex;
+                            align-items: stretch;
+                        }
 
                         .m-tabs__link {
-                            height: 100%;
-                            padding: ($space - 0.5rem) 0 ($space - 0.7rem) 0;
+                            display:flex;
+                            align-items: center;
                         }
 
                         &.m-tabs-line--2x {
@@ -354,24 +391,19 @@
         &.m-portlet--head-sm {
             .m-portlet__head  {
                 height: $height-sm;
-
-                .m-portlet__head-tools {
-                    padding: 0;
-
-                    // portlet tabs
-                    .m-tabs-line {  
-                        .m-tabs__link {
-                            height: 100%;
-                            padding: ($space - 1rem) 0 ($space - 1rem) 0;
-                        }
-                    }
-                }
             }
 
             .m-portlet__foot,
             .m-portlet__body  {
                 padding-top: $space - 0.5rem;
                 padding-bottom: $space - 0.5rem;  
+            }
+        }
+
+         //== Portlet header large size
+        &.m-portlet--head-lg {
+            .m-portlet__head  {
+                height: $height-lg;
             }
         }
 
@@ -406,21 +438,28 @@
         //== Responsive mode
         &.m-portlet--responsive-mobile {
             @include mobile {
-                .m-portlet__head  {  
-                    display: block;
+                .m-portlet__head  { 
                     height: auto;
+                    flex-direction: column;
+                    flex-wrap: wrap;
+
+                    .m-portlet__head-wrapper {
+                        flex-direction: column;
+                        flex-wrap: wrap;
+                    }
 
                     .m-portlet__head-caption  {
-                        display: block;
+                        flex-grow: 1;
                         padding-top: $responsive-head-padding-y;
                         padding-bottom: $responsive-head-padding-y;
+                        flex-wrap: wrap;
                     }
 
                     .m-portlet__head-tools  {
-                        text-align: left;
-                        display: block;
-                        padding-top: $responsive-head-padding-y / 2;
+                        flex-grow: 1;
+                        padding-top: 0;
                         padding-bottom: $responsive-head-padding-y;
+                        flex-wrap: wrap;
                     }
                 }
             }
@@ -428,21 +467,28 @@
 
         &.m-portlet--responsive-tablet-and-mobile {
             @include tablet-and-mobile {
-                .m-portlet__head  {  
-                    display: block;
+                .m-portlet__head  { 
                     height: auto;
+                    flex-direction: column;
+                    flex-wrap: wrap;
 
-                    .m-portlet__head-caption  {
-                        display: block;
-                        padding-top: $responsive-head-padding-y;
-                        padding-bottom: $responsive-head-padding-y;
+                    .m-portlet__head-wrapper {
+                        flex-direction: column;
+                        flex-wrap: wrap;
                     }
 
-                    .m-portlet__head-tools  {  
-                        text-align: left;
-                        display: block;
-                        padding-top: $responsive-head-padding-y / 2;
+                    .m-portlet__head-caption  {
+                        flex-grow: 1;
+                        padding-top: $responsive-head-padding-y;
                         padding-bottom: $responsive-head-padding-y;
+                        flex-wrap: wrap;
+                    }
+
+                    .m-portlet__head-tools  {
+                        flex-grow: 1;
+                        padding-top: 0;
+                        padding-bottom: $responsive-head-padding-y;
+                        flex-wrap: wrap;
                     }
                 }
             }
@@ -514,9 +560,7 @@
 
                 .m-portlet__head-caption  {
                     position: relative;
-                    display: table-cell;
-                    vertical-align: middle;
-                    text-align: left;
+                    display: flex;
 
                     .m-portlet__head-title  {
                         .m-portlet__head-icon  {
@@ -552,6 +596,10 @@
                     }
                 } 
             }
+
+            .m-portlet__body  { 
+                padding-top: 1rem;
+            }
         } 
 
         //== Head overlay
@@ -571,6 +619,16 @@
                 padding-top: 0;
             }
         }
+
+        //== Sticky portlet head
+        &.m-portlet--sticky {
+            .m-portlet__head  { 
+                position: fixed;
+                box-shadow: 0px 1px 15px 1px rgba(69, 65, 78, 0.1);
+                z-index: 101;
+                background: #fff;
+            }
+        }        
     }
 
     @include desktop() {
@@ -785,6 +843,15 @@
                 } 
             }
         } 
+
+
+        //== Angular source code viewer
+        //== Angular source code viewer
+        &.m-portlet--ngviewer {
+            .m-portlet__code {
+                border-bottom: 1px solid get-color($skin, panel, '-');
+            }
+        }
     }
 }
 
@@ -892,7 +959,7 @@
 
                 .m-portlet__foot {
                     background: white;
-                    border-color: array-get($color, base);
+                    //border-color: array-get($color, base);
                 }
 
                 background: array-get($color, base);

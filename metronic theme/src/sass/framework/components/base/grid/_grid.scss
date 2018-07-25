@@ -17,22 +17,20 @@
 	//== Horizontal grid
 	.m-grid.m-grid--hor#{$mode-dir}#{$mode-class} {	
 		display: flex;
-		display: -ms-flexbox;
 		flex-direction: column;
-		-ms-flex-direction: column;
 
 		&.m-grid--root {
 			flex: 1;
-			-ms-flex: 1 0 0px;
+			-ms-flex: 1 0 0px; // IE10-11 fix
 		}
 
 		> .m-grid__item {
 			flex: none;
-			-ms-flex: none;
 
-			&.m-grid__item--fluid {
+			&.m-grid__item--fluid,
+			&.m-grid__item--fluid-#{$mode} {
 				flex: 1 0 auto;
-				-ms-flex: 1 0 auto;
+				//-ms-flex: 1 0 0px;  // IE10-11 fix
 			}
 		}
 
@@ -40,7 +38,6 @@
 		@for $i from 1 through 12 {
 			> .m-grid__item.m-grid__item--order-#{$mode}-#{$i} {
 				order: $i;
-				-ms-flex-order: $i;
 			}
 		}
 	}
@@ -48,22 +45,31 @@
 	//== Vertical grid
 	.m-grid.m-grid--ver#{$mode-dir}#{$mode-class} {	
 		display: flex;
-		display: -ms-flexbox;
 		flex-direction: row;
-		-ms-flex-direction: row;
 
 		&.m-grid--root {
 			flex: 1;
-			-ms-flex: 1 0 0px;
+			-ms-flex: 1 0 0px;  // IE10-11 fix
 		}
 
 		> .m-grid__item {
 			flex: 0 0 auto;
-			-ms-flex: 0 0 auto;
 
-			&.m-grid__item--fluid {
-				flex: 1 auto;  // 1/7/2018 added auto to fix the overflow issue in demo4
-				-ms-flex: 1 auto;
+			&.m-grid__item--fluid,
+			&.m-grid__item--fluid-#{$mode} {
+				flex: 1 auto; 
+				-ms-flex: 1 0 0px;  // IE10-11 fix
+				min-width: 0;
+
+				@include hack-ie8-11 {
+					min-width: none;  // IE10-11 fix
+				}				
+			}
+
+			&.m-grid-item--center {
+				display: flex;
+  				justify-content: center;
+  				align-items: center;
 			}
 		}
 
@@ -71,7 +77,6 @@
 		@for $i from 1 through 12 {
 			> .m-grid__item.m-grid__item--order-#{$mode}-#{$i} {
 				order: $i;
-				-ms-flex-order: $i;
 			}
 		}
 	}	
@@ -80,26 +85,23 @@
 	.m-grid {
 		// horizontal items aligment
 		&.m-grid--center {
-			justify-content: center;
-			-ms-flex-pack: center;  
+			align-content: center;
 		}		
 
 		// vertical item alignment
 		> .m-grid__item {		
+			max-width:100%;
+			
 			&.m-grid__item--top {
 				align-self: flex-start;
-				-ms-flex-align: start;
 			}
 
 			&.m-grid__item--middle {
 				align-self: center;
-				-ms-flex-align: center;
-				//margin: auto;
 			}
 
 			&.m-grid__item--bottom {
 				align-self: flex-end;
-				-ms-flex-align: end;
 			}
 		}
 
@@ -107,7 +109,6 @@
 		@for $i from 1 through 12 {
 			> .m-grid__item.m-grid__item--order-#{$i} {
 				order: $i;
-				-ms-flex-order: $i;
 			}
 		}
 	}

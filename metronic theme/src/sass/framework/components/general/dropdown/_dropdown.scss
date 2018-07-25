@@ -122,17 +122,6 @@
             }
         }
 
-        // dropdown width options
-        @each $name, $width in array-get($layout, base, self, width) {
-            @if ($name != default) {
-                &.m-dropdown--#{$name} {
-                    .m-dropdown__wrapper {
-                        width: $width;
-                    }
-                }
-            }
-        }
-
         // open and hover states
         &.m-dropdown--open,
         &.m-dropdown--hoverable:hover {
@@ -203,24 +192,45 @@
             .m-dropdown__wrapper {
                 left: 50%;
                 width: array-get($layout, base, self, width, default);
-                margin-left: -(array-get($layout, base, self, width, default) / 2);
+                margin-left: -(array-get($layout, base, self, width, default) / 2)#{'/*rtl:ignore*/'};
             }
+        }
+    }
 
+    // desktop mode
+    @include desktop() {
+         //== Dropdown
+        .m-dropdown {
+            // dropdown width options
             @each $name, $width in array-get($layout, base, self, width) {
                 @if ($name != default) {
                     &.m-dropdown--#{$name} {
                         .m-dropdown__wrapper {
                             width: $width;
-                            margin-left: -($width / 2);
+                        }
+                    }
+                }
+            }
+
+            // align to center
+            &.m-dropdown--align-center {
+                @each $name, $width in array-get($layout, base, self, width) {
+                    @if ($name != default) {
+                        &.m-dropdown--#{$name} {
+                            .m-dropdown__wrapper {
+                                width: $width;
+                                margin-left: -($width / 2);
+                            }
                         }
                     }
                 }
             }
         }
-    }
+    }    
 
     // mobile full width mode
     @include mobile() { 
+        //== Full width mode
         .m-dropdown.m-dropdown--mobile-full-width.m-dropdown--align-center,
         .m-dropdown.m-dropdown--mobile-full-width {
             > .m-dropdown__wrapper {
@@ -238,6 +248,13 @@
                     .m-dropdown__header-subtitle {
                         font-size: get-font-size(regular);
                     }
+                }
+            }
+
+            &.m-dropdown--align-push {
+                .m-dropdown__wrapper {
+                    margin-left: auto;
+                    margin-right: auto;
                 }
             }
         }
@@ -341,59 +358,8 @@
 //== Classic arrow base
 @mixin m-build-component--dropdown-classic-arrow-base($layout) {
     .m-dropdown.m-dropdown--arrow {
-        // placement - bottom
-        .m-dropdown__wrapper {  
-            padding-top: array-get($layout, base, arrow, classic, size) - 1px;
-        }
-
-        // placement - top
-        &.m-dropdown--up {
-            .m-dropdown__wrapper {  
-                padding-top: 0;
-                padding-bottom: array-get($layout, base, arrow, classic, size) - 1px;
-
-                .m-dropdown__arrow {             
-                    border: 0;
-                    @include m--build-classic-arrow(bottom, array-get($layout, base, arrow, classic, size));
-                    top: auto;
-                    position: absolute;
-                    margin-top: 0;
-
-                    // ie8-11 versions hack
-                    @include hack-ie8-11 {
-                        margin-top: -1px;
-                    }
-
-                    // edge all versions hack
-                    @include hack-edge-all {
-                        margin-top: -1px;
-                    }
-                }        
-            }
-        }
-
-        // dropdowndown arrow
-        &.m-dropdown--up .m-dropdown__arrow,
-        .m-dropdown__arrow {            
-            @include m--build-classic-arrow(top, array-get($layout, base, arrow, classic, size));
-
-            top: 0;
-            position: absolute;
-            left: 50%;
-            margin-left: -(array-get($layout, base, arrow, classic, size) / 2);
-            
-            // left arrow
-            &.m-dropdown__arrow--left {
-                left: array-get($layout, base, arrow, classic, offset);
-                margin-left: 0;
-            }
-
-            // right arrow
-            &.m-dropdown__arrow--right {
-                right: array-get($layout, base, arrow, classic, offset);
-                left: auto;
-                margin-left: auto;
-            }            
+        .m-dropdown__arrow {
+            display: none !important;
         }
     }
 }

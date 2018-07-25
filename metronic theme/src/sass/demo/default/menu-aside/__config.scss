@@ -307,6 +307,7 @@ $m-config-menu-aside: (
 							// submenu base styles
 							padding: 20px 0,
 							width: $m-aside-menu-dropdown-submenu-width,
+							parent-width: $m-aside-left-width,
 							border-radius: 4px,
 
 							// submenu animation

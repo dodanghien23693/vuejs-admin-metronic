@@ -68,24 +68,27 @@ var PortletTools = function () {
 
         //== Reload event handlers
         portlet.on('afterFullscreenOn', function(portlet) {
-            //toastr.info('After fullscreen on event fired!');
-
+            toastr.warning('After fullscreen on event fired!');    
             var scrollable = $(portlet.getBody()).find('> .m-scrollable');
 
-            scrollable.data('original-height', scrollable.data('max-height'));
-            scrollable.css('height', '100%');
-            scrollable.css('max-height', '100%');
-            mApp.initScroller(scrollable, {});
+            if (scrollable) {
+                scrollable.data('original-height', scrollable.css('height'));
+                scrollable.css('height', '100%');
+                
+                mUtil.scrollerUpdate(scrollable[0]);
+            }
         });
 
         portlet.on('afterFullscreenOff', function(portlet) {
-            toastr.warning('After fullscreen off event fired!');
-
+            toastr.warning('After fullscreen off event fired!');    
             var scrollable = $(portlet.getBody()).find('> .m-scrollable');
 
-            scrollable.css('height', scrollable.data('original-height'));
-            scrollable.data('max-height', scrollable.data('original-height')); 
-            mApp.initScroller(scrollable, {});
+            if (scrollable) {
+                var scrollable = $(portlet.getBody()).find('> .m-scrollable');
+                scrollable.css('height', scrollable.data('original-height'));
+
+                mUtil.scrollerUpdate(scrollable[0]);
+            }
         });
     }
 
@@ -214,24 +217,27 @@ var PortletTools = function () {
 
         //== Reload event handlers
         portlet.on('afterFullscreenOn', function(portlet) {
-            //toastr.info('After fullscreen on event fired!');
-
+            toastr.warning('After fullscreen on event fired!');    
             var scrollable = $(portlet.getBody()).find('> .m-scrollable');
 
-            scrollable.data('original-height', scrollable.data('max-height'));
-            scrollable.css('height', '100%');
-            scrollable.css('max-height', '100%');
-            mApp.initScroller(scrollable, {});
+            if (scrollable) {
+                scrollable.data('original-height', scrollable.css('height'));
+                scrollable.css('height', '100%');
+                
+                mUtil.scrollerUpdate(scrollable[0]);
+            }
         });
 
         portlet.on('afterFullscreenOff', function(portlet) {
-            toastr.warning('After fullscreen off event fired!');
-
+            toastr.warning('After fullscreen off event fired!');    
             var scrollable = $(portlet.getBody()).find('> .m-scrollable');
 
-            scrollable.css('height', scrollable.data('original-height'));
-            scrollable.data('max-height', scrollable.data('original-height')); 
-            mApp.initScroller(scrollable, {});
+            if (scrollable) {
+                var scrollable = $(portlet.getBody()).find('> .m-scrollable');
+                scrollable.css('height', scrollable.data('original-height'));
+
+                mUtil.scrollerUpdate(scrollable[0]);
+            }
         });
     }
  
@@ -297,24 +303,27 @@ var PortletTools = function () {
 
         //== Reload event handlers
         portlet.on('afterFullscreenOn', function(portlet) {
-            //toastr.info('After fullscreen on event fired!');
-
+            toastr.warning('After fullscreen on event fired!');    
             var scrollable = $(portlet.getBody()).find('> .m-scrollable');
 
-            scrollable.data('original-height', scrollable.data('max-height'));
-            scrollable.css('height', '100%');
-            scrollable.css('max-height', '100%');
-            mApp.initScroller(scrollable, {});
+            if (scrollable) {
+                scrollable.data('original-height', scrollable.css('height'));
+                scrollable.css('height', '100%');
+                
+                mUtil.scrollerUpdate(scrollable[0]);
+            }
         });
 
         portlet.on('afterFullscreenOff', function(portlet) {
-            toastr.warning('After fullscreen off event fired!');
-
+            toastr.warning('After fullscreen off event fired!');    
             var scrollable = $(portlet.getBody()).find('> .m-scrollable');
 
-            scrollable.css('height', scrollable.data('original-height'));
-            scrollable.data('max-height', scrollable.data('original-height')); 
-            mApp.initScroller(scrollable, {});
+            if (scrollable) {
+                var scrollable = $(portlet.getBody()).find('> .m-scrollable');
+                scrollable.css('height', scrollable.data('original-height'));
+
+                mUtil.scrollerUpdate(scrollable[0]);
+            }
         });
     }
 

@@ -55,14 +55,13 @@
                 display: block;
                 padding: 0 0 0 0;
                 font-size: get-font-size(regular, '+++');
-                font-weight: get-font-weight(bold);  
-                line-height: 1;             
+                font-weight: get-font-weight(bold);
             }
 
             // email
             .m-card-user__email {
                 display: inline-block;
-                padding: 6px 0 0 0;
+                padding: 0 0 0 0;
                 font-size: get-font-size(regular); 
             }
         }    	
@@ -88,12 +87,11 @@
                 // name
                 .m-card-user__name {
                     font-size: get-font-size(regular);
-                    line-height: 0.7; 
                 }
 
                 // email
                 .m-card-user__email {
-                    padding: 4px 0 0 0;
+                    padding: 0 0 0 0;
                     font-size: get-font-size(regular, '--'); 
                 }
             }       

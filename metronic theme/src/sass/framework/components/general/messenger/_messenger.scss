@@ -164,12 +164,16 @@
                             margin-left: 0;
                             margin-top: 6px;
                         } @else {
-                            @include m--build-classic-arrow(right, array-get($layout, size));
+                            @include m--build-classic-arrow(right, 10px);
                             left: 0;
                             position: absolute;
-                            margin-top: array-get($layout, offset, arrow) ;
+                            margin-top: 10px ;
                             margin-left: 0;
                         }  
+
+                        /*rtl:raw:
+                            display:none;
+                        */
                     }
 
                     .m-messenger__message-content {
@@ -188,14 +192,18 @@
                             margin-right: 0;
                             margin-top: 6px;
                         } @else {
-                            @include m--build-classic-arrow(left, array-get($layout, size));
+                            @include m--build-classic-arrow(left, 10px);
                             right: 0;
                             left: auto;
                             position: absolute;
-                            margin-top: array-get($layout, offset, arrow);
+                            margin-top: 10px;
                             margin-left: 0;
                             margin-right: 0;
                         }
+
+                        /*rtl:raw:
+                            display:none;
+                        */
                     }
 
                     .m-messenger__message-content {
@@ -299,12 +307,12 @@
         &.m-messenger.m-messenger--message-arrow {
             .m-messenger__message {
                 &.m-messenger__message--in {
-                    @if smooth-arrow() {
-                        .m-messenger__message-arrow {
-                           color: get-color($skin, panel, '-');
+                    .m-messenger__message-arrow {
+                        @if smooth-arrow() {
+                            color: get-color($skin, panel, '-');
+                        } @else {
+                            @include m--set-classic-arrow-bg(right, get-color($skin, panel, '-'));
                         }
-                    } @else {
-                        @include m--set-classic-arrow-bg(right, get-color($skin, panel, '-'));
                     }         
                 }
 

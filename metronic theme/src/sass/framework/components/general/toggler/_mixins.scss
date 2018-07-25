@@ -31,7 +31,9 @@
 	  		min-height: array-get($config, thickness);  
 	  		width: 100%;
 	  		//background: array-get($config, color, default);
-	  		@include border-radius(array-get($config, radius));
+	  		@include rounded {
+	  			@include border-radius(array-get($config, radius));
+	  		}
 
 	  		@include transition(all array-get($config, transition-duration) ease);
 
@@ -45,7 +47,9 @@
 			  	min-height: array-get($config, thickness);
 			  	//background: array-get($config, color, default);
 			  	content: "";
-			  	@include border-radius(array-get($config, radius));
+			  	@include rounded {
+			  		@include border-radius(array-get($config, radius));
+			  	}
 
 			  	@include transition(all array-get($config, transition-duration) ease);
 	  		}

@@ -418,7 +418,9 @@
             .m-nav__item {
                 &.m-nav__item--active {
                     > .m-nav__link {
-                        @include border-radius(2rem);
+                        @include rounded {
+                            @include border-radius(2rem);
+                        }
                         background-color: get-color($skin, panel, '--');
                         
                         .m-nav__link-text {
@@ -437,7 +439,9 @@
 
                 //== Metronic custom tab integration
                 > .m-nav__link.m-tabs__item--active {    
-                    @include border-radius(2rem);
+                    @include rounded {
+                        @include border-radius(2rem);
+                    }
                     background-color: get-color($skin, panel, '--');    
 
                     .m-nav__link-text {

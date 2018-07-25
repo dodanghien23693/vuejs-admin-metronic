@@ -9,7 +9,7 @@ $m--dropdown: (
 		base: (
 			// self
 			self: (
-				zindex: 1100,
+				zindex: 101,
 				border-radius: array-get($m--border-radius, dropdown),
 				width: (
 					default: 245px,

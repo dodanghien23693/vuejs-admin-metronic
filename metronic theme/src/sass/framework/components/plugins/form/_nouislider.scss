@@ -7,6 +7,10 @@
 //== Component Base
 @mixin m-build-component--nouislider-base() {
     .noUi-target {
+        @include not-rounded {
+            @include border-radius(0 !important);
+        }
+        
         &.noUi-horizontal {
             height: 15px;
 

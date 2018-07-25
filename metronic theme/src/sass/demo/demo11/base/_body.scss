@@ -1,0 +1,71 @@
+//
+//** Body
+// Page body container
+
+//== General Mode
+.m-body {	
+	.m-header--static & {
+		//height: calc(100% - #{array-get($m-config-header, header, default, height, desktop)});
+	}
+	
+	.m-content {
+		background-color: array-get($m-config-base, body, content, bg-color);
+	}
+}
+
+body {
+	background-color: array-get($m-config-base, body, content, bg-color);
+}
+
+//== Desktop Mode
+@include desktop {
+	.m-body {	
+		padding: array-get($m-config-base, body, self, padding, desktop, y) array-get($m-config-base, body, self, padding, desktop, x) 0px array-get($m-config-base, body, self, padding, desktop, x);
+
+		.m-content {
+			padding: array-get($m-config-base, body, content, padding, desktop, y) array-get($m-config-base, body, content, padding, desktop, x);
+			padding-right: 0; 
+			padding-bottom: 0;
+			padding-left: array-get($m-config-base, body, content, padding, desktop, x) - array-get($m-config-aside, aside-left, self, default, margin-right);
+			margin-bottom: -20px;
+		}
+
+		.m-aside-left--fixed & {
+			.m-wrapper {
+				margin-left: array-get($m-config-base, body, self, padding, desktop, x) + array-get($m-config-aside, aside-left, self, default, margin-right);
+			}
+		}
+
+		// fixed header
+		.m-header--fixed & {			
+			padding-top: array-get($m-config-header, header, default, height, desktop) + array-get($m-config-base, body, self, padding, desktop, y) !important; 
+		}
+	}
+}
+
+// Tablet & Mobile Mode
+@include tablet-and-mobile {
+	.m-body {
+		padding: array-get($m-config-base, body, self, padding, mobile, y) array-get($m-config-base, body, self, padding, mobile, x);
+
+		// fixed header
+		.m-header--fixed-mobile & {
+			@include transition(padding-top array-get($m-config-header, header, fixed, transition));  
+			padding-top: array-get($m-config-header, header, default, height, mobile) !important;   
+		}
+
+		// fixed and minimized header
+		.m-header--fixed-mobile.m-header--minimize & {
+			padding-top: array-get($m-config-header, header, fixed, minimize, height, mobile); 
+		}
+
+		.m-content {
+			padding: array-get($m-config-base, body, content, padding, mobile, y) array-get($m-config-base, body, content, padding, mobile, x); 
+			padding-bottom: 0;
+
+			.m-aside-right--enabled & {
+				padding-bottom: 0;
+			}
+		}
+	}
+}
