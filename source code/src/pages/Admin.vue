@@ -9,7 +9,7 @@
 
       <left-sidebar></left-sidebar>
       <div class="m-grid__item m-grid__item--fluid m-wrapper">
-          <router-view id="page-view-container" class="m-grid__item m-grid__item--fluid m-grid m-grid--ver-desktop m-grid--desktop">
+          <router-view id="page-view-container" >
 
           </router-view>
       </div>
