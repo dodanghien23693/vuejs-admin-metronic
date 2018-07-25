@@ -9,6 +9,7 @@
     "build-watch": "vue-cli-service build-watch"
   },
   "dependencies": {
+    "axios": "^0.18.0",
     "html-loader": "^0.5.5",
     "vue": "^2.5.16",
     "vue-router": "^3.0.1",
