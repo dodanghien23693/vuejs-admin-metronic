@@ -1,1 +1,21 @@
-var BootstrapSelect={init:function(){$(".m_selectpicker").selectpicker()}};jQuery(document).ready(function(){BootstrapSelect.init()});
+//== Class definition
+
+var BootstrapSelect = function () {
+    
+    //== Private functions
+    var demos = function () {
+        // minimum setup
+        $('.m_selectpicker').selectpicker();
+    }
+
+    return {
+        // public functions
+        init: function() {
+            demos(); 
+        }
+    };
+}();
+
+jQuery(document).ready(function() {    
+    BootstrapSelect.init();
+});

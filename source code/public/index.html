@@ -7,10 +7,13 @@
     <link href="/favicon.ico" rel="shortcut icon"/>
 
     <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js"></script>
-    
+    <!-- <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"> -->
+    <!-- 'Open Sans', sans-serif; -->
 		<script>
           WebFont.load({
-            google: {"families":["Poppins:300,400,500,600,700","Roboto:300,400,500,600,700"]},
+            google: {
+              "families":["Open Sans","Poppins"]
+            },
             active: function() {
                 sessionStorage.fonts = true;
             }
@@ -38,6 +41,8 @@
     <!--end::Base Scripts -->
 
     <!--Begin plugin scripts-->
+    <style href="assets/vendors/custom/datatables/datatables.bundle.css"></style>
+    <script src="assets/vendors/custom/datatables/datatables.bundle.js"></script>
     <!--End:: plugin scripts-->
 
     <!-- built files will be auto injected -->

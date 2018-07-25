@@ -30,7 +30,14 @@ export default new Router({
           name:'admin.user.detail',
           component:()=>import("@/pages/user/DetailUserPage.vue")
         },
+
+
+        
       ]
+    },
+    {
+      path: '/',
+      redirect: '/admin'
     }
   ]
 })
