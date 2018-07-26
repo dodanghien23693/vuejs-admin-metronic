@@ -9234,10 +9234,10 @@ var mLayout = function() {
         }); 
 
         asideLeftToggle.on('toggle', function(toggle) {     
-            // mainPortlet.updateSticky();       
+            mainPortlet.updateSticky();       
             
-            // horMenu.pauseDropdownHover(800);
-            // asideMenu.pauseDropdownHover(800);
+            horMenu.pauseDropdownHover(800);
+            asideMenu.pauseDropdownHover(800);
 
             //== Remember state in cookie
             Cookies.set('sidebar_toggle_state', toggle.getState());
