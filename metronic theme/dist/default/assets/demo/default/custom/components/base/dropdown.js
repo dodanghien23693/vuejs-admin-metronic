@@ -1,1 +1,50 @@
-var DropdownDemo={init:function(){var e,o,n;e=$("#m_dropdown_api_output"),o=new mDropdown("m_dropdown_api_1"),n=new mDropdown("m_dropdown_api_2"),o.on("afterShow",function(o){e.append("<p>Dropdown 1: afterShow event fired</p>")}),o.on("beforeShow",function(o){e.append("<p>Dropdown 1: beforeShow event fired</p>")}),o.on("afterHide",function(o){e.append("<p>Dropdown 1: afterHide event fired</p>")}),o.on("beforeHide",function(o){e.append("<p>Dropdown 1: beforeHide event fired</p>")}),n.on("afterShow",function(o){e.append("<p>Dropdown 2: afterShow event fired</p>")}),n.on("beforeShow",function(o){e.append("<p>Dropdown 2: beforeShow event fired</p>")}),n.on("afterHide",function(o){e.append("<p>Dropdown 2: afterHide event fired</p>")}),n.on("beforeHide",function(o){e.append("<p>Dropdown 2: beforeHide event fired</p>")})}};jQuery(document).ready(function(){DropdownDemo.init()});
+//== Class definition
+
+var DropdownDemo = function () {
+    
+    //== Private functions
+
+    // basic demo
+    var demo1 = function () {
+        var output = $('#m_dropdown_api_output');
+        var dropdown1 = new mDropdown('m_dropdown_api_1');
+        var dropdown2 = new mDropdown('m_dropdown_api_2');
+
+        dropdown1.on('afterShow', function(dropdown) {
+            output.append('<p>Dropdown 1: afterShow event fired</p>');
+        });
+        dropdown1.on('beforeShow', function(dropdown) {
+            output.append('<p>Dropdown 1: beforeShow event fired</p>');
+        });
+        dropdown1.on('afterHide', function(dropdown) {
+            output.append('<p>Dropdown 1: afterHide event fired</p>');
+        });
+        dropdown1.on('beforeHide', function(dropdown) {
+            output.append('<p>Dropdown 1: beforeHide event fired</p>');
+        });
+    
+        dropdown2.on('afterShow', function(dropdown) {
+            output.append('<p>Dropdown 2: afterShow event fired</p>');
+        });
+        dropdown2.on('beforeShow', function(dropdown) {
+            output.append('<p>Dropdown 2: beforeShow event fired</p>');
+        });
+        dropdown2.on('afterHide', function(dropdown) {
+            output.append('<p>Dropdown 2: afterHide event fired</p>');
+        });
+        dropdown2.on('beforeHide', function(dropdown) {
+            output.append('<p>Dropdown 2: beforeHide event fired</p>');
+        });    
+    }
+
+    return {
+        // public functions
+        init: function() {
+            demo1();
+        }
+    };
+}();
+
+jQuery(document).ready(function() {    
+    DropdownDemo.init();
+});
