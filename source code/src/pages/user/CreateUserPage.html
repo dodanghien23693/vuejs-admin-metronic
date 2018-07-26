@@ -1,6 +1,66 @@
 <div>
-        <h3>Thêm user</h3>
         <div class="m-content col-md-12">
+                <!--begin::Portlet-->
+                <div class="m-portlet m-portlet--tab">
+                        <div class="m-portlet__head">
+                                <div class="m-portlet__head-caption">
+                                        <div class="m-portlet__head-title">
+                                                <span class="m-portlet__head-icon m--hide">
+                                                        <i class="la la-gear"></i>
+                                                </span>
+                                                <h3 class="m-portlet__head-text">
+                                                        Thêm user
+                                                </h3>
+                                        </div>
+                                </div>
+                        </div>
 
+                        <!--begin::Form-->
+                        <form class="m-form m-form--fit m-form--label-align-right">
+
+                                <div class="m-portlet__body form-row">
+                                        <div class="form-group m-form__group col-md-6">
+                                                <label for="exampleInputEmail1">Email address</label>
+                                                <input type="email" class="form-control m-input" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+                                        </div>
+                                        <div class="form-group m-form__group col-md-6">
+                                                <label for="exampleInputPassword1">Password</label>
+                                                <input type="password" class="form-control m-input" id="exampleInputPassword1" placeholder="Password">
+                                        </div>
+
+                                        <!-- Select 2 -->
+                                        <div class="form-group m-form__group col-md-6">
+                                                <label for="exampleSelect1">Example select 2 component</label>
+                                                <app-select2 :options="options" v-model="selected" placeholder="Hãy chọn" class="form-control m-input"></app-select2>
+                                                {{selected}}
+                                        </div>
+
+                                        <div class="form-group m-form__group col-md-6">
+                                                <label for="exampleSelect2">Example multiple select</label>
+                                                <select multiple="" class="form-control m-input" id="exampleSelect2">
+                                                        <option>1</option>
+                                                        <option>2</option>
+                                                        <option>3</option>
+                                                        <option>4</option>
+                                                        <option>5</option>
+                                                </select>
+                                        </div>
+                                        <div class="form-group m-form__group col-md-6">
+                                                <label for="exampleTextarea">Example textarea</label>
+                                                <textarea class="form-control m-input" id="exampleTextarea" rows="3"></textarea>
+                                        </div>
+                                </div>
+                                <div class="m-portlet__foot m-portlet__foot--fit">
+                                        <div class="m-form__actions m--align-center">
+                                                <button type="reset" class="btn btn-primary">Thêm user</button>
+                                                <button type="reset" class="btn btn-secondary">Huỷ</button>
+                                        </div>
+                                </div>
+                        </form>
+
+                        <!--end::Form-->
+                </div>
+
+                <!--end::Portlet-->
         </div>
 </div>
