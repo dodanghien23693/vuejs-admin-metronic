@@ -42,8 +42,7 @@
                                 birthday
                             </label>
                             <div class="col-lg-4 col-md-9 col-sm-12">
-                                <input type="text" class="form-control" id="m_datepicker_1_modal" v-model="userInfor.birthday" placeholder="Select date"
-                                />
+                                <app-date-picker v-bind:date="userInfor.birthday"></app-date-picker>
                             </div>
                         </div>
                         <div class="form-group m-form__group row">

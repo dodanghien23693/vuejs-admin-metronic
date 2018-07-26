@@ -5,6 +5,6 @@
 </template>
 <script>
 export default {
-  name: "detail-user-page"
+	name: "detail-user-page"
 };
 </script>
