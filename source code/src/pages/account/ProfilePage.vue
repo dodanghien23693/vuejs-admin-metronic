@@ -1,5 +1,6 @@
 <script>
 import template from "./ProfilePage.html";
+import AppDatePicker from "../../components/date-picker/AppDatePicker";
 export default {
 	name: "profile",
 	template: template,
@@ -16,6 +17,9 @@ export default {
 				birthday: "05/20/2017"
 			}
 		};
+	},
+	components: {
+		AppDatePicker
 	},
 	created: function() {
 		this.changeName();
