@@ -3,6 +3,15 @@ import template from "./CreateUserPage.html";
 export default {
 	template: template,
 	name: "create-user-page",
+	data: {
+		user: {
+			email: "",
+			phone: "",
+			name: "",
+			user_name: "",
+			address: ""
+		}
+	},
 	methods: {
 		doLogin() {
 			//gọi request thông qua axios
