@@ -1,18 +1,32 @@
+<template>
+  <input type="text" class="form-control" id="m_datepicker_1_modal" 
+  ref="input" :value="this.value"  placeholder="Select date" />
+</template>
 
 <script>
-import template from "./AppDatePicker.html";
 export default {
 	name: "app-date-picker",
-	props: ["date"],
-	data: {
-		time: ""
-	},
-	template: template,
-	created: function() {
-		this.time = this.date;
-	},
+	props: ["value", "type"],
+
 	mounted() {
-		mLayout.initAside();
+		this.$emit("input", moment(this.value).format(this.type));
+		this.$refs.input.value = moment(this.value).format(this.type);
+		let self = this;
+		$(this.$el)
+			.datepicker({
+				todayHighlight: true,
+				orientation: "bottom left",
+				templates: {
+					leftArrow: '<i class="la la-angle-left"></i>',
+					rightArrow: '<i class="la la-angle-right"></i>'
+				}
+			})
+			// .on("changeDate", function(e) {
+			// 	self.$emit("input", moment(e.date).format(self.type));
+			// })
+			.on("hide", function(e) {
+				self.$emit("input", moment(e.date).format(self.type));
+			});
 	}
 };
 </script>

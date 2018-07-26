@@ -1,0 +1,70 @@
+//
+//** Override The Base Framework Config For This Demo
+//
+
+//== Example(reduce font size from 14px to 13px globally for desktop mode only)
+
+//== The body element font settings
+/**
+$m--root-font: (
+    size: (
+        desktop: 13px,
+        tablet: 13px,
+        mobile: 13px
+    ), 
+    weight: 300, 
+    color: (
+        light: #333333, 
+        dark: #efefef
+    )
+);
+*/
+
+$m--brand-color: #6167e6;
+$m--brand-inverse-color: #ffffff;
+
+$m--state-colors: (
+    // metronic states
+    brand: (
+        base: $m--brand-color,
+        inverse: $m--brand-inverse-color
+    ),
+    metal: (
+        base: #c4c5d6,
+        inverse: #ffffff
+    ),  
+    light: (
+        base: #ffffff,
+        inverse: #282a3c 
+    ),
+    accent: (
+        base: #00c5dc,
+        inverse: #ffffff 
+    ),
+    focus: (
+        base: #9816f4,
+        inverse: #ffffff 
+    ),
+
+    // bootstrap states
+    primary: (
+        base: #5867dd,
+        inverse: #ffffff
+    ),
+    success: (
+        base: #12af78,
+        inverse: #ffffff
+    ),
+    info: (
+        base: #36a3f7,
+        inverse: #ffffff
+    ),
+    warning: (
+        base: #ffb822,
+        inverse: #111111
+    ),
+    danger: (
+        base: #f4516c,
+        inverse: #ffffff
+    )    
+);

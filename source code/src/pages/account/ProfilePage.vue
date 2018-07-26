@@ -1,6 +1,9 @@
 <script>
 import template from "./ProfilePage.html";
 import AppDatePicker from "../../components/date-picker/AppDatePicker";
+import AppDateTimePicker from "../../components/datetime-picker/AppDateTimePicker";
+import TimePicker from "../../components/time-picker/AppTimePicker";
+
 export default {
 	name: "profile",
 	template: template,
@@ -14,22 +17,18 @@ export default {
 				contact: "0943611060",
 				isSupperAdmin: true,
 				sex: "girl",
+				time: "10:20",
 				birthday: "05/20/2017"
 			}
 		};
 	},
 	components: {
-		AppDatePicker
+		AppDatePicker,
+		AppDateTimePicker,
+		TimePicker
 	},
-	created: function() {
-		this.changeName();
-	},
+	created: function() {},
 	methods: {
-		changeName: function() {
-			setTimeout(() => {
-				this.userInfor.name = "dao van hai";
-			}, 2000);
-		},
 		Change: function() {
 			console.log(this.userInfor);
 		}
