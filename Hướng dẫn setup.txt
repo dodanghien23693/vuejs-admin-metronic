@@ -9,6 +9,15 @@ Cấu hình user setting trong visual studio để sủ dụng prettier format c
 
 File->Preferences->Settings và Thêm các dòng sau vào phía cuối file
 
-"editor.formatOnSave": true,
+"[javascript]": {
+	"editor.formatOnSave": true
+},
+"[html]": {
+	"editor.formatOnSave": true
+},
+"[vue]": {
+	"editor.formatOnSave": true
+},
+
 "prettier.useTabs": true,
 "prettier.tabWidth": 2

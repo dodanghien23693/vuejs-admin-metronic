@@ -4,21 +4,24 @@
 
 <script>
 export default {
-	name: "app-datetime-picker",
-	props: ["date"],
-	data() {
-		return {
-			time: this.date
-		};
-	},
-	created: function() {},
-	mounted() {
-		$(this.$el).datetimepicker({
-			todayHighlight: !0,
-			autoclose: !0,
-			pickerPosition: "bottom-left",
-			format: "dd/mm/yyyy hh:ii"
-		});
-	}
+  name: "app-datetime-picker",
+  props: ["date"],
+  data() {
+    return {
+      time: this.date
+    };
+  },
+  created: function() {},
+  mounted() {
+    $(this.$el).datetimepicker({
+      todayHighlight: !0,
+      autoclose: !0,
+      pickerPosition: "bottom-left",
+      format: "dd/mm/yyyy hh:ii"
+    });
+  },
+  beforeDestroy: function() {
+    //destroy datetimepicker
+  }
 };
 </script>

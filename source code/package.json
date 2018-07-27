@@ -29,12 +29,12 @@
     "sass-loader": "^7.0.1",
     "vue-cli-plugin-build-watch": "^1.0.0"
   },
-  "gitHooks": {},
+  "gitHooks": {
+    "pre-commit": "lint-staged"
+  },
   "lint-staged": {
-    "*.js": [
-      "git add"
-    ],
-    "*.vue": [
+    "*.{vue,js,json}": [
+      "prettier --write",
       "git add"
     ]
   }
