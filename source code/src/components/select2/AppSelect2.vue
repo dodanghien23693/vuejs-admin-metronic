@@ -19,21 +19,13 @@ export default {
 			.trigger("change")
 			.on("change", function() {
 				// emit event on change.
-				vm.$emit("input", this.value);
+				vm.value = $(this).val();
+				vm.$emit("input", vm.value);
 			});
 	},
 	watch: {
-		value: function(value) {
-			// update value
-			$(this.$el)
-				.val(value)
-				.trigger("change");
-		},
 		options: function(options) {
-			// update options
-			$(this.$el)
-				.empty()
-				.select2({ data: options });
+			$(this.$el).select2({ data: options });
 		}
 	},
 	destroyed: function() {

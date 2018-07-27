@@ -17,9 +17,9 @@ export default {
 				address: ""
 			},
 			options: [
-				{ title: "option1", value: "1", selected: false },
-				{ title: "option2", value: "2", selected: false },
-				{ title: "option3", value: "3", selected: false }
+				{ title: "option1", value: "1" },
+				{ title: "option2", value: "2" },
+				{ title: "option3", value: "3" }
 			],
 			selected: 2
 		};
@@ -28,6 +28,7 @@ export default {
 	methods: {
 		addUser() {
 			console.log(this.user);
+			this.options.push({ title: "option4", value: "4" });
 		},
 		doLogin() {
 			//gọi request thông qua axios
