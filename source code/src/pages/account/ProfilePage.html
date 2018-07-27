@@ -43,7 +43,7 @@
                             </label>
                             <div class="col-lg-4 col-md-9 col-sm-12">
                                 {{userInfor.birthday}}
-                                <app-date-picker v-model="userInfor.birthday" type="dd-mm-yyyy"></app-date-picker>
+                                <app-date-picker v-model="userInfor.birthday" format="dd-mm-yyyy"></app-date-picker>
                             </div>
                         </div>
                         <div class="form-group m-form__group row">
@@ -52,7 +52,7 @@
                             </label>
                             <div class="col-lg-4 col-md-9 col-sm-12">
                                 {{userInfor.dateTime}}
-                                <app-date-time-picker v-model="userInfor.dateTime" type="dd-mm-yyyy hh:mm"></app-date-time-picker>
+                                <app-date-time-picker v-model="userInfor.dateTime" format="dd-mm-yyyy hh:mm"></app-date-time-picker>
                             </div>
                         </div>
                         <div class="form-group m-form__group row">

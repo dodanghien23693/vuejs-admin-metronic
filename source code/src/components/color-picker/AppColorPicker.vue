@@ -2,10 +2,21 @@
   <input type="text" id="wheel-demo" class="form-control minicolors-input" :value="value" data-control="wheel" />
 </template>
 
+
 <script>
+/**
+ * Color picker, sử dụng thư viện minicolors : https://labs.abeautifulsite.net/jquery-minicolors
+ */
 export default {
   name: "app-color-picker",
-  props: ["value"],
+  props: {
+    /**
+     * @model Giá trị color kiểu hex dùng để binding (ví dụ: #ffddee)
+     */
+    value: {
+      type: String
+    }
+  },
   mounted() {
     let self = this;
     $(this.$el).minicolors({

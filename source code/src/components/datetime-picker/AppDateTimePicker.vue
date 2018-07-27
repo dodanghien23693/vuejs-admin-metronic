@@ -5,22 +5,45 @@
 <script>
 export default {
   name: "app-datetime-picker",
-  props: ["value", "type"],
+  props: {
+    /**
+     * @Model
+     */
+    value: {
+      type: String
+    },
+    /**
+     * Chuỗi định dạng ngày tháng (optional)
+     */
+    format: {
+      type: String
+    }
+  },
   created: function() {},
   mounted() {
-    this.$emit("input", moment(this.value).format(this.type.toUpperCase()));
-    this.$refs.input.value = moment(this.value).format(this.type.toUpperCase());
+    this.$emit("input", moment(this.value).format(this.format.toUpperCase()));
+    this.$refs.input.value = moment(this.value).format(
+      this.format.toUpperCase()
+    );
     let self = this;
     $(this.$el)
       .datetimepicker({
         todayHighlight: !0,
         autoclose: !0,
         pickerPosition: "bottom-left",
-        format: self.type
+        format: self.format
       })
       .on("hide", function(e) {
-        self.$emit("input", moment(e.date).format(self.type.toUpperCase()));
+        self.$emit("input", moment(e.date).format(self.format.toUpperCase()));
       });
+  },
+  methods: {
+    /**
+     * Hàm khởi tạo Component
+     *
+     * @public
+     */
+    init() {}
   },
   beforeDestroy: function() {
     //destroy datetimepicker
