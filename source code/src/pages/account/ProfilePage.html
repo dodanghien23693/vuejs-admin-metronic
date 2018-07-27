@@ -43,7 +43,7 @@
                             </label>
                             <div class="col-lg-4 col-md-9 col-sm-12">
                                 {{userInfor.birthday}}
-                                <app-date-picker v-model="userInfor.birthday" type="DD-MM-YYYY"></app-date-picker>
+                                <app-date-picker v-model="userInfor.birthday" type="dd-mm-yyyy"></app-date-picker>
                             </div>
                         </div>
                         <div class="form-group m-form__group row">
@@ -51,7 +51,8 @@
                                 demo date time picker
                             </label>
                             <div class="col-lg-4 col-md-9 col-sm-12">
-                                <!-- <app-date-time-picker v-bind:date="userInfor.birthday"></app-date-time-picker> -->
+                                {{userInfor.dateTime}}
+                                <app-date-time-picker v-model="userInfor.dateTime" type="dd-mm-yyyy hh:mm"></app-date-time-picker>
                             </div>
                         </div>
                         <div class="form-group m-form__group row">
@@ -59,7 +60,26 @@
                                 demo time picker
                             </label>
                             <div class="col-lg-4 col-md-9 col-sm-12">
-                                <time-picker v-bind:time="userInfor.time"></time-picker>
+                                {{userInfor.time}}
+                                <time-picker v-model="userInfor.time"></time-picker>
+                            </div>
+                        </div>
+                        <div class="form-group m-form__group row">
+                            <label class=" col-lg-2 col-form-label">
+                                demo Summernote
+                            </label>
+                            <div class="col-lg-4 col-md-9 col-sm-12">
+                                {{userInfor.note}}
+                                <app-summernote v-model="userInfor.note" config=""></app-summernote>
+                            </div>
+                        </div>
+                        <div class="form-group m-form__group row">
+                            <label class=" col-lg-2 col-form-label">
+                                demo colorpicker
+                            </label>
+                            <div class="col-lg-4 col-md-9 col-sm-12">
+                                {{userInfor.hex}}
+                                <app-color-picker v-model="userInfor.hex"></app-color-picker>
                             </div>
                         </div>
                         <div class="form-group m-form__group row">
