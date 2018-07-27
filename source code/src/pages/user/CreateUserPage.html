@@ -30,11 +30,23 @@
 
                                         <!-- Select 2 -->
                                         <div class="form-group m-form__group col-md-6">
+                                                <label for="exampleSelect1">select multi 2 component</label>
+                                                <app-select2 :options="options_multi" v-model="selected_multi" placeholder="Hãy chọn" multiple="true" class="form-control m-input"></app-select2>
+                                                {{selected_multi}}
+                                        </div>
+                                        <!-- Select 2 multi -->
+                                        <div class="form-group m-form__group col-md-6">
                                                 <label for="exampleSelect1">Example select 2 component</label>
                                                 <app-select2 :options="options" v-model="selected" placeholder="Hãy chọn" class="form-control m-input"></app-select2>
                                                 {{selected}}
                                         </div>
+                                        <!-- TypeAhead -->
+                                        <div class="form-group m-form__group col-md-6">
+                                                <di>{{country}}</di>
+                                                <label for="">TypeAhead</label>
+                                                <app-type-ahead :source="data_souce" v-model="country"></app-type-ahead>
 
+                                        </div>
                                         <div class="form-group m-form__group col-md-6">
                                                 <label for="exampleSelect2">Example multiple select</label>
                                                 <select multiple="" class="form-control m-input" id="exampleSelect2">
