@@ -17,7 +17,7 @@ export default {
       type: String
     },
     /**
-     * Chuỗi định dạng ngày (optional)
+     *@description Chuỗi định dạng ngày vd: "dd-mm-yyy", "mm/dd/yyyy"
      */
     format: {
       type: String
