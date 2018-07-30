@@ -6,7 +6,20 @@
 </template>
 <script>
 export default {
-  props: ["source", "value"],
+  //props: ["source", "value"],
+  props: {
+    /**
+     * source là 1 mảng
+     */
+    source: {
+      type: Array,
+      default: []
+    },
+    /**
+     * @model
+     */
+    value: String
+  },
   name: "app-type-ahead",
   methods: {},
   mounted() {

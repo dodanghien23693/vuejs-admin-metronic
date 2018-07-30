@@ -8,12 +8,13 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "build-watch": "vue-cli-service build-watch",
-    "styleguide": "vue-styleguidist server",
-    "styleguide:build": "vue-styleguidist build"
+    "styleguide": "vue-styleguidist server --config ./config/docs.config.js",
+    "styleguide:build": "vue-styleguidist build --config ./config/docs.config.js"
   },
   "dependencies": {
     "axios": "^0.18.0",
     "html-loader": "^0.5.5",
+    "star": "^0.5.0",
     "vue": "^2.5.16",
     "vue-router": "^3.0.1",
     "vue-template-loader": "^1.0.0",
