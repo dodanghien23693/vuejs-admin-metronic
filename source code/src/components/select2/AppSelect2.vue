@@ -7,7 +7,34 @@
 <script>
 export default {
   name: "app-select2",
-  props: ["options", "value", "placeholder", "multiple"],
+  // props: ["options", "value", "placeholder", "multiple"],
+  props: {
+    /**
+     * options là 1 mảng để chọn
+     */
+    options: {
+      type: Array,
+      default: []
+    },
+    /**
+     *  placeholder
+     */
+    placeholder: {
+      type: String,
+      default: ""
+    },
+    /**
+     *  Thuộc tính để cấu hình multiple hoặc không
+     */
+    multiple: {
+      type: Boolean,
+      default: false
+    },
+    /**
+     * @model
+     */
+    value: String
+  },
   mounted() {
     var vm = this;
     $(this.$el)
