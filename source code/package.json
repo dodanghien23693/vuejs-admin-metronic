@@ -8,8 +8,8 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "build-watch": "vue-cli-service build-watch",
-    "styleguide": "vue-styleguidist server",
-    "styleguide:build": "vue-styleguidist build"
+    "styleguide": "vue-styleguidist server --config ./config/docs.config.js",
+    "styleguide:build": "vue-styleguidist build --config ./config/docs.config.js"
   },
   "dependencies": {
     "axios": "^0.18.0",
