@@ -5,7 +5,11 @@
 <script>
 export default {
   name: "app-time-picker",
-  props: ["value"],
+  props: {
+    value: {
+      type: String
+    }
+  },
   mounted() {
     this.$emit("input", moment(this.value).format("HH:MM:SS"));
     this.$refs.input.value = moment(this.value).format("HH:MM:SS");
