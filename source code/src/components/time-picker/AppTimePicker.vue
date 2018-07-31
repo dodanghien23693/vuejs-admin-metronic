@@ -5,10 +5,17 @@
 <script>
 export default {
   name: "app-time-picker",
-  props: ["value"],
+  props: {
+    /**
+     * @description Giá trị value kiểu String vd: 24:10:23
+     */
+    value: {
+      type: String
+    }
+  },
   mounted() {
-    this.$emit("input", moment(this.value).format("HH:MM:SS"));
-    this.$refs.input.value = moment(this.value).format("HH:MM:SS");
+    this.$emit("input", this.value);
+    // this.$refs.input.value = moment(this.value).format("HH:MM:SS");
     let self = this;
     $(this.$el).timepicker({
       minuteStep: 1,
@@ -18,7 +25,7 @@ export default {
       snapToStep: !0
     });
     $(this.$el).on("change", function(time) {
-      self.$emit("input", moment(time.timeStamp).format("HH:MM:SS"));
+      self.$emit("input", time.currentTarget.value);
     });
   },
   beforeDestroy() {}

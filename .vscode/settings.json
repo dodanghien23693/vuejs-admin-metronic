@@ -1,0 +1,14 @@
+{
+	"[javascript]": {
+		"editor.formatOnSave": true
+	},
+	"[html]": {
+		"editor.formatOnSave": true
+	},
+	"[vue]": {
+		"editor.formatOnSave": true
+	},
+
+	"prettier.useTabs": true,
+	"prettier.tabWidth": 2
+}

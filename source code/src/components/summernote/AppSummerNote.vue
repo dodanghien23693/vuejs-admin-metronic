@@ -3,9 +3,26 @@
 </template>
 
 <script>
+/**
+ * App Summernote, sử dụng thư viện Summernote: https://summernote.org/getting-started/
+ */
 export default {
   name: "app-summernote",
   props: ["value", "config"],
+  props: {
+    /**
+     * @description Giá trị value kiểu String
+     */
+    value: {
+      type: String
+    },
+    /**
+     * @description Giá trị Object (ví dụ: config: { height: 300, focus: true})
+     */
+    config: {
+      type: Object
+    }
+  },
   mounted() {
     let config = {
       height: 200
