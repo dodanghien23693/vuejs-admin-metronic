@@ -15,7 +15,7 @@
             </div>
 
             <!-- thong tin user -->
-            <form class="m-form">
+            <app-form class="m-form">
                 <div class="m-portlet__body">
                     <div class="m-form__section m-form__section--first">
                         <div class="form-group m-form__group row">
@@ -26,7 +26,8 @@
                                 Full Name:
                             </label>
                             <div class="col-lg-4">
-                                <input type="text" v-model="userInfor.name" class="form-control m-input" placeholder="Enter full name">
+                                {{userInfor.name}}
+                                <app-input type="text" v-model="userInfor.name" placeholder="Enter full name"></app-input>
                             </div>
                         </div>
                         <div class="form-group m-form__group row">
@@ -34,7 +35,8 @@
                                 Email address:
                             </label>
                             <div class="col-lg-4">
-                                <input type="email" v-model="userInfor.email" class="form-control m-input" placeholder="Enter full email">
+                                {{userInfor.email}}
+                                <app-input type="email" v-model="userInfor.email" placeholder="Enter full email"></app-input>
                             </div>
                         </div>
                         <div class="form-group m-form__group row">
@@ -70,7 +72,7 @@
                             </label>
                             <div class="col-lg-4 col-md-9 col-sm-12">
                                 {{userInfor.note}}
-                                <app-summernote v-model="userInfor.note" config=""></app-summernote>
+                                <app-summernote v-model="userInfor.note" :config="{}"></app-summernote>
                             </div>
                         </div>
                         <div class="form-group m-form__group row">
@@ -138,7 +140,7 @@
                         </div>
                     </div>
                 </div>
-            </form>
+            </app-form>
         </div>
     </div>
 </div>

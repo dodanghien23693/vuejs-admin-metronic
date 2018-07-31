@@ -1,6 +1,5 @@
 <template>
-  <input type="text" class="form-control" id="m_datepicker_1_modal" 
-  ref="input" :value="this.value"  placeholder="Select date" />
+  <input type="text" class="form-control" ref="input" :value="this.value" />
 </template>
 
 <script>

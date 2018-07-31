@@ -9,10 +9,10 @@ module.exports = {
     //   filename: '[name].js',
     //   publicPath: '/'
     // },
-    entry: {
-      vendor: [path.resolve(__dirname, "src/util.js"), "jquery"],
-      app: path.resolve(__dirname, "src/index.js")
-    },
+    // entry: {
+    //   vendor: [path.resolve(__dirname, "src/util.js"), "jquery"],
+    //   app: path.resolve(__dirname, "src/index.js")
+    // },
     module: {
       rules: [
         // {
