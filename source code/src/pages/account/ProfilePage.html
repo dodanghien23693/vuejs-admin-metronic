@@ -72,7 +72,7 @@
                             </label>
                             <div class="col-lg-4 col-md-9 col-sm-12">
                                 {{userInfor.note}}
-                                <app-summernote v-model="userInfor.note" :config="{}"></app-summernote>
+                                <app-summernote v-model="userInfor.note" :config="{height: 200}"></app-summernote>
                             </div>
                         </div>
                         <div class="form-group m-form__group row">
@@ -125,7 +125,6 @@
                         <div class="m-form__seperator m-form__seperator--dashed  m-form__seperator--space m--margin-bottom-10"></div>
                     </div>
                 </div>
-                <app-datatable></app-datatable>
                 <div class="m-portlet__foot m-portlet__foot--fit">
                     <div class="m-form__actions m-form__actions">
                         <div class="row">
