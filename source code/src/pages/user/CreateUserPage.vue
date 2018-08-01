@@ -2,12 +2,14 @@
 import template from "./CreateUserPage.html";
 import AppSelect2 from "@/components/select2/AppSelect2.vue";
 import AppTypeAhead from "@/components/app-type-ahead/AppTypeAhead.vue";
+import fromValidation from "@/components/from-validation/formValidation.vue";
 export default {
   template: template,
   name: "create-user-page",
   components: {
     AppSelect2,
-    AppTypeAhead
+    AppTypeAhead,
+    fromValidation
   },
   data() {
     return {

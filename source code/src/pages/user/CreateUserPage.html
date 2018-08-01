@@ -61,6 +61,7 @@
                                                 <label for="exampleTextarea">Example textarea</label>
                                                 <textarea class="form-control m-input" id="exampleTextarea" rows="3"></textarea>
                                         </div>
+
                                 </div>
                                 <div class="m-portlet__foot m-portlet__foot--fit">
                                         <div class="m-form__actions m--align-center">
@@ -71,6 +72,16 @@
                         </form>
 
                         <!--end::Form-->
+
+                        <from-validation>
+                                <form slot="form">
+                                        <div class="form-group m-form__group col-md-6">
+                                                <textarea name="form-textarea" class="form-control m-input " rows="3 "></textarea>
+                                        </div>
+                                </form>
+                        </from-validation>
+                        <slot></slot>
+
                 </div>
 
                 <!--end::Portlet-->

@@ -20,9 +20,14 @@ Ví dụ cách sử dụng component <strong style="background-color: orange">`<
         {title: "option 4", value: "4"}
         ]
         let selected = 1;
+                let selected_multi = [];
         <div class="form-group m-form__group col-md-6">
-            <label for="exampleSelect1">select multi 2 component</label>
+            <label for="exampleSelect1">select 2 component</label>
             <app-select2 :options="options" v-model="selected" placeholder="Hãy chọn" class="form-control m-input"></app-select2>
             <span>Giá trị chọn là {{selected}}</span>
+
+            <label for="exampleSelect1">select multi 2 component</label>
+            <app-select2 :options="options" v-model="selected_multi" placeholder="Hãy chọn" multiple = "true" class="form-control m-input"></app-select2>
+            <span>Giá trị multiple chọn là {{selected_multi}}</span>
         </div>
 ```
