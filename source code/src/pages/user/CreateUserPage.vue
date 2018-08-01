@@ -2,12 +2,16 @@
 import template from "./CreateUserPage.html";
 import AppSelect2 from "@/components/select2/AppSelect2.vue";
 import AppTypeAhead from "@/components/app-type-ahead/AppTypeAhead.vue";
+import fromValidation from "@/components/from-validation/formValidation.vue";
+import AppForm from "@/components/app-form/AppForm";
 export default {
   template: template,
   name: "create-user-page",
   components: {
     AppSelect2,
-    AppTypeAhead
+    AppTypeAhead,
+    fromValidation,
+    AppForm
   },
   data() {
     return {
@@ -40,7 +44,17 @@ export default {
         "Thái Lan",
         "Campuchia"
       ],
-      country: ""
+      country: "",
+      rules: {
+        email: {
+          required: true,
+          email: true,
+          minlength: 10
+        },
+        name: {
+          required: true
+        }
+      }
     };
   },
 
@@ -58,3 +72,8 @@ export default {
   mounted() {}
 };
 </script>
+<style lang="scss" scoped>
+label.error {
+  color: red;
+}
+</style>
