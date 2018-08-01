@@ -6,6 +6,8 @@ import TimePicker from "../../components/time-picker/AppTimePicker";
 import AppSummernote from "../../components/summernote/AppSummerNote";
 import AppColorPicker from "../../components/color-picker/AppColorPicker";
 import AppDatatable from "../../components/datatable/AppDatatable";
+import AppForm from "@/components/app-form/AppForm";
+import AppInput from "@/components/app-input/AppInput";
 
 export default {
   name: "profile",
@@ -34,7 +36,9 @@ export default {
     TimePicker,
     AppSummernote,
     AppColorPicker,
-    AppDatatable
+    AppDatatable,
+    AppForm,
+    AppInput
   },
   created: function() {},
   methods: {

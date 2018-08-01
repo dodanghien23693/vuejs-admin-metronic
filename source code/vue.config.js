@@ -9,6 +9,10 @@ module.exports = {
     //   filename: '[name].js',
     //   publicPath: '/'
     // },
+    // entry: {
+    //   vendor: [path.resolve(__dirname, "src/util.js"), "jquery"],
+    //   app: path.resolve(__dirname, "src/index.js")
+    // },
     module: {
       rules: [
         // {
@@ -20,7 +24,9 @@ module.exports = {
         {
           test: /\.html$/,
           exclude: /node_modules/,
-          use: { loader: "html-loader" }
+          use: {
+            loader: "html-loader"
+          }
         }
       ]
     },

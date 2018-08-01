@@ -14,10 +14,10 @@ Ví dụ cách sử dụng component <strong style="background-color: orange">`<
 
 ```js
         let options = [
-            {title: "option 1", value: "1"},
-        {title: "option 2", value: "2"},
-        {title: "option 3", value: "3"},
-        {title: "option 4", value: "4"}
+          {title: "option 1", value: "1"},
+          {title: "option 2", value: "2"},
+          {title: "option 3", value: "3"},
+          {title: "option 4", value: "4"}
         ]
         let selected = 1;
         <div class="form-group m-form__group col-md-6">
