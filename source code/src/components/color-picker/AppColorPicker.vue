@@ -15,7 +15,6 @@ export default {
      */
     value: {
       type: String
-      // description: "giá trị của input"
     }
   },
   mounted() {

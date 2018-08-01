@@ -13,6 +13,7 @@ export default {
     /**
      * @description Giá trị value kiểu String
      */
+
     value: {
       type: String
     },
@@ -20,7 +21,8 @@ export default {
      * @description Giá trị Object (ví dụ: config: { height: 300, focus: true})
      */
     config: {
-      type: Object
+      type: Object,
+      default: {}
     }
   },
   mounted() {

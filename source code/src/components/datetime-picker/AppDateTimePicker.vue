@@ -7,7 +7,7 @@ export default {
   name: "app-datetime-picker",
   props: {
     /**
-     * @Model
+     * giá trị cần hiển thị
      */
     value: {
       type: String
@@ -30,7 +30,7 @@ export default {
       .datetimepicker({
         todayHighlight: !0,
         autoclose: !0,
-        pickerPosition: "bottom-left",
+        pickerPosition: "bottom-right",
         format: self.format
       })
       .on("hide", function(e) {

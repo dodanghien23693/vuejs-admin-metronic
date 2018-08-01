@@ -5,6 +5,7 @@ import AppDateTimePicker from "../../components/datetime-picker/AppDateTimePicke
 import TimePicker from "../../components/time-picker/AppTimePicker";
 import AppSummernote from "../../components/summernote/AppSummerNote";
 import AppColorPicker from "../../components/color-picker/AppColorPicker";
+import AppDatatable from "../../components/datatable/AppDatatable";
 
 export default {
   name: "profile",
@@ -32,7 +33,8 @@ export default {
     AppDateTimePicker,
     TimePicker,
     AppSummernote,
-    AppColorPicker
+    AppColorPicker,
+    AppDatatable
   },
   created: function() {},
   methods: {
