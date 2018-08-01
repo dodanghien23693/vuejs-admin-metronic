@@ -1,7 +1,15 @@
 Ví dụ:
+```js
+let format = "dd-mm-yyyy hh:mm";
+let date = "2018/07/26 10:30";
+<app-datetime-picker v-model="date" v-bind:format="format" ></app-datetime-picker>
+
+```
+vd 2:
 
 ```js
 let format = "dd-mm-yyyy hh:mm";
 let date = "2018/07/26 10:30";
-<app-date-time-picker v-model="date" format="dd-mm-yyyy hh:mm" />;
+<app-datetime-picker v-model="date" v-bind:format="format" ></app-datetime-picker>
+
 ```

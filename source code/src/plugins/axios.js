@@ -9,7 +9,7 @@
  * https://github.com/mzabriskie/axios
  */
 
-import Vue from "vue";
+import Vue from "vue/dist/vue.js";
 import Axios from "axios";
 // import store from '@/store';
 import AppConfig from "../config";

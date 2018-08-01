@@ -11,16 +11,18 @@ export default {
   props: ["value", "config"],
   props: {
     /**
-     * @model Giá trị value kiểu String
+     * @description Giá trị value kiểu String
      */
+
     value: {
       type: String
     },
     /**
-     * @config Giá trị Object (ví dụ: config: { height: "300px", focus: true})
+     * @description Giá trị Object (ví dụ: config: { height: 300, focus: true})
      */
     config: {
-      type: Object
+      type: Object,
+      default: {}
     }
   },
   mounted() {

@@ -11,7 +11,7 @@ export default {
   name: "app-color-picker",
   props: {
     /**
-     * @model Giá trị color kiểu hex dùng để binding (ví dụ: #ffddee)
+     * @description Giá trị color kiểu hex dùng để binding (ví dụ: #ffddee)
      */
     value: {
       type: String
