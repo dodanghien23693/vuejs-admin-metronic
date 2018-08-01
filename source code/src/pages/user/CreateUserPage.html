@@ -16,16 +16,16 @@
                         </div>
 
                         <!--begin::Form-->
-                        <form class="m-form m-form--fit m-form--label-align-right">
+                        <app-form :rules="rules" class="m-form m-form--fit m-form--label-align-right">
 
                                 <div class="m-portlet__body form-row">
                                         <div class="form-group m-form__group col-md-6">
-                                                <label for="exampleInputEmail1">Email address</label>
-                                                <input type="email" class="form-control m-input" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+                                                <label for="email">Email</label>
+                                                <input type="email" class="form-control m-input" name="email" aria-describedby="emailHelp" placeholder="Enter email">
                                         </div>
                                         <div class="form-group m-form__group col-md-6">
-                                                <label for="exampleInputPassword1">Password</label>
-                                                <input type="password" class="form-control m-input" id="exampleInputPassword1" placeholder="Password">
+                                                <label for="name">Name</label>
+                                                <input type="text" class="form-control m-input" name="name">
                                         </div>
 
                                         <!-- Select 2 -->
@@ -65,22 +65,14 @@
                                 </div>
                                 <div class="m-portlet__foot m-portlet__foot--fit">
                                         <div class="m-form__actions m--align-center">
+                                                <button type="submit" class="btn btn-warning">submit</button>
                                                 <button type="reset" v-on:click="addUser()" class="btn btn-primary">Thêm user</button>
                                                 <button type="reset" class="btn btn-secondary">Huỷ</button>
                                         </div>
                                 </div>
-                        </form>
+                        </app-form>
 
                         <!--end::Form-->
-
-                        <from-validation>
-                                <form slot="form">
-                                        <div class="form-group m-form__group col-md-6">
-                                                <textarea name="form-textarea" class="form-control m-input " rows="3 "></textarea>
-                                        </div>
-                                </form>
-                        </from-validation>
-                        <slot></slot>
 
                 </div>
 
