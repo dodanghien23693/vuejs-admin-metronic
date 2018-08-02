@@ -21,8 +21,7 @@ export default {
      * @description Giá trị Object (ví dụ: config: { height: 300, focus: true})
      */
     config: {
-      type: Object,
-      default: {}
+      type: Object
     }
   },
   mounted() {

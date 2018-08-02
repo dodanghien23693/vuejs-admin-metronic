@@ -27,25 +27,28 @@
                             </label>
                             <div class="col-lg-4">
                                 {{userInfor.name}}
-                                <app-input type="text" v-model="userInfor.name" placeholder="Enter full name"></app-input>
+                                <app-input name="name1" type="text" validate="required|min:5" v-model="userInfor.name" placeholder="Enter full name"></app-input>
                             </div>
                         </div>
+
                         <div class="form-group m-form__group row">
                             <label class="col-lg-2 col-form-label">
                                 Email address:
                             </label>
                             <div class="col-lg-4">
                                 {{userInfor.email}}
-                                <app-input type="email" v-model="userInfor.email" placeholder="Enter full email"></app-input>
+                                <app-input type="email" name="email" validate="email" v-model="userInfor.email" placeholder="Enter full email"></app-input>
                             </div>
                         </div>
+
                         <div class="form-group m-form__group row">
                             <label class=" col-lg-2 col-form-label">
                                 birthday
                             </label>
                             <div class="col-lg-4 col-md-9 col-sm-12">
                                 {{userInfor.birthday}}
-                                <app-date-picker v-model="userInfor.birthday" format="dd-mm-yyyy"></app-date-picker>
+                                <app-date-picker validate="date_format:DD/MM/YYYY|date_between:01/08/2018,05/08/2018" name="birthday" v-model="userInfor.birthday"
+                                    format="dd/mm/yyyy"></app-date-picker>
                             </div>
                         </div>
                         <div class="form-group m-form__group row">
@@ -72,7 +75,7 @@
                             </label>
                             <div class="col-lg-4 col-md-9 col-sm-12">
                                 {{userInfor.note}}
-                                <app-summernote v-model="userInfor.note" :config="{}"></app-summernote>
+                                <app-summernote v-model="userInfor.note" :config="{height: 200}"></app-summernote>
                             </div>
                         </div>
                         <div class="form-group m-form__group row">
@@ -125,7 +128,6 @@
                         <div class="m-form__seperator m-form__seperator--dashed  m-form__seperator--space m--margin-bottom-10"></div>
                     </div>
                 </div>
-                <app-datatable></app-datatable>
                 <div class="m-portlet__foot m-portlet__foot--fit">
                     <div class="m-form__actions m-form__actions">
                         <div class="row">

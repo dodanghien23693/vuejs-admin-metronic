@@ -1,5 +1,16 @@
 <template>
-    <input :type="type" v-on:change="inputChange()" ref="input" :value="value" class="form-control m-input" :placeholder="placeholder"/>
+<div>
+    <input 
+    :type="type"
+    class="form-control m-input" 
+    :placeholder="placeholder"
+    :name="name"
+	v-model="inputValue"
+	@input="inputChange"
+	v-validate="validate"
+    />
+    <span class="form-control-feedback" v-show="errors.has(name)">{{errors.first(name)}}</span>
+</div>
 </template>
 <script>
 /**
@@ -21,15 +32,28 @@ export default {
     /**
      * PlaceHolder
      */
-    placeholder: String
+    placeholder: String,
+    name: {
+      type: String,
+      required: true
+    },
+    validate: {
+      type: [String, Object]
+    }
+  },
+  data() {
+    return {
+      inputValue: this.value
+    };
   },
   methods: {
     /**
      * Hàm được gọi khi giá trị của input được thay đổi từ bên trong
      */
     inputChange() {
-      this.$emit("input", this.$refs.input.value);
+      this.$emit("input", this.inputValue);
     }
-  }
+  },
+  mounted() {}
 };
 </script>
