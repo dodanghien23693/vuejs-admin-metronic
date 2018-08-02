@@ -1,6 +1,6 @@
 <template>
 <div>
-<form>
+<form >
     <h1>Content form ở phía dưới</h1>
     <slot></slot>
 </form>
@@ -45,10 +45,9 @@ export default {
             email: "Hãy nhập email hợp lệ"
           }
         },
+        errorClass: "form-control-feedback",
         invalidHandler: function(event, validator) {
-          // var alert = $("#m_form_1_msg");
-          // alert.removeClass("m--hide").show();
-          // debugger;
+          console.log(event);
           console.log(validator);
           mUtil.scrollTop();
         },
@@ -60,3 +59,8 @@ export default {
   }
 };
 </script>
+<style scoped>
+.error-lable {
+  color: red;
+}
+</style>

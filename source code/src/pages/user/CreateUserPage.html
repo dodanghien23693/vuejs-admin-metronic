@@ -16,50 +16,48 @@
                         </div>
 
                         <!--begin::Form-->
-                        <app-form :rules="rules" class="m-form m-form--fit m-form--label-align-right">
+                        <form @submit.prevent="validateBeforeSubmit" class="m-form m-form--fit m-form--label-align-right">
 
                                 <div class="m-portlet__body form-row">
                                         <div class="form-group m-form__group col-md-6">
-                                                <label for="email">Email</label>
-                                                <input type="email" class="form-control m-input" name="email" aria-describedby="emailHelp" placeholder="Enter email">
+                                                <input name="email" v-model="email" v-validate="'required|email'" :class="{'input': true, 'is-danger': errors.has('email') }"
+                                                        type="text" placeholder="Email" class="form-control m-input">
+                                                <i v-show="errors.has('email')" class="fa fa-warning"></i>
+                                                <span style="color: red" v-show="errors.has('email')" class="help is-danger">{{ errors.first('email') }}</span>
                                         </div>
                                         <div class="form-group m-form__group col-md-6">
                                                 <label for="name">Name</label>
-                                                <input type="text" class="form-control m-input" name="name">
+                                                <input type="text" v-validate="'required'" class="form-control m-input" name="name">
+                                                <i v-show="errors.has('name')" class="fa fa-warning"></i>
+                                                <span style="color: red" v-show="errors.has('name')" class="help is-danger">{{ errors.first('name') }}</span>
                                         </div>
-
-                                        <!-- Select 2 -->
                                         <div class="form-group m-form__group col-md-6">
-                                                <label for="exampleSelect1">select multi 2 component</label>
-                                                <app-select2 :options="options_multi" v-model="selected_multi" placeholder="Hãy chọn" multiple="true" class="form-control m-input"></app-select2>
-                                                {{selected_multi}}
+                                                <label for="phonenumber">Số điện thoại</label>
+                                                <input type="number" v-validate="'required'" class="form-control m-input" name="phonenumber">
+                                                <i v-show="errors.has('phonenumber')" class="fa fa-warning"></i>
+                                                <span style="color: red" v-show="errors.has('phonenumber')" class="help is-danger">{{ errors.first('phonenumber') }}</span>
                                         </div>
-                                        <!-- Select 2 multi -->
                                         <div class="form-group m-form__group col-md-6">
-                                                <label for="exampleSelect1">Example select 2 component</label>
-                                                <app-select2 :options="options" v-model="selected" placeholder="Hãy chọn" class="form-control m-input"></app-select2>
-                                                {{selected}}
+                                                <label for="language">Trình độ ngoại ngữ</label>
+                                                <app-select2 :options="options_multi" v-model="selected_multi" v-validate="'required'" name="language" placeholder="Hãy chọn"
+                                                        multiple="true" class="form-control m-input"></app-select2>
+                                                <i v-show="errors.has('language')" class="fa fa-warning"></i>
+                                                <span style="color: red" v-show="errors.has('language')" class="help is-danger">{{ errors.first('language') }}</span>
+                                        </div>
+                                        <div class="form-group m-form__group col-md-6">
+                                                <label for="lever">Trình độ học vấn</label>
+                                                <app-select2 :options="options" v-validate="'required'" v-model="selected" name="lever" :class="{'input': true, 'is-danger': errors.has('lever') }"
+                                                        placeholder="Hãy chọn" class="form-control m-input"></app-select2>
+                                                <i v-show="errors.has('lever')" class="fa fa-warning"></i>
+                                                <span style="color: red" v-show="errors.has('lever')" class="help is-danger">{{ errors.first('lever') }}</span>
                                         </div>
                                         <!-- TypeAhead -->
                                         <div class="form-group m-form__group col-md-6">
-                                                <di>{{country}}</di>
-                                                <label for="">TypeAhead</label>
-                                                <app-type-ahead :source="data_souce" v-model="country"></app-type-ahead>
-
-                                        </div>
-                                        <div class="form-group m-form__group col-md-6">
-                                                <label for="exampleSelect2">Example multiple select</label>
-                                                <select multiple="" class="form-control m-input" id="exampleSelect2">
-                                                        <option>1</option>
-                                                        <option>2</option>
-                                                        <option>3</option>
-                                                        <option>4</option>
-                                                        <option>5</option>
-                                                </select>
-                                        </div>
-                                        <div class="form-group m-form__group col-md-6">
-                                                <label for="exampleTextarea">Example textarea</label>
-                                                <textarea class="form-control m-input" id="exampleTextarea" rows="3"></textarea>
+                                                <label for="">Quốc tịch</label>
+                                                <app-type-ahead :source="data_souce" v-validate="'required'" :class="{'input': true, 'is-danger': errors.has('country') }"
+                                                        name="country" v-model="country"></app-type-ahead>
+                                                <i v-show="errors.has('country')" class="fa fa-warning"></i>
+                                                <span style="color: red" v-show="errors.has('country')" class="help is-danger">{{ errors.first('country') }}</span>
                                         </div>
 
                                 </div>
@@ -70,7 +68,7 @@
                                                 <button type="reset" class="btn btn-secondary">Huỷ</button>
                                         </div>
                                 </div>
-                        </app-form>
+                        </form>
 
                         <!--end::Form-->
 
