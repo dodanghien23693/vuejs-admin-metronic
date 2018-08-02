@@ -1,11 +1,8 @@
 <template>
-<div> 
   <input type="text" class="form-control" 
     ref="input"
     :value="value"
    />
-    <span class="form-control-feedback" v-show="error.has(name)">{{error.first(name)}}</span>
-  </div>
 </template>
 
 <script>
@@ -28,8 +25,7 @@ export default {
     format: {
       type: String
     },
-    name: String,
-    error: Object
+    name: String
   },
   // $_veeValidate: {
   // 	value() {

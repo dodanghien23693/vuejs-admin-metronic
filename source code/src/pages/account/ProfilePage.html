@@ -26,8 +26,8 @@
                                 Full Name:
                             </label>
                             <div class="col-lg-4">
-                                <app-input name="name1" type="text" v-validate="'required|min:5'" v-model="userInfor.name" placeholder="Enter full name"
-                                    :error="errors"></app-input>
+                                <app-input name="name1" type="text" v-validate="'required|min:5'" v-model="userInfor.name" placeholder="Enter full name"></app-input>
+                                <span v-show="errors.has('name1')">{{errors.first('name1')}}</span>
                             </div>
                         </div>
 
@@ -36,7 +36,8 @@
                                 Email address:
                             </label>
                             <div class="col-lg-4">
-                                <app-input type="email" name="email" v-validate="'email'" v-model="userInfor.email" placeholder="Enter full email" :error="errors"></app-input>
+                                <app-input type="email" name="email" v-validate="'email'" v-model="userInfor.email" placeholder="Enter full email"></app-input>
+                                <span v-show="errors.has('email')">{{errors.first('email')}}</span>
                             </div>
                         </div>
 
@@ -47,7 +48,9 @@
                             <div class="col-lg-4 col-md-9 col-sm-12">
                                 {{userInfor.birthday}}
                                 <app-date-picker v-validate="'date_format:DD/MM/YYYY|date_between:01/08/2018,05/08/2018'" name="birthday" v-model="userInfor.birthday"
-                                    format="dd/mm/yyyy" :error="errors"></app-date-picker>
+                                    format="dd/mm/yyyy"></app-date-picker>
+                                <span v-show="errors.has('birthday')">{{errors.first('birthday')}}</span>
+
                             </div>
                         </div>
                         <div class="form-group m-form__group row">
@@ -75,6 +78,7 @@
                             <div class="col-lg-4 col-md-9 col-sm-12">
                                 {{userInfor.note}}
                                 <app-summernote v-validate="'min:100'" name="summernote1" v-model="userInfor.note" :config="{height: 200}" :error="errors"></app-summernote>
+                                <span v-show="errors.has('summernote1')">{{errors.first('summernote1')}}</span>
                             </div>
                         </div>
                         <div class="form-group m-form__group row">

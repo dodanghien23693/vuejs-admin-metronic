@@ -1,12 +1,12 @@
 
 <template>
-<div class="m-typeahead">
-  <input class="form-control m-input col-md-12" :value="value" type="text">
-</div>
+  <div class="m-typeahead">
+    <input ref="input" class="form-control m-input col-md-12" :value="value" type="text">
+  </div>
 </template>
 <script>
 export default {
-  //props: ["source", "value"],
+  name: "app-type-ahead",
   props: {
     /**
      * source là 1 mảng
@@ -20,7 +20,6 @@ export default {
      */
     value: String
   },
-  name: "app-type-ahead",
   methods: {},
   mounted() {
     var engine = new Bloodhound({
@@ -33,9 +32,8 @@ export default {
     });
 
     engine.initialize();
-    let vm = this;
-    $(this.$el)
-      .find("input")
+    let self = this;
+    $(this.$refs.input)
       .typeahead(
         {
           hint: true,
@@ -57,8 +55,8 @@ export default {
       .trigger("keyup")
       .on("keyup", function() {
         // emit event on change.
-        vm.value = $(this).val();
-        vm.$emit("input", vm.value);
+        self.value = $(this).val();
+        self.$emit("input", self.value);
       });
   }
 };

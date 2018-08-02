@@ -1,12 +1,9 @@
 <template>
-<div>
-  <textarea class="summernote" 
+  <textarea
     ref="input"
     :value="value"
   >
   </textarea>
-  <span class="form-control-feedback" v-show="error.has(name)">{{error.first(name)}}</span>
-</div>
 </template>
 
 <script>
@@ -31,14 +28,8 @@ export default {
       type: Object
     },
 
-    name: String,
-    error: Object
+    name: String
   },
-  // $_veeValidate: {
-  // 	// value() {
-  // 	// 	return this.innerValue;
-  // 	// }
-  // },
   data() {},
   mounted() {
     let config = {
@@ -47,7 +38,7 @@ export default {
     if (this.config) {
       config = this.config;
     }
-    var editor = $(this.$el).find("textarea");
+    var editor = $(this.$refs.input);
 
     editor.summernote(config);
 
