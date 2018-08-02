@@ -23,16 +23,19 @@ export default {
         address: ""
       },
       options: [
-        { title: "option1", value: "1" },
-        { title: "option2", value: "2" },
-        { title: "option3", value: "3" }
+        { title: "Đại học", value: "1" },
+        { title: "Tiến sỹ", value: "2" },
+        { title: "Giáo sư", value: "3" },
+        { title: "Tiểu học", value: "4" },
+        { title: "Mẫu giáo", value: "5" }
       ],
-      selected: 2,
-      selected_multi: [2, 3],
+      selected: "",
+      selected_multi: [],
       options_multi: [
-        { title: "multi_option1", value: "1" },
-        { title: "multi_option2", value: "2" },
-        { title: "multi_option3", value: "3" }
+        { title: "Tiếng việt", value: "1" },
+        { title: "Tiếng Anh", value: "2" },
+        { title: "Tiếng Hàn", value: "3" },
+        { title: "Tiếng Trung", value: "4" }
       ],
       data_souce: [
         "Việt Nam ",
@@ -62,18 +65,24 @@ export default {
     addUser() {
       console.log(this.user);
       console.log(this.country);
-      // this.options.push({ title: "option4", value: "4" });
     },
     doLogin() {
       //gọi request thông qua axios
       this.$http.post("").then(() => {});
+    },
+    validateBeforeSubmit() {
+      this.$validator.validateAll().then(result => {
+        if (result) {
+          // eslint-disable-next-line
+          alert("Form Submitted!");
+          return;
+        }
+        console.log("Correct them errors!");
+      });
     }
   },
   mounted() {}
 };
 </script>
 <style lang="scss" scoped>
-label.error {
-  color: red;
-}
 </style>
