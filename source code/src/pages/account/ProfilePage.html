@@ -15,7 +15,7 @@
             </div>
 
             <!-- thong tin user -->
-            <app-form class="m-form">
+            <app-form class="m-form" :form-submit="submit">
                 <div class="m-portlet__body">
                     <div class="m-form__section m-form__section--first">
                         <div class="form-group m-form__group row">
@@ -26,8 +26,8 @@
                                 Full Name:
                             </label>
                             <div class="col-lg-4">
-                                {{userInfor.name}}
-                                <app-input name="name1" type="text" validate="required|min:5" v-model="userInfor.name" placeholder="Enter full name"></app-input>
+                                <app-input name="name1" type="text" v-validate="'required|min:5'" v-model="userInfor.name" placeholder="Enter full name"
+                                    :error="errors"></app-input>
                             </div>
                         </div>
 
@@ -36,8 +36,7 @@
                                 Email address:
                             </label>
                             <div class="col-lg-4">
-                                {{userInfor.email}}
-                                <app-input type="email" name="email" validate="email" v-model="userInfor.email" placeholder="Enter full email"></app-input>
+                                <app-input type="email" name="email" v-validate="'email'" v-model="userInfor.email" placeholder="Enter full email" :error="errors"></app-input>
                             </div>
                         </div>
 
@@ -47,8 +46,8 @@
                             </label>
                             <div class="col-lg-4 col-md-9 col-sm-12">
                                 {{userInfor.birthday}}
-                                <app-date-picker validate="date_format:DD/MM/YYYY|date_between:01/08/2018,05/08/2018" name="birthday" v-model="userInfor.birthday"
-                                    format="dd/mm/yyyy"></app-date-picker>
+                                <app-date-picker v-validate="'date_format:DD/MM/YYYY|date_between:01/08/2018,05/08/2018'" name="birthday" v-model="userInfor.birthday"
+                                    format="dd/mm/yyyy" :error="errors"></app-date-picker>
                             </div>
                         </div>
                         <div class="form-group m-form__group row">
@@ -75,7 +74,7 @@
                             </label>
                             <div class="col-lg-4 col-md-9 col-sm-12">
                                 {{userInfor.note}}
-                                <app-summernote v-model="userInfor.note" :config="{height: 200}"></app-summernote>
+                                <app-summernote v-validate="'min:100'" name="summernote1" v-model="userInfor.note" :config="{height: 200}" :error="errors"></app-summernote>
                             </div>
                         </div>
                         <div class="form-group m-form__group row">
@@ -133,8 +132,8 @@
                         <div class="row">
                             <div class="col-lg-2"></div>
                             <div class="col-lg-2">
-                                <button v-on:click="Change" class="btn btn-success">
-                                    Change
+                                <button class="btn btn-success">
+                                    submit
                                 </button>
                                 <button type="reset" class="btn btn-secondary">
                                     Cancel

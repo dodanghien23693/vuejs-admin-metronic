@@ -4,12 +4,10 @@
     :type="type"
     class="form-control m-input" 
     :placeholder="placeholder"
-    :name="name"
 	v-model="inputValue"
 	@input="inputChange"
-	v-validate="validate"
     />
-    <span class="form-control-feedback" v-show="errors.has(name)">{{errors.first(name)}}</span>
+    <span class="form-control-feedback" v-show="error.has(name)">{{error.first(name)}}</span>
 </div>
 </template>
 <script>
@@ -37,10 +35,16 @@ export default {
       type: String,
       required: true
     },
-    validate: {
-      type: [String, Object]
-    }
+    error: Object
   },
+  // $_veeValidate: {
+  // 	// name() {
+  // 	// 	return this.name;
+  // 	// },
+  // 	value() {
+  // 		return this.inputValue;
+  // 	}
+  // },
   data() {
     return {
       inputValue: this.value

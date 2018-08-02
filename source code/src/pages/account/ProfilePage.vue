@@ -11,6 +11,7 @@ import AppInput from "@/components/app-input/AppInput";
 
 export default {
   name: "profile",
+  inject: ["$validator"],
   template: template,
   data: function() {
     return {
@@ -24,7 +25,7 @@ export default {
         dateTime: "2018/07/26 10:30",
         sex: "girl",
         time: "10:20:91",
-        birthday: "02/08/2018",
+        birthday: "01/08/2018",
         note: "dao hai la nguoi rat dep trai",
         hex: "#61485c"
       }
@@ -42,8 +43,8 @@ export default {
   },
   created: function() {},
   methods: {
-    Change: function() {
-      console.log(this.userInfor);
+    submit(e) {
+      debugger;
     }
   }
 };
