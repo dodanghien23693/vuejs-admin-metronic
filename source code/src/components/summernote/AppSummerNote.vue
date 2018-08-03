@@ -1,5 +1,9 @@
 <template>
-  <textarea class="summernote" name="editordata"></textarea>
+  <textarea
+    ref="input"
+    :value="value"
+  >
+  </textarea>
 </template>
 
 <script>
@@ -22,8 +26,11 @@ export default {
      */
     config: {
       type: Object
-    }
+    },
+
+    name: String
   },
+  data() {},
   mounted() {
     let config = {
       height: 200
@@ -31,14 +38,18 @@ export default {
     if (this.config) {
       config = this.config;
     }
-    $(this.$el).summernote(config);
-    // evevnt change
+    var editor = $(this.$refs.input);
+
+    editor.summernote(config);
+
     var self = this;
-    $(this.$el).on("summernote.change", function(we, contents, $editable) {
-      self.$emit("input", contents);
+    editor.on("summernote.change", function(we, contents, $editable) {
+      self.$validator.validate().then(result => {
+        if (result) {
+          self.$emit("input", contents);
+        }
+      });
     });
-    // set data for summernote
-    $(this.$el).summernote("code", this.value);
   }
 };
 </script>

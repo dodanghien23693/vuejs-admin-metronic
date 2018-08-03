@@ -1,5 +1,5 @@
 <template>
-  <input type="text" id="wheel-demo" class="form-control minicolors-input" :value="value" data-control="wheel" />
+  <input ref="input" type="text" id="wheel-demo" class="form-control minicolors-input" :value="value" data-control="wheel" />
 </template>
 
 
@@ -19,7 +19,7 @@ export default {
   },
   mounted() {
     let self = this;
-    $(this.$el).minicolors({
+    $(this.$refs.input).minicolors({
       animationSpeed: 100,
       animationEasing: "swing",
       change: null,

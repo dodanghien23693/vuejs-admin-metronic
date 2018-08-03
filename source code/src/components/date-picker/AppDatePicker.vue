@@ -1,13 +1,8 @@
 <template>
-<div> 
   <input type="text" class="form-control" 
     ref="input"
     :value="value"
-    :name="name"
-    v-validate="validate"
    />
-    <span class="form-control-feedback" v-show="errors.has(name)">{{errors.first(name)}}</span>
-   </div>
 </template>
 
 <script>
@@ -16,6 +11,7 @@
  */
 export default {
   name: "app-date-picker",
+
   props: {
     /**
      * @model
@@ -29,20 +25,19 @@ export default {
     format: {
       type: String
     },
-    name: String,
-    validate: {
-      type: [Object, String]
-    }
+    name: String
   },
+  // $_veeValidate: {
+  // 	value() {
+  // 		return this.$refs.input.value;
+  // 	}
+  // },
   data() {
-    return {
-      inputValue: this.value
-    };
+    return {};
   },
   mounted() {
     let self = this;
-    $(this.$el)
-      .find("input")
+    $(this.$refs.input)
       .datepicker({
         todayHighlight: true,
         orientation: "bottom left",
@@ -61,18 +56,14 @@ export default {
          * @type {string}
          */
 
-        self.$validator.validate().then(result => {
-          if (result) {
-            let newValue = moment(e.date).format(self.format.toUpperCase());
-            self.$refs.input.value = newValue;
-            self.$emit("input", newValue);
-          }
-        });
+        let newValue = moment(e.date).format(self.format.toUpperCase());
+        self.$refs.input.value = newValue;
+        self.$emit("input", newValue);
       });
   },
 
   beforeDestroy: function() {
-    $(this.$el)
+    $(this.$refs.input)
       .datepicker("hide")
       .datepicker("destroy");
   }

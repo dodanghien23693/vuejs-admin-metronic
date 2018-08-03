@@ -1,6 +1,6 @@
 <template>
 <div>
-<form class="m-form">
+<form class="m-form" v-on:submit.prevent="submitForm">
     <h1>Content form ở phía dưới</h1>
     <slot></slot>
 </form>
@@ -11,17 +11,18 @@
 /**
  * #### app-form dùng để quản lý form: quản lý hàm xử lý khi submit, thực hiện validate dữ liệu
  */
-import $ from "jquery";
-import validate from "jquery-validation";
+// import $ from "jquery";
+// import validate from "jquery-validation";
 export default {
   name: "app-form",
+  inject: ["$validator"],
   props: {
     /**
      * Là 1 object dùng để cấu hình các input cần validation
      */
-    rules: {
-      type: Object
-    },
+    // rules: {
+    //   type: Object
+    // },
     /**
      * Hàm thực hiện khi submit form
      */
@@ -30,8 +31,14 @@ export default {
     }
   },
   methods: {
-    // doSubmit() {
-    // }
+    submitForm() {
+      this.$validator.validateAll().then(result => {
+        //Nếu thành công thì mới gọi hàm
+        if (result) {
+          this.formSubmit();
+        }
+      });
+    }
   },
   mounted() {
     // $(this.$el)
