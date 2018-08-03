@@ -1,0 +1,53 @@
+//== Portlets
+.m-portlet {
+	//== Angular source code previewer
+    &.m-portlet--ngviewer {
+        .m-portlet__body { 
+            padding: 0;
+
+            .m-portlet__code {
+                display: none;
+
+                &.m-portlet__code--show {
+                    display: block;
+                }
+            }
+                
+            .m-portlet__preview {
+                padding: array-get($m--portlet, layout, self, space) array-get($m--portlet, layout, self, space);
+            }
+        }    
+
+        .m-portlet__code-copy {
+        	position: absolute;
+        	right: 0;
+        	top: 10px;
+        	
+        	i {
+        		font-size: 2rem;
+        	}
+
+        	&:hover {
+        		i {
+        			text-decoration: none;
+        		}
+        	}
+        }  
+    }  
+
+    //== Portlet progress bar
+    .m-portlet__progress-bar__wrapper {
+        height: 5px;
+    }
+
+    .m-portlet__progress-bar {
+        height: 5px;
+    }
+
+    // Tools
+    .m-portlet__head-tools {
+        button {
+            margin-left: 5px;
+        }
+    }
+}

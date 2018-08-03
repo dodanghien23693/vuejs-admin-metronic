@@ -549,16 +549,16 @@ document.addEventListener("click", function(e) {
             }
 
             if (toggle && target !== toggle && toggle.contains(target) === false && target.contains(toggle) === false) {
-                if (the.isPersistent() === true) {
-                    if (element.contains(target) === false) {
+                if (element.contains(target) === false) {
+                    if (the.isPersistent() === true) {
                         the.hide();
-                    }    
-                } else {
-                    the.hide();
-                }
+                    } else {
+                        the.hide();
+                    }
+               }
             } else if (element.contains(target) === false) {
                 the.hide();
-            } 
+            }
         }
     }
 });

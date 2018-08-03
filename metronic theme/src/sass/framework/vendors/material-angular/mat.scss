@@ -1,9 +1,19 @@
 //
-//** Customized Material Angular Version For Metronic
+// Customized Material Angular Version For Metronic
 //
 
 //1:== Framework Base Include
 @import "../../base/include";
 
-//2:== Override Framework Components
+//2:== Angular Material Include
+@import "custom";
+
+//3:== Override Framework Components
 @import "components/general";
+@import "components/alert";
+@import "components/button";
+@import "components/dialog";
+@import "components/portlet";
+@import "components/table";
+@import "components/snackbar";
+@import "components/checkbox";

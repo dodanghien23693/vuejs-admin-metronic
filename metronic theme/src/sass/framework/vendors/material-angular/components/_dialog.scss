@@ -1,0 +1,32 @@
+//== Dialog
+.m-mat-dialog-container__wrapper {
+	.mat-dialog-container {
+	   	padding: 0;
+	   	overflow-x: hidden;
+
+	   	.m-portlet {
+	       	margin-bottom: 0;
+	    	
+	       	.m-portlet__body {
+	       		overflow: auto;
+	       		max-height: 60vh;
+	       	}
+	   	}
+	}
+}
+
+@include tablet-and-mobile {
+	//== Dialog
+	.m-mat-dialog-container__wrapper {
+		max-width: 90%;
+		
+		.mat-dialog-container {
+		   	.m-portlet {	    	
+		       	.m-portlet__body {
+		       		overflow: auto;
+		       		max-height: 60vh; 
+		       	}
+		   	}
+		}
+	}
+}

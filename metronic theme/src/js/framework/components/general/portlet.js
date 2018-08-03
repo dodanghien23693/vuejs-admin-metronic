@@ -30,7 +30,7 @@ var mPortlet = function(elementId, options) {
         },
         sticky: {
             offset: 300,
-            zIndex: 101
+            zIndex: 98
         }
     };
 

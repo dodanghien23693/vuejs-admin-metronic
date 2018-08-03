@@ -205,6 +205,42 @@
             } 
         }
 
+        //== Body loding
+        .m-portlet__body  {
+            .m-portlet__body-progress {
+                display: none;
+            }
+        }
+
+        &.m-portlet--body-progress {
+            .m-portlet__body  {
+                position: relative;
+                animation: k-animate-fade-out 0.3s;
+
+                .m-portlet__body-progress {
+                    background-color: #fff;
+                    position: absolute; 
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    z-index: 5;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-grow: 1;
+                }
+            }
+
+            &.m-portlet--body-progress-overlay {
+                .m-portlet__body  {
+                    .m-portlet__body-progress {
+                        background-color: transparent;
+                    }
+                }
+            }
+        }
+
         //== collapse portlet
         &.m-portlet--collapsed,
         &.m-portlet--collapse {
@@ -783,6 +819,10 @@
             }    
 
             border-bottom: 1px solid get-color($skin, panel);
+
+            &.m-portlet__head-no-border {
+                border-bottom: 0;
+            }
         }
 
         .m-portlet__body {

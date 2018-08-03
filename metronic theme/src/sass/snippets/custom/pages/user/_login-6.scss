@@ -162,6 +162,14 @@
                                 padding: 1.3rem 3.43rem;
                             }                                                 
                         }
+
+                        &.m-login__action--fit {
+                            > a {                             
+                                &:first-child {
+                                    margin-left: 0rem;
+                                }
+                            }
+                        }
                     }
 
                     //== Divider
