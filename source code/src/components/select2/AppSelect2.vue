@@ -7,7 +7,6 @@
 <script>
 export default {
   name: "app-select2",
-  // props: ["options", "value", "placeholder", "multiple"],
   props: {
     /**
      * options là 1 mảng để chọn

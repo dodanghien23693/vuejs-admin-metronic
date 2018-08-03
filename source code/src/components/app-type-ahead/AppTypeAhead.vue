@@ -58,6 +58,11 @@ export default {
         self.value = $(this).val();
         self.$emit("input", self.value);
       });
+  },
+  destroyed: function() {
+    $(this.$el)
+      .off()
+      .typeahead("destroy");
   }
 };
 </script>
