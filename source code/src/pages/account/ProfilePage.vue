@@ -8,6 +8,7 @@ import AppColorPicker from "../../components/color-picker/AppColorPicker";
 import AppDatatable from "../../components/datatable/AppDatatable";
 import AppForm from "@/components/app-form/AppForm";
 import AppInput from "@/components/app-input/AppInput";
+import AppDropzone from "@/components/app-dropzone/AppDropzone";
 
 export default {
   name: "profile",
@@ -39,7 +40,8 @@ export default {
     AppColorPicker,
     AppDatatable,
     AppForm,
-    AppInput
+    AppInput,
+    AppDropzone
   },
   created: function() {},
   methods: {

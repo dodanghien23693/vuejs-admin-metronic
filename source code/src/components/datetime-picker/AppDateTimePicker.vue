@@ -1,13 +1,10 @@
 <template>
-<div> 
   <input type="text" class="form-control" 
     ref="input"
     :value="value"
     :name="name"
-    v-validate="validate"
    />
-    <span class="form-control-feedback" v-show="errors.has(name)">{{errors.first(name)}}</span>
-   </div>
+   
 </template>
 
 <script>
@@ -26,20 +23,18 @@ export default {
     format: {
       type: String
     },
-    name: String,
-    validate: {
-      type: [Object, String]
-    }
+    name: String
   },
   created: function() {},
   mounted() {
-    this.$emit("input", moment(this.value).format(this.format.toUpperCase()));
-    this.$refs.input.value = moment(this.value).format(
-      this.format.toUpperCase()
-    );
+    // this.$emit("input", moment(this.value).format(this.format.toUpperCase()));
+
+    // this.$refs.input.value = moment(this.value).format(
+    //   this.format.toUpperCase()
+    // );
+
     let self = this;
-    $(this.$el)
-      .find("input")
+    $(this.$refs.input)
       .datetimepicker({
         todayHighlight: !0,
         autoclose: !0,
@@ -47,13 +42,9 @@ export default {
         format: self.format
       })
       .on("hide", function(e) {
-        self.$validator.validate().then(result => {
-          if (result) {
-            let newValue = moment(e.date).format(self.format.toUpperCase());
-            self.$refs.input.value = newValue;
-            self.$emit("input", newValue);
-          }
-        });
+        let newValue = moment(e.date).format(self.format.toUpperCase());
+        self.$refs.input.value = newValue;
+        self.$emit("input", newValue);
       });
   },
   methods: {
