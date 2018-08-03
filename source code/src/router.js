@@ -40,6 +40,11 @@ export default new Router({
           path: "table",
           name: "table",
           component: () => import("@/components/datatable/AppDatatable.vue")
+        },
+        {
+          path: "form",
+          name: "form",
+          component: () => import("@/components/datatable/DemoFormValidate.vue")
         }
       ]
     },
