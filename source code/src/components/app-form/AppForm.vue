@@ -16,12 +16,6 @@ export default {
   inject: ["$validator"],
   props: {
     /**
-     * Là 1 object dùng để cấu hình các input cần validation
-     */
-    // rules: {
-    //   type: Object
-    // },
-    /**
      * Hàm thực hiện khi submit form
      */
     formSubmit: {
