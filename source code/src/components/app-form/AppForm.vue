@@ -11,8 +11,6 @@
 /**
  * #### app-form dùng để quản lý form: quản lý hàm xử lý khi submit, thực hiện validate dữ liệu
  */
-// import $ from "jquery";
-// import validate from "jquery-validation";
 export default {
   name: "app-form",
   inject: ["$validator"],
@@ -32,38 +30,19 @@ export default {
   },
   methods: {
     submitForm() {
+      let self = this;
       this.$validator.validateAll().then(result => {
         //Nếu thành công thì mới gọi hàm
         if (result) {
           this.formSubmit();
+        } else {
+          self.$swal("Dữ liệu nhập vào form không hợp lệ!", "", "error");
+          debugger;
+          self.$toastr.error("Dữ liệu nhập vào không hợp lệ");
         }
       });
     }
   },
-  mounted() {
-    // $(this.$el)
-    // 	.find("form")
-    // 	.validate({
-    // 		rules: this.rules,
-    // 		messages: {
-    // 			name: "Hãy nhập họ tên",
-    // 			email: {
-    // 				required: "Hãy nhập email",
-    // 				email: "Hãy nhập email hợp lệ"
-    // 			}
-    // 		},
-    // 		invalidHandler: function(event, validator) {
-    // 			// var alert = $("#m_form_1_msg");
-    // 			// alert.removeClass("m--hide").show();
-    // 			// debugger;
-    // 			console.log(validator);
-    // 			mUtil.scrollTop();
-    // 		},
-    // 		submitHandler: function(form) {
-    // 			console.log("ko co lio");
-    // 			form[0].submit(); // submit the form
-    // 		}
-    // 	});
-  }
+  mounted() {}
 };
 </script>
