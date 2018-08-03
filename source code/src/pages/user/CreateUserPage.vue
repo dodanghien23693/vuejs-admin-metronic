@@ -2,7 +2,6 @@
 import template from "./CreateUserPage.html";
 import AppSelect2 from "@/components/select2/AppSelect2.vue";
 import AppTypeAhead from "@/components/app-type-ahead/AppTypeAhead.vue";
-import fromValidation from "@/components/from-validation/formValidation.vue";
 import AppForm from "@/components/app-form/AppForm";
 export default {
   template: template,
@@ -10,7 +9,6 @@ export default {
   components: {
     AppSelect2,
     AppTypeAhead,
-    fromValidation,
     AppForm
   },
   data() {

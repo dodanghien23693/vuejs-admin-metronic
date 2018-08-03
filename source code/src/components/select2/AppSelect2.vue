@@ -1,6 +1,6 @@
 <template>
-   <select> 
-    <option v-for="opt in options" :key="opt" :value="opt.value">{{opt.title}}</option>
+   <select ref="input"> 
+    <option v-for="(opt,index) in options" :key="index" :value="opt.value">{{opt.title}}</option>
   </select>
 </template>
 
@@ -32,11 +32,11 @@ export default {
     /**
      * @model
      */
-    value: String
+    value: [String, Array]
   },
   mounted() {
     var vm = this;
-    $(this.$el)
+    $(this.$refs.input)
       .select2({
         placeholder: this.placeholder,
         multiple: this.multiple

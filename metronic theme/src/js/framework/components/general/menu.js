@@ -73,6 +73,24 @@ var mMenu = function(elementId, options) {
             the.uid = mUtil.getUniqueID();
         },
 
+        update: function(options) {
+            // merge default and user defined options
+            the.options = mUtil.deepExtend({}, defaultOptions, options);
+
+            // pause menu
+            the.pauseDropdownHoverTime = 0;
+
+             // reset menu
+            Plugin.reset();
+
+            the.eventHandlers = {};
+
+            // build menu
+            Plugin.build();
+
+            mUtil.data(element).set('menu', the);
+        },
+
         reload: function() {
              // reset menu
             Plugin.reset();
@@ -133,6 +151,7 @@ var mMenu = function(elementId, options) {
         */
         scrollerInit: function() {
             if ( the.options.scroll && the.options.scroll.height ) {
+                mUtil.scrollerDestroy(element);
                 mUtil.scrollerInit(element, {disableForMobile: true, resetHeightOnDestroy: true, handleWindowResize: true, height: the.options.scroll.height});
             }            
         },
@@ -143,6 +162,8 @@ var mMenu = function(elementId, options) {
         scrollerUpdate: function() {
             if ( the.options.scroll && the.options.scroll.height ) {
                 mUtil.scrollerUpdate(element);
+            } else {
+                mUtil.scrollerDestroy(element);
             }
         },
 
@@ -667,6 +688,12 @@ var mMenu = function(elementId, options) {
                 one: one,
                 fired: false
             });
+        },
+
+        removeEvent: function(name) {
+            if (the.events[name]) {
+                delete the.events[name];
+            }
         }
     };
 
@@ -705,6 +732,10 @@ var mMenu = function(elementId, options) {
 
     the.reload = function() {
         return Plugin.reload();
+    };
+
+    the.update = function(options) {
+        return Plugin.update(options);
     };
 
     /**
@@ -757,6 +788,10 @@ var mMenu = function(elementId, options) {
      */
     the.on = function(name, handler) {
         return Plugin.addEvent(name, handler);
+    };
+
+    the.off = function(name) {
+        return Plugin.removeEvent(name);
     };
 
     the.one = function(name, handler) {

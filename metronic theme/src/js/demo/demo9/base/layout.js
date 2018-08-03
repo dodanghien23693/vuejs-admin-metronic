@@ -76,7 +76,9 @@ var mLayout = function() {
         if ( mUtil.attr(menu, 'm-menu-scrollable') === '1' ) {
             scroll = {
                 height: function() {
-                    return mUtil.getViewPort().height;
+                    if (mUtil.isInResponsiveRange('desktop')) {
+                        return mUtil.getViewPort().height;
+                    }
                 }
             };
         }

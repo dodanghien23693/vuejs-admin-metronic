@@ -1,44 +1,35 @@
 (function ($) {
 
-	$.fn.mDatatable = $.fn.mDatatable || {};
+	var pluginName = 'mDatatable';
+	var pfx = 'm-';
+
+	$.fn[pluginName] = $.fn[pluginName] || {};
 
 	/**
 	 * @param datatable Main datatable plugin instance
 	 * @param options Extension options
 	 * @returns {*}
 	 */
-	$.fn.mDatatable.checkbox = function (datatable, options) {
-
+	$.fn[pluginName].checkbox = function (datatable, options) {
 		var Extension = {
 			selectedAllRows: false,
 			selectedRows: [],
 			unselectedRows: [],
 
 			init: function () {
-				if (Extension.selectorEnabled()) {
-					// reset
-					datatable.setDataSourceParam(options.vars.selectedAllRows, false);
-					datatable.stateRemove('checkbox');
+				datatable.stateRemove('checkbox');
 
+				if (Extension.selectorEnabled()) {
 					// requestIds is not null
 					if (options.vars.requestIds) {
 						// request ids in response
 						datatable.setDataSourceParam(options.vars.requestIds, true);
 					}
 
-					// remove selected checkbox on datatable reload
-					$(datatable).on('m-datatable--on-reloaded', function () {
-						datatable.stateRemove('checkbox');
-						datatable.setDataSourceParam(options.vars.selectedAllRows, false);
-						Extension.selectedAllRows = false;
-						Extension.selectedRows = [];
-						Extension.unselectedRows = [];
-					});
-
 					// select all on extension init
 					Extension.selectedAllRows = datatable.getDataSourceParam(options.vars.selectedAllRows);
 
-					$(datatable).on('m-datatable--on-layout-updated', function (e, args) {
+					$(datatable).on(pfx + 'datatable--on-layout-updated', function (e, args) {
 						if (args.table != $(datatable.wrap).attr('id')) return;
 						datatable.ready(function () {
 							Extension.initVars();
@@ -47,7 +38,7 @@
 						});
 					});
 
-					$(datatable).on('m-datatable--on-check', function (e, ids) {
+					$(datatable).on(pfx + 'datatable--on-check', function (e, ids) {
 						ids.forEach(function (id) {
 							Extension.selectedRows.push(id);
 							// // remove from unselected rows
@@ -58,7 +49,7 @@
 						storage['unselectedRows'] = $.unique(Extension.unselectedRows);
 						datatable.stateKeep('checkbox', storage);
 					});
-					$(datatable).on('m-datatable--on-uncheck', function (e, ids) {
+					$(datatable).on(pfx + 'datatable--on-uncheck', function (e, ids) {
 						ids.forEach(function (id) {
 							Extension.unselectedRows.push(id);
 							// // remove from selected rows
@@ -77,7 +68,7 @@
 			 */
 			initEvent: function () {
 				// select all checkbox click
-				$(datatable.tableHead).find('.m-checkbox--all > [type="checkbox"]').click(function (e) {
+				$(datatable.tableHead).find('.' + pfx + 'checkbox--all > [type="checkbox"]').click(function (e) {
 					// clear selected and unselected rows
 					Extension.selectedRows = Extension.unselectedRows = [];
 					datatable.stateRemove('checkbox');
@@ -92,7 +83,7 @@
 					// local select all current page rows
 					if (!options.vars.requestIds) {
 						if ($(this).is(':checked')) {
-							Extension.selectedRows = $.makeArray($(datatable.tableBody).find('.m-checkbox--single > [type="checkbox"]').map(function (i, chk) {
+							Extension.selectedRows = $.makeArray($(datatable.tableBody).find('.' + pfx + 'checkbox--single > [type="checkbox"]').map(function (i, chk) {
 								return $(chk).val();
 							}));
 						}
@@ -104,11 +95,11 @@
 					// keep selectedAllRows in datasource params
 					datatable.setDataSourceParam(options.vars.selectedAllRows, Extension.selectedAllRows);
 
-					$(datatable).trigger('m-datatable--on-click-checkbox', [$(this)]);
+					$(datatable).trigger(pfx + 'datatable--on-click-checkbox', [$(this)]);
 				});
 
 				// single row checkbox click
-				$(datatable.tableBody).find('.m-checkbox--single > [type="checkbox"]').click(function (e) {
+				$(datatable.tableBody).find('.' + pfx + 'checkbox--single > [type="checkbox"]').click(function (e) {
 					var id = $(this).val();
 					if ($(this).is(':checked')) {
 						Extension.selectedRows.push(id);
@@ -123,7 +114,7 @@
 					// local checkbox header check
 					if (!options.vars.requestIds && Extension.selectedRows.length < 1) {
 						// remove select all checkbox, if there is no checked checkbox left
-						$(datatable.tableHead).find('.m-checkbox--all > [type="checkbox"]').prop('checked', false);
+						$(datatable.tableHead).find('.' + pfx + 'checkbox--all > [type="checkbox"]').prop('checked', false);
 					}
 
 					var storage = {};
@@ -131,16 +122,16 @@
 					storage['unselectedRows'] = $.unique(Extension.unselectedRows);
 					datatable.stateKeep('checkbox', storage);
 
-					$(datatable).trigger('m-datatable--on-click-checkbox', [$(this)]);
+					$(datatable).trigger(pfx + 'datatable--on-click-checkbox', [$(this)]);
 				});
 			},
 
 			initSelect: function () {
 				// selected all rows from server
 				if (Extension.selectedAllRows && options.vars.requestIds) {
-					if (!datatable.hasClass('m-datatable--error')) {
+					if (!datatable.hasClass(pfx + 'datatable--error')) {
 						// set header select all checkbox checked
-						$(datatable.tableHead).find('.m-checkbox--all > [type="checkbox"]').prop('checked', true);
+						$(datatable.tableHead).find('.' + pfx + 'checkbox--all > [type="checkbox"]').prop('checked', true);
 					}
 
 					// set all checkbox in table body
@@ -158,9 +149,9 @@
 					});
 
 					// local checkbox; check if all checkboxes of currect page are checked
-					if (!datatable.hasClass('m-datatable--error') && $(datatable.tableBody).find('.m-checkbox--single > [type="checkbox"]').not(':checked').length < 1) {
+					if (!datatable.hasClass(pfx + 'datatable--error') && $(datatable.tableBody).find('.' + pfx + 'checkbox--single > [type="checkbox"]').not(':checked').length < 1) {
 						// set header select all checkbox checked
-						$(datatable.tableHead).find('.m-checkbox--all > [type="checkbox"]').prop('checked', true);
+						$(datatable.tableHead).find('.' + pfx + 'checkbox--all > [type="checkbox"]').prop('checked', true);
 					}
 				}
 			},
@@ -219,14 +210,14 @@
 		};
 
 		if (typeof options === 'object') {
-			options = $.extend(true, {}, $.fn.mDatatable.checkbox.default, options);
+			options = $.extend(true, {}, $.fn[pluginName].checkbox.default, options);
 			Extension.init.apply(this, [options]);
 		}
 
 		return datatable;
 	};
 
-	$.fn.mDatatable.checkbox.default = {
+	$.fn[pluginName].checkbox.default = {
 		vars: {
 			// select all rows flag to be sent to the server
 			selectedAllRows: 'selectedAllRows',

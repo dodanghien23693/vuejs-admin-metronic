@@ -1,0 +1,71 @@
+//== Tables
+.mat-table__wrapper {
+    width: 100%;
+
+    .mat-table {
+        min-width: 1000px;
+
+        .mat-cell, 
+        .mat-footer-cell, 
+        .mat-header-cell {
+            padding-right: 10px;
+        }
+        
+        .mat-cell:last-child, 
+        .mat-footer-cell:last-child, 
+        .mat-header-cell:last-child {
+            padding-right: 0;
+        }
+            
+        .mat-row {
+            transition: padding 0.3s ease;
+        }
+
+        .mat-row-editing {
+            transition: padding 0.3s ease;
+            padding: 12px 0 !important;
+
+            .mat-form-field-fluid {
+                width: 99% !important;
+            }
+        }
+    }
+
+    .mat-column-actions {
+        .mat-column-actions-wrapper {
+            display: flex;
+            align-items: center;
+        }
+        .mat-spinner {
+            margin-left: 12px;
+            margin-right: 8px;
+        }
+    }
+
+    .mat-table__message {
+        padding: 30px !important;
+        text-align: center;
+        font-weight: 500;
+    }
+
+    .mat-column-checkbox {
+         padding-left: 20px;
+
+        .mat-checkbox {
+            .mat-checkbox-layout {
+                margin-top: 0.25rem;
+                margin-bottom: 0.25rem;
+            }
+        }
+    }
+
+    .ps__rail-y {
+        z-index: 100;
+    }
+}
+
+.mat-table__bottom {
+    display: flex;
+    align-items: center;
+    justify-content:  flex-end;
+}

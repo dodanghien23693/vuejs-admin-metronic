@@ -60,6 +60,13 @@
         > .ps__rail-x {
             > .ps__thumb-x {
                 background: get-color(light, panel, '++++');
+                opacity: 1;
+
+                &:hover,
+                &:focus {
+                    opacity: 1;
+                    background: get-color(light, panel, '++++');
+                }
             }
         }
 
@@ -67,7 +74,13 @@
             right: 0;
 
             > .ps__thumb-y {
-                background: get-color(light, panel, '++++');                
+                background: get-color(light, panel, '++++');         
+
+                &:hover,
+                &:focus {
+                    opacity: 1;
+                    background: get-color(light, panel, '++++');
+                }       
             }
         }
     }
@@ -97,6 +110,7 @@
             background: transparent !important;
 
             > .ps__thumb-x {
+                background: $color;
                 opacity: 1;
             }
         } 
@@ -120,6 +134,7 @@
             opacity: 1;
 
             > .ps__thumb-y {
+                background: $color;
                 opacity: 1;
             }
         } 
