@@ -574,28 +574,6 @@
 		//== Scrollable
 		&.m-datatable--scroll {
 			//== scrollbar
-			.mCustomScrollbar {
-				.mCS-minimal-dark.mCSB_scrollTools .mCSB_dragger .mCSB_dragger_bar {
-					background: $scrollbar_color;
-					@include opacity(0.7);
-					@include transition(all 0.3s ease);
-
-					@include not-rounded {
-                    	@include border-radius(0 !important);
-                	}
-				}
-
-				// on drag
-				.mCS-minimal-dark.mCSB_scrollTools .mCSB_dragger.mCSB_dragger_onDrag .mCSB_dragger_bar {
-					background: $scrollbar_on_drag_color;
-					@include opacity(1);
-					@include transition(all 0.3s ease);
-
-					@include not-rounded {
-                    	@include border-radius(0 !important);
-                	}
-				}
-			}
 		}
 
 		//== Pagination

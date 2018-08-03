@@ -1305,7 +1305,6 @@ var mUtil = function() {
         scrollerUpdate: function(element) {
             var ps;
             if (ps = mUtil.data(element).get('ps')) {
-                console.log('update!');
                 ps.update();
             }
         },

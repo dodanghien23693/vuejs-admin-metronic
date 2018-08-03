@@ -30,7 +30,6 @@ export default {
 
     name: String
   },
-  data() {},
   mounted() {
     let config = {
       height: 200

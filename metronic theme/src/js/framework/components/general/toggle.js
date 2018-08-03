@@ -71,6 +71,8 @@ var mToggle = function(elementId, options) {
          * Handles offcanvas click toggle
          */
         toggle: function() {
+            Plugin.eventTrigger('beforeToggle');
+            
             if (the.state == 'off') {
                 Plugin.toggleOn();
             } else {

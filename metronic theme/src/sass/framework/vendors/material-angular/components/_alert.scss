@@ -1,0 +1,63 @@
+//== Alert
+.m-mat-alert {
+    display: flex;
+    //flex-wrap: wrap;
+    align-items: center;
+    padding: 10px 10px 10px 20px;
+    border-radius: 3px;
+    margin: 0 0 20px 0;
+
+    .m-mat-alert__icon {
+        display: flex;
+        align-items: center;
+        padding: 0 15px 0 0;
+
+        i {
+            font-size: 2.4rem;
+            color: #fff;
+        }
+    }
+
+    .m-mat-alert__text {
+        display: flex;
+        align-items: center;
+        flex-grow: 1;
+        color: #fff;
+    }
+
+    .m-mat-alert__close {
+        padding: 0 0 0 10px;
+        display: flex;
+        align-items: center;
+        ustify-content: flex-end;
+
+        .material-icons {
+            opacity: 0.8;
+            transition: all 0.3s ease;
+            color: #fff;
+
+            &:hover {
+                transition: all 0.3s ease;
+                opacity: 1;
+            }
+        }
+    }
+
+    // States
+    &.m-mat-alert--warn {
+        background: array-get($mat-m-warn, 500);
+    }
+
+    &.m-mat-alert--primary {
+        background: array-get($mat-m-primary, 500);
+    }
+
+    &.m-mat-alert--accent {
+        background: array-get($mat-m-accent, 500);
+    }
+
+    // Marginless
+    &.m-mat-alert--marginless {
+        margin: 0;
+    }
+}

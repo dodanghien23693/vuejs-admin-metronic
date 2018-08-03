@@ -172,6 +172,11 @@
                 text-align: right;
             }
 
+            &.m-form__actions--sm {
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+            }
+
             &.m-form__actions--paddingless-sides {
                 padding-left: 0;
                 padding-right: 0;

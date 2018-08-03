@@ -46,7 +46,7 @@ export default {
   created: function() {},
   methods: {
     submit(e) {
-      debugger;
+      this.$swal("Cập nhật thành công", "Tiêu đề con", "OK");
     }
   }
 };

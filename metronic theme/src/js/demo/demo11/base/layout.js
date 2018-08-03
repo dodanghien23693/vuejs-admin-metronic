@@ -53,7 +53,9 @@ var mLayout = function() {
         if ( mUtil.attr(menu, 'm-menu-scrollable') === '1' ) {
             scroll = {
                 height: function() {
-                    return mUtil.getViewPort().height - parseInt(mUtil.css('m_header', 'height')) - (30 * 2);
+                    if (mUtil.isInResponsiveRange('desktop')) {
+                        return mUtil.getViewPort().height - parseInt(mUtil.css('m_header', 'height')) - (30 * 2);
+                    }
                 }
             };
         }

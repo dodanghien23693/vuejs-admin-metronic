@@ -82,7 +82,9 @@ var mLayout = function() {
         if (mUtil.attr(menu, 'm-menu-scrollable') === '1') {
             scroll = {
                 height: function() {
-                    return mUtil.getViewPort().height - parseInt(mUtil.css('m_header', 'height'));
+                    if (mUtil.isInResponsiveRange('desktop')) {
+                        return mUtil.getViewPort().height - parseInt(mUtil.css('m_header', 'height'));
+                    }                   
                 }
             };
         }
@@ -183,7 +185,9 @@ var mLayout = function() {
         }); 
 
         asideLeftToggle.on('toggle', function(toggle) {     
-            mainPortlet.updateSticky();       
+            if (mUtil.get('main_portlet')) {
+                mainPortlet.updateSticky();      
+            } 
             
             horMenu.pauseDropdownHover(800);
             asideMenu.pauseDropdownHover(800);
@@ -193,6 +197,13 @@ var mLayout = function() {
             // to set default minimized left aside use this cookie value in your 
             // server side code and add "m-brand--minimize m-aside-left--minimize" classes to 
             // the body tag in order to initialize the minimized left aside mode during page loading.
+        });
+
+        asideLeftToggle.on('beforeToggle', function(toggle) {   
+            var body = mUtil.get('body'); 
+            if (mUtil.hasClass(body, 'm-aside-left--minimize') === false && mUtil.hasClass(body, 'm-aside-left--minimize-hover')) {
+                mUtil.removeClass(body, 'm-aside-left--minimize-hover');
+            }
         });
     }
 

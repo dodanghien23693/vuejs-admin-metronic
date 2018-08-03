@@ -72,7 +72,8 @@ $meta = [
 // if selected all records enabled, provide all the ids
 if (isset($datatable['requestIds']) && filter_var($datatable['requestIds'], FILTER_VALIDATE_BOOLEAN)) {
     $meta['rowIds'] = array_map(function ($row) {
-        return $row->RecordID;
+        foreach($row as $first) break;
+        return $first;
     }, $alldata);
 }
 
