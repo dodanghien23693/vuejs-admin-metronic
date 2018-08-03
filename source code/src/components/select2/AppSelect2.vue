@@ -1,6 +1,6 @@
 <template>
    <select> 
-    <option v-for="opt in options" :key="opt" :value="opt.value">{{opt.title}}</option>
+    <option v-for="(opt,index) in options" :key="index" :value="opt.value">{{opt.title}}</option>
   </select>
 </template>
 
@@ -13,7 +13,9 @@ export default {
      */
     options: {
       type: Array,
-      default: []
+      default: function() {
+        return [];
+      }
     },
     /**
      *  placeholder
@@ -26,13 +28,14 @@ export default {
      *  Thuộc tính để cấu hình multiple hoặc không
      */
     multiple: {
-      type: Boolean,
-      default: false
+      type: Boolean
     },
     /**
      * @model
      */
-    value: String
+    value: {
+      type: [String, Array]
+    }
   },
   mounted() {
     var vm = this;
