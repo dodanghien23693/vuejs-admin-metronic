@@ -40,11 +40,6 @@ export default {
     };
   },
   mounted() {
-    // this.$emit("input", moment(this.value).format(this.format.toUpperCase()));
-    // this.$refs.input.value = moment(this.value).format(
-    // 	this.format.toUpperCase()
-    // );
-
     let self = this;
     $(this.$el)
       .find("input")

@@ -1,5 +1,13 @@
 <template>
-    <input type="text" class="form-control" ref="input" id="m_datetimepicker_2_modal" :value="this.value" placeholder="Select date &amp; time">
+<div> 
+  <input type="text" class="form-control" 
+    ref="input"
+    :value="value"
+    :name="name"
+    v-validate="validate"
+   />
+    <span class="form-control-feedback" v-show="errors.has(name)">{{errors.first(name)}}</span>
+   </div>
 </template>
 
 <script>
@@ -17,6 +25,10 @@ export default {
      */
     format: {
       type: String
+    },
+    name: String,
+    validate: {
+      type: [Object, String]
     }
   },
   created: function() {},
@@ -27,6 +39,7 @@ export default {
     );
     let self = this;
     $(this.$el)
+      .find("input")
       .datetimepicker({
         todayHighlight: !0,
         autoclose: !0,
@@ -34,7 +47,13 @@ export default {
         format: self.format
       })
       .on("hide", function(e) {
-        self.$emit("input", moment(e.date).format(self.format.toUpperCase()));
+        self.$validator.validate().then(result => {
+          if (result) {
+            let newValue = moment(e.date).format(self.format.toUpperCase());
+            self.$refs.input.value = newValue;
+            self.$emit("input", newValue);
+          }
+        });
       });
   },
   methods: {
