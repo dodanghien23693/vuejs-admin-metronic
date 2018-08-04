@@ -19,28 +19,28 @@ export default {
   },
   mounted() {
     let self = this;
-    $(this.$refs.input).minicolors({
-      animationSpeed: 100,
-      animationEasing: "swing",
-      change: null,
-      changeDelay: 0,
-      control: "hue",
-      defaultValue: "",
-      hide: null,
-      hideSpeed: 100,
-      inline: false,
-      letterCase: "lowercase",
-      opacity: false,
-      position: "default",
-      show: null,
-      showSpeed: 100,
-      swatchPosition: "left",
-      textfield: true,
-      theme: "default",
-      change: function(hex, opacity) {
-        self.$emit("input", hex);
-      }
-    });
+    // $(this.$refs.input).minicolors({
+    //   animationSpeed: 100,
+    //   animationEasing: "swing",
+    //   change: null,
+    //   changeDelay: 0,
+    //   control: "hue",
+    //   defaultValue: "",
+    //   hide: null,
+    //   hideSpeed: 100,
+    //   inline: false,
+    //   letterCase: "lowercase",
+    //   opacity: false,
+    //   position: "default",
+    //   show: null,
+    //   showSpeed: 100,
+    //   swatchPosition: "left",
+    //   textfield: true,
+    //   theme: "default",
+    //   change: function(hex, opacity) {
+    //     self.$emit("input", hex);
+    //   }
+    // });
   }
 };
 </script>

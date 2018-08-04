@@ -41,8 +41,8 @@
 	</div>
 </template>
 <script>
-import $ from "jquery";
-import validate from "jquery-validation";
+// import $ from "jquery";
+// import validate from "jquery-validation";
 
 export default {
   name: "demo-form-validate",
@@ -52,25 +52,25 @@ export default {
     }
   },
   mounted() {
-    $("#m_form_1").validate({
-      rules: {
-        email: { required: true, email: true, minlength: 10 },
-        phone: { required: true, minlength: 10, number: true }
-      },
-      messages: {
-        email: {
-          required: "Ban chua nhap email",
-          email: "Hãy nhập email hợp lệ"
-        },
-        phone: {
-          required: "Ban chua nhap phone",
-          minlength: "do dai hon 10",
-          number: "nhap so"
-        }
-      },
-      invalidHandler: function(e, r) {},
-      submitHandler: function(e) {}
-    });
+    // $("#m_form_1").validate({
+    // 	rules: {
+    // 		email: { required: true, email: true, minlength: 10 },
+    // 		phone: { required: true, minlength: 10, number: true }
+    // 	},
+    // 	messages: {
+    // 		email: {
+    // 			required: "Ban chua nhap email",
+    // 			email: "Hãy nhập email hợp lệ"
+    // 		},
+    // 		phone: {
+    // 			required: "Ban chua nhap phone",
+    // 			minlength: "do dai hon 10",
+    // 			number: "nhap so"
+    // 		}
+    // 	},
+    // 	invalidHandler: function(e, r) {},
+    // 	submitHandler: function(e) {}
+    // });
   }
 };
 </script>
