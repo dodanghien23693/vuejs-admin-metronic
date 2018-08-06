@@ -40,6 +40,11 @@ export default new Router({
           path: "table",
           name: "table",
           component: () => import("@/components/datatable/AppDatatable.vue")
+        },
+        {
+          path: "datetime",
+          name: "admin.datetime.add",
+          component: () => import("@/pages/test/CreateDateTime.vue")
         }
       ]
     },
