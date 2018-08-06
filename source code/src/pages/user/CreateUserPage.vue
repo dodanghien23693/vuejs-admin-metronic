@@ -3,13 +3,15 @@ import template from "./CreateUserPage.html";
 import AppSelect2 from "@/components/select2/AppSelect2.vue";
 import AppTypeAhead from "@/components/app-type-ahead/AppTypeAhead.vue";
 import AppForm from "@/components/app-form/AppForm";
+import AppJsTree from "@/components/app-js-tree/AppJsTree.vue";
 export default {
   template: template,
   name: "create-user-page",
   components: {
     AppSelect2,
     AppTypeAhead,
-    AppForm
+    AppForm,
+    AppJsTree
   },
   data() {
     return {
@@ -56,7 +58,20 @@ export default {
         name: {
           required: true
         }
-      }
+      },
+      jstree_data: [
+        { text: "node", children: ["Child node 1", "Child node 2"] },
+        { text: "Root node", children: ["Child node 1", "Child node 2"] },
+        {
+          text: "Root node2",
+          children: [
+            {
+              text: "Root node2",
+              children: ["Child node 12", "Child node 22"]
+            }
+          ]
+        }
+      ]
     };
   },
 
@@ -64,6 +79,7 @@ export default {
     addUser() {
       console.log(this.user);
       console.log(this.country);
+      this.$swal("Dữ liệu nhập vào form không hợp lệ!", "", "error");
     },
     doLogin() {
       //gọi request thông qua axios

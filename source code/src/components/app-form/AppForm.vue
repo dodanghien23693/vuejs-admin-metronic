@@ -31,7 +31,6 @@ export default {
           this.formSubmit();
         } else {
           self.$swal("Dữ liệu nhập vào form không hợp lệ!", "", "error");
-          debugger;
           self.$toastr.error("Dữ liệu nhập vào không hợp lệ");
         }
       });
