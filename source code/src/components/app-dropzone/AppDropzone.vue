@@ -16,22 +16,6 @@
 <script>
 export default {
   name: "app-dropzone",
-  mounted() {
-    var DropzoneDemo = {
-      init: function() {
-        debugger;
-        Dropzone.options.mDropzoneTwo = {
-          paramName: "file",
-          maxFiles: 1,
-          maxFilesize: 5,
-          addRemoveLinks: !0,
-          accept: function(e, o) {
-            "justinbieber.jpg" == e.name ? console.log("ok") : o();
-          }
-        };
-      }
-    };
-    DropzoneDemo.init();
-  }
+  mounted() {}
 };
 </script>

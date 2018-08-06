@@ -13,6 +13,7 @@
  */
 export default {
   name: "app-form",
+  //Inject $validator để app-form truy cập được các v-validate của các component con
   inject: ["$validator"],
   props: {
     /**
