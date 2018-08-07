@@ -1,5 +1,5 @@
 <template>
-   <div>
+   <div class="tree-demo">
    </div>
 </template>
 <script>
@@ -25,10 +25,21 @@ export default {
     console.log(this.$el);
     $(this.$el).jstree({
       core: {
-        data: this.data
+        data: this.data,
+        themes: {
+          responsive: false
+        }
       },
-      plugins: ["sort"],
-      opened: true
+      // plugins: ["wholerow", "checkbox", "types"],
+      plugins: ["contextmenu", "state", "types"],
+      types: {
+        default: {
+          icon: "fa fa-folder m--font-warning"
+        },
+        file: {
+          icon: "fa fa-file  m--font-warning"
+        }
+      }
     });
   }
 };
