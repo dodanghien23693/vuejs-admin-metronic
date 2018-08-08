@@ -40,6 +40,11 @@ export default new Router({
           path: "table",
           name: "table",
           component: () => import("@/components/datatable/AppDatatable.vue")
+        },
+        {
+          path: "sample/jstree",
+          name: "admin.sample.jstree",
+          component: () => import("@/pages/samples/jstree.vue")
         }
       ]
     },
