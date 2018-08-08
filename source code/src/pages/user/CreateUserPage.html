@@ -86,7 +86,7 @@
                         </app-form>
                         <!--end::Form-->
                         <!-- JS Tree -->
-                        <app-js-tree :data="jstree_data"></app-js-tree>
+                        <app-js-tree :data="jstree_data" :plugins="plugins" v-on:change="treeHasChange()"></app-js-tree>
                 </div>
 
                 <!--end::Portlet-->

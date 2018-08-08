@@ -59,6 +59,7 @@ export default {
           required: true
         }
       },
+      plugins: ["wholerow", "checkbox", "types", "dnd"],
       jstree_data: [
         { text: "node", children: ["Child node 1", "Child node 2"] },
         { text: "Root node", children: ["Child node 1", "Child node 2"] },
@@ -76,6 +77,7 @@ export default {
   },
 
   methods: {
+    treeHasChange() {},
     addUser() {
       console.log(this.user);
       console.log(this.country);

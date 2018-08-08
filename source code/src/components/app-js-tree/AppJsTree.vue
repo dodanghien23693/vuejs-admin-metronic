@@ -1,5 +1,5 @@
 <template>
-   <div class="tree-demo">
+   <div class="tree-demo" id="tree">
    </div>
 </template>
 <script>
@@ -13,6 +13,7 @@ export default {
      * @Model
      */
     value: [String, Number],
+    plugins: [Array],
     data: [Object, Array]
   },
   data() {
@@ -20,27 +21,40 @@ export default {
       inputValue: this.value
     };
   },
-  methods: {},
+  methods: {
+    innit() {
+      var self = this;
+      $(this.$el)
+        .on("changed.jstree", function(e, data) {
+          self.$emit("change", data);
+        })
+        .jstree({
+          core: {
+            data: this.data,
+            themes: {
+              responsive: false
+            }
+          },
+          plugins: this.plugins,
+          //plugins: ["contextmenu", "state", "types"],
+          types: {
+            default: {
+              icon: "fa fa-folder m--font-warning"
+            },
+            file: {
+              icon: "fa fa-file  m--font-warning"
+            }
+          }
+        });
+    }
+  },
   mounted() {
-    console.log(this.$el);
-    $(this.$el).jstree({
-      core: {
-        data: this.data,
-        themes: {
-          responsive: false
-        }
-      },
-      // plugins: ["wholerow", "checkbox", "types"],
-      plugins: ["contextmenu", "state", "types"],
-      types: {
-        default: {
-          icon: "fa fa-folder m--font-warning"
-        },
-        file: {
-          icon: "fa fa-file  m--font-warning"
-        }
-      }
-    });
+    this.innit();
+  },
+  watch: {
+    value: function(val) {
+      this.innit();
+    }
   }
 };
 </script>
