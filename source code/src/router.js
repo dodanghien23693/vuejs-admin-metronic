@@ -45,6 +45,11 @@ export default new Router({
           path: "sample/jstree",
           name: "admin.sample.jstree",
           component: () => import("@/pages/samples/jstree.vue")
+        },
+        {
+          path: "datetime",
+          name: "admin.datetime.add",
+          component: () => import("@/pages/test/CreateDateTime.vue")
         }
       ]
     },
