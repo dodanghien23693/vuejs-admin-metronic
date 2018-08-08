@@ -42,11 +42,6 @@ export default new Router({
           component: () => import("@/components/datatable/AppDatatable.vue")
         },
         {
-          path: "sample/jstree",
-          name: "admin.sample.jstree",
-          component: () => import("@/pages/samples/jstree.vue")
-        },
-        {
           path: "datetime",
           name: "admin.datetime.add",
           component: () => import("@/pages/test/CreateDateTime.vue")
