@@ -1,6 +1,6 @@
 <template>
 <div class="col-sm-4">
-  <div class="m-dropzone dropzone" action="inc/api/dropzone/upload.php" ref="input">
+  <div class="m-dropzone dropzone" id="my-dropzone" action="#" ref="input">
     <div class="m-dropzone__msg dz-message needsclick">
       <h3 class="m-dropzone__msg-title">Drop files here or click to upload.</h3>
       <span class="m-dropzone__msg-desc">This is just a demo dropzone. Selected files are <strong>not</strong> actually uploaded.</span>
@@ -12,69 +12,110 @@
 export default {
   name: "app-dropzone",
   props: {
+    /**
+     * @Model
+     */
     value: {
       type: [Array, Object]
     },
+
+    /**
+     * Cấu hình setting cho dropzone, chi tiết xem tại: https://www.dropzonejs.com/#configuration-options
+     */
     options: {
       type: Object
-    }
+    },
+    /**
+     * Cấu hình cho phép dropzone tự động upload ảnh ngay khi được thêm vào
+     */
+    autoUpload: {
+      type: Boolean
+    },
+
+    /**
+     * Giới hạn số file tối đa
+     */
+    maxFiles: Number
   },
-  methods: {
-    getData() {}
+  data() {
+    return {
+      files: [],
+      myDropzone: {}
+    };
   },
+  methods: {},
   mounted() {
     let data = new Array();
     let self = this;
 
-    Dropzone.autoDiscover = false;
-
-    var myDropzone = new Dropzone(this.$refs.input, {
-      url: "/app-dropzone",
+    let defaultConfig = {
+      url: "/uploadImage",
+      // autoQueue: false,
       paramName: "file",
-      maxFiles: 1,
-      maxFilesize: 5,
+      maxFilesize: 1,
       acceptedFiles: "image/*",
-      // addRemoveLinks: !0,
-      accept: function(e, o) {}
-    });
+      addRemoveLinks: true,
 
-    myDropzone.options.maxFiles = 1;
+      dictDefaultMessage: "Default message",
+      dictFileTooBig: "File lớn quá",
+      dictResponseError: "Lỗi server",
+      dictRemoveFile: "<button class='btn btn-sm btn-danger'>Xóa</button>",
+      dictRemoveFileConfirmation: "Bạn có chắc muốn xóa file này?",
+      dictMaxFilesExceeded: "Vượt quá số lượng file tối đa cho phép"
+
+      // previewTemplate:""  //Cấu hình template cho image preview
+    };
+
+    let config = Object.assign({}, defaultConfig, this.options);
+
+    //Cấu hình cho phép bật tắt chế độ tự động upload ảnh (true: tự động, false: tắt chế độ tự động)
+    config.autoProcessQueue = this.autoUpload;
+
+    //Giới hạn số lượng file tối đa
+    if (this.maxFiles) {
+      config.maxFiles = this.maxFiles;
+    }
+
+    //Khởi tạo dropzone
+    let myDropzone = new Dropzone(this.$refs.input, config);
+    this.myDropzone = myDropzone;
+    this.files = myDropzone.files;
 
     myDropzone.on("addedfile", function(file, dataUrl) {
       /* Maybe display some more file information on your page */
+      console.log(myDropzone.files);
+      self.$emit("input", myDropzone.files);
     });
 
-    myDropzone.on("removedfile", function(file) {});
+    /**
+     * Xử lý các sự kiện cho dropzone
+     */
 
-    myDropzone.on("maxfilesexceeded", function(file) {
-      debugger;
+    //Khi thực hiện xóa file
+    myDropzone.on("removedfile", function(file) {
+      self.$emit("input", myDropzone.files);
     });
+
+    myDropzone.on("maxfilesexceeded", file => {
+      //Khi số lượng file vượt quá số lượng giới hạn cho phép: Hiển thị thông báo lỗi cho người dùng biết nếu cần
+    });
+
     myDropzone.on("error", err => {
       debugger;
+      //Khi khi upload file lên server có lỗi
     });
 
-    myDropzone.on("thumbnail", function(file, dataUrl) {
-      let dataUpload = new Object();
-      dataUpload.dataURL = dataUrl;
-      dataUpload.filename = file.name;
-      dataUpload.uuid = file.upload.uuid;
-      data.push(dataUpload);
-      self.$emit("input", data);
-    });
-
-    myDropzone.on("removedfile", function(file) {
-      let name = file.name;
-      for (let i = 0; i < data.length; i++) {
-        if (name == data[i].filename) {
-          data.splice(i, 1);
-          self.$emit("input", data);
-        }
-      }
-    });
-
-    myDropzone.on("maxfilesreached", file => {
-      debugger;
-    });
+    // myDropzone.on("thumbnail", function(file, dataUrl) {
+    // 	let dataUpload = new Object();
+    // 	dataUpload.dataURL = dataUrl;
+    // 	dataUpload.filename = file.name;
+    // 	dataUpload.uuid = file.upload.uuid;
+    // 	data.push(dataUpload);
+    // 	self.$emit("input", data);
+    // });
+  },
+  beforeDestroy() {
+    this.myDropzone.destroy();
   }
 };
 </script>
