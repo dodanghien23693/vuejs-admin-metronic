@@ -42,9 +42,9 @@ export default new Router({
           component: () => import("@/components/datatable/AppDatatable.vue")
         },
         {
-          path: "dropfile",
-          name: "dropfile",
-          component: () => import("@/components/app-dropzone/AppDropzone.vue")
+          path: "sample/dropzone",
+          name: "dropzone",
+          component: () => import("@/pages/samples/dropzone.vue")
         },
         {
           path: "datetime",

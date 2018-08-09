@@ -9,6 +9,8 @@ import "./plugins/sweet-alert2";
 
 // Vue.config.productionTip = false;
 
+Dropzone.autoDiscover = false;
+
 new Vue({
   router,
   store,

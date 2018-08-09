@@ -9,7 +9,6 @@ import AppDatatable from "../../components/datatable/AppDatatable";
 import AppForm from "@/components/app-form/AppForm";
 import AppInput from "@/components/app-input/AppInput";
 import AppDropzone from "@/components/app-dropzone/AppDropzone";
-import AppDropzoneVue from "@/components/app-dropzone/AppDropzoneVue";
 
 export default {
   name: "profile",
@@ -43,8 +42,7 @@ export default {
     AppDatatable,
     AppForm,
     AppInput,
-    AppDropzone,
-    AppDropzoneVue
+    AppDropzone
   },
   created: function() {},
   methods: {

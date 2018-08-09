@@ -1,21 +1,12 @@
 <template>
-<div class="m-portlet m-portlet--mobile">
-    <div class="m-portlet__body">
-      <div class="form-group m-form__group row">
-        <label class="col-form-label col-lg-3 col-sm-12">Single File Upload</label>
-        <div class="col-lg-4 col-md-9 col-sm-12">
-          <div id="dropzone">
-            <div class="m-dropzone dropzone m-dropzone--primary" ref="input" id="m-dropzone-two">
-              <div class="m-dropzone__msg dz-message needsclick">
-                <h3 class="m-dropzone__msg-title">Drop files here or click to upload.</h3>
-                <span class="m-dropzone__msg-desc">Upload up to {{config}} files</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+<div class="col-sm-4">
+  <div class="m-dropzone dropzone" action="inc/api/dropzone/upload.php" ref="input">
+    <div class="m-dropzone__msg dz-message needsclick">
+      <h3 class="m-dropzone__msg-title">Drop files here or click to upload.</h3>
+      <span class="m-dropzone__msg-desc">This is just a demo dropzone. Selected files are <strong>not</strong> actually uploaded.</span>
     </div>
-</div>
+  </div>
+  </div>
 </template>
 <script>
 export default {
@@ -24,8 +15,8 @@ export default {
     value: {
       type: [Array, Object]
     },
-    config: {
-      type: Number
+    options: {
+      type: Object
     }
   },
   methods: {
@@ -34,15 +25,32 @@ export default {
   mounted() {
     let data = new Array();
     let self = this;
-    Dropzone.autoDiscover = true;
+
+    Dropzone.autoDiscover = false;
+
     var myDropzone = new Dropzone(this.$refs.input, {
       url: "/app-dropzone",
       paramName: "file",
-      maxFiles: this.config,
+      maxFiles: 1,
       maxFilesize: 5,
       acceptedFiles: "image/*",
-      addRemoveLinks: !0,
+      // addRemoveLinks: !0,
       accept: function(e, o) {}
+    });
+
+    myDropzone.options.maxFiles = 1;
+
+    myDropzone.on("addedfile", function(file, dataUrl) {
+      /* Maybe display some more file information on your page */
+    });
+
+    myDropzone.on("removedfile", function(file) {});
+
+    myDropzone.on("maxfilesexceeded", function(file) {
+      debugger;
+    });
+    myDropzone.on("error", err => {
+      debugger;
     });
 
     myDropzone.on("thumbnail", function(file, dataUrl) {
@@ -53,6 +61,7 @@ export default {
       data.push(dataUpload);
       self.$emit("input", data);
     });
+
     myDropzone.on("removedfile", function(file) {
       let name = file.name;
       for (let i = 0; i < data.length; i++) {
@@ -61,6 +70,10 @@ export default {
           self.$emit("input", data);
         }
       }
+    });
+
+    myDropzone.on("maxfilesreached", file => {
+      debugger;
     });
   }
 };
