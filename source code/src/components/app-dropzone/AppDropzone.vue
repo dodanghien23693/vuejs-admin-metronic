@@ -38,7 +38,7 @@ export default {
     var myDropzone = new Dropzone(this.$refs.input, {
       url: "/app-dropzone",
       paramName: "file",
-      maxFiles: 1,
+      maxFiles: this.config,
       maxFilesize: 5,
       acceptedFiles: "image/*",
       addRemoveLinks: !0,
