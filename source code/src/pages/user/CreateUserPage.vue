@@ -61,16 +61,37 @@ export default {
       },
       plugins: ["wholerow", "checkbox", "types", "dnd"],
       jstree_data: [
-        { text: "node", children: ["Child node 1", "Child node 2"] },
-        { text: "Root node", children: ["Child node 1", "Child node 2"] },
+        // { text: "node", children: ["Child node 1", "Child node 2"] },
+        // { text: "Root node", children: ["Child node 1", "Child node 2"] },
+        // {
+        //   text: "Root node2",
+        //   children: [
+        //     {
+        //       text: "Root node2",
+        //       children: ["Child node 12", "Child node 22"]
+        //     }
+        //   ]
+        // }
+        { id: "p80", parent: "#", text: "Page0", state: { selected: false } },
+        { id: "p90", parent: "#", text: "Page1", state: { selected: false } },
+        { id: "p100", parent: "p90", text: "Page2", state: { selected: true } },
         {
-          text: "Root node2",
-          children: [
-            {
-              text: "Root node2",
-              children: ["Child node 12", "Child node 22"]
-            }
-          ]
+          id: "p101",
+          parent: "p100",
+          text: "Page3",
+          state: { selected: false }
+        },
+        {
+          id: "p102",
+          parent: "p101",
+          text: "Page4",
+          state: { selected: true }
+        },
+        {
+          id: "p103",
+          parent: "p101",
+          text: "Page5",
+          state: { selected: false }
         }
       ]
     };
@@ -78,6 +99,15 @@ export default {
 
   methods: {
     treeHasChange() {},
+    renameNode(v) {
+      console.log(v.text);
+    },
+    createNode(v) {
+      console.log(v);
+    },
+    deleteNode(v) {
+      console.log(v);
+    },
     addUser() {
       console.log(this.user);
       console.log(this.country);
