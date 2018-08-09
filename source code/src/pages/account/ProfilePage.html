@@ -59,7 +59,8 @@
                             </label>
                             <div class="col-lg-4 col-md-9 col-sm-12">
                                 {{userInfor.dateTime}}
-                                <app-date-time-picker validate="" v-model="userInfor.dateTime" format="dd/mm/yyyy hh:mm"></app-date-time-picker>
+                                <app-date-time-picker v-validate="'date_format:DD/MM/YYYY HH:MM'" name="datetime" v-model="userInfor.dateTime" format="dd/mm/yyyy hh:mm"></app-date-time-picker>
+                                <span v-show="errors.has('datetime')">{{errors.first('datetime')}}</span>
                             </div>
                         </div>
                         <div class="form-group m-form__group row">
@@ -131,7 +132,8 @@
                         <div class="m-form__seperator m-form__seperator--dashed  m-form__seperator--space m--margin-bottom-10"></div>
                     </div>
                 </div>
-                <app-dropzone></app-dropzone>
+                {{updateImage}}
+                <app-dropzone v-model="updateImage" v-bind:config="2"></app-dropzone>
                 <div class="m-portlet__foot m-portlet__foot--fit">
                     <div class="m-form__actions m-form__actions">
                         <div class="row">

@@ -9,6 +9,7 @@ import AppDatatable from "../../components/datatable/AppDatatable";
 import AppForm from "@/components/app-form/AppForm";
 import AppInput from "@/components/app-input/AppInput";
 import AppDropzone from "@/components/app-dropzone/AppDropzone";
+import AppDropzoneVue from "@/components/app-dropzone/AppDropzoneVue";
 
 export default {
   name: "profile",
@@ -29,7 +30,8 @@ export default {
         birthday: "01/08/2018",
         note: "dao hai la nguoi rat dep trai",
         hex: "#61485c"
-      }
+      },
+      updateImage: { dataURL: "a" }
     };
   },
   components: {
@@ -41,7 +43,8 @@ export default {
     AppDatatable,
     AppForm,
     AppInput,
-    AppDropzone
+    AppDropzone,
+    AppDropzoneVue
   },
   created: function() {},
   methods: {

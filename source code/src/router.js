@@ -40,6 +40,11 @@ export default new Router({
           path: "table",
           name: "table",
           component: () => import("@/components/datatable/AppDatatable.vue")
+        },
+        {
+          path: "dropfile",
+          name: "dropfile",
+          component: () => import("@/components/app-dropzone/AppDropzone.vue")
         }
       ]
     },
