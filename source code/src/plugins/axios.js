@@ -11,7 +11,9 @@
 
 import Vue from "vue/dist/vue.js";
 import Axios from "axios";
+
 // import store from '@/store';
+
 import AppConfig from "../config";
 
 Axios.defaults.headers.common.Accept = "application/json";
@@ -51,7 +53,8 @@ HTTP.interceptors.response.use(
 );
 
 // Bind Axios to Vue.
-Vue.$http = HTTP;
+
+// Vue.$http = HTTP;
 
 Object.defineProperty(Vue.prototype, "$http", {
   get() {

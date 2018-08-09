@@ -45,6 +45,11 @@ export default new Router({
           path: "dropfile",
           name: "dropfile",
           component: () => import("@/components/app-dropzone/AppDropzone.vue")
+        },
+        {
+          path: "datetime",
+          name: "admin.datetime.add",
+          component: () => import("@/pages/test/CreateDateTime.vue")
         }
       ]
     },

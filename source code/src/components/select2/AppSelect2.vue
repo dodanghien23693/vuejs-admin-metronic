@@ -13,7 +13,9 @@ export default {
      */
     options: {
       type: Array,
-      default: []
+      default: function() {
+        return [];
+      }
     },
     /**
      *  placeholder
@@ -22,17 +24,19 @@ export default {
       type: String,
       default: ""
     },
+
     /**
      *  Thuộc tính để cấu hình multiple hoặc không
      */
     multiple: {
-      type: Boolean,
-      default: false
+      type: Boolean
     },
     /**
      * @model
      */
-    value: [String, Array]
+    value: {
+      type: [String, Array]
+    }
   },
   mounted() {
     var vm = this;
@@ -51,11 +55,11 @@ export default {
   },
   watch: {
     options: function(options) {
-      $(this.$el).select2({ data: options });
+      $(this.$refs.input).select2({ data: options });
     }
   },
   destroyed: function() {
-    $(this.$el)
+    $(this.$refs.input)
       .off()
       .select2("destroy");
   }
