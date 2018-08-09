@@ -73,28 +73,60 @@ export default {
       //Danh sách các sự kiện: https://www.jstree.com/api/#/?q=.jstree%20Event
       //Danh sách các hàm của jstree: https://www.jstree.com/api/#/?q=(
       $(this.$refs.input)
-        // .on("changed.jstree", function(e, data) {
-        // 	self.$emit("change", data);
-        // })
-        // .on("dnd_start.vakata", function(e, data) {
-        // 	console.log("Dragged");
-        // })
-        // .on("dnd_stop.vakata", function(e, data) {
-        // 	console.log("Dropped");
-        // })
+        .on("dnd_scroll.vakata", (e, data) => {
+          console.log("Dragged");
+          debugger;
+        })
+        .on("dnd_start.vakata", (e, data) => {
+          console.log("Dragged");
+          debugger;
+        })
+        .on("dnd_stop.vakata", (e, data) => {
+          console.log("Dropped");
+          debugger;
+        })
+        .on("dnd_move.vakata", (e, data) => {
+          console.log("Dropped");
+          debugger;
+        })
         .on("select_node.jstree", (node, selected, event) => {
           self.selected = selected.selected;
         })
-        // .on("check_node.jstree", (node, selected, event) => {
-        // })
-        // .on("uncheck_node.jstree", (node, selected, event) => {
-        // 	debugger;
-        // 	self.checkNodeChange();
-        // })
-        .on("delete_node.jstree", (node, selected, event) => {})
-        .on("create_node.jstree", (node, selected, event) => {})
-
+        .on("deselect_node.jstree", function(e, data) {})
+        .on("check_node.jstree", (node, selected, event) => {
+          self.selected = selected.selected;
+        })
+        .on("uncheck_node.jstree", (node, selected, event) => {
+          self.selected = selected.selected;
+        })
+        .on("delete_node.jstree", (node, parent) => {
+          //Event khi thực hiện delete mặc định
+          self.$emit("deleteNode", { node: node, parent: parent });
+        })
+        .on("create_node.jstree", (node, parent, position) => {
+          //Event khi thực hiện create mặc định
+          self.$emit("createNode", {
+            node: node,
+            parent: parent,
+            position: position
+          });
+        })
+        .on("rename_node.jstree", (node, text, old) => {
+          //Event khi thực hiện rename mặc định
+          self.$emit("renameNode", { node: node, text: text, old: old });
+        })
         .jstree({
+          checkbox: {
+            cascade: "down", //Chọn thư mục cha thư mục con cũng sẽ được selected
+            three_state: false
+            // tie_selection: false,
+            // whole_node: false
+          },
+          expand_selected_onload: true,
+          dnd: {
+            always_copy: true,
+            drag_selection: true
+          },
           core: {
             data: this.data,
             multiple: this.multiple,
@@ -110,15 +142,8 @@ export default {
               return true;
               return operation === "rename_node" ? true : false;
             },
-            checkbox: {
-              tie_selection: false,
-              whole_node: false
-            },
             themes: {
               responsive: false
-            },
-            dnd: {
-              always_copy: true
             }
           },
           plugins: plugins,
