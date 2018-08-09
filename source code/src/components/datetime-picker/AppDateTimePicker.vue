@@ -2,7 +2,6 @@
   <input type="text" class="form-control" 
     ref="input"
     :value="value"
-    :name="name"
    />
    
 </template>
@@ -22,8 +21,7 @@ export default {
      */
     format: {
       type: String
-    },
-    name: String
+    }
   },
   created: function() {},
   mounted() {
@@ -56,6 +54,9 @@ export default {
     init() {}
   },
   beforeDestroy: function() {
+    $(this.$refs.inout)
+      .datetimepicker("hide")
+      .datetimepicker("destroy");
     //destroy datetimepicker
   }
 };

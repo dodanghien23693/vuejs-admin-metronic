@@ -64,7 +64,7 @@ export default {
 
   beforeDestroy: function() {
     $(this.$refs.input)
-      .datepicker("hide")
+      .datepicker("changeDate")
       .datepicker("destroy");
   }
 };
