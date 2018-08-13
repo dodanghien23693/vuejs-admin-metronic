@@ -1,7 +1,7 @@
 const path = require("path");
 
 module.exports = {
-  lintOnSave: true,
+  lintOnSave: false,
   outputDir: path.resolve(__dirname, "./dist"),
   configureWebpack: {
     // output: {

@@ -59,19 +59,7 @@ export default {
           required: true
         }
       },
-      plugins: ["wholerow", "checkbox", "types", "dnd"],
       jstree_data: [
-        // { text: "node", children: ["Child node 1", "Child node 2"] },
-        // { text: "Root node", children: ["Child node 1", "Child node 2"] },
-        // {
-        //   text: "Root node2",
-        //   children: [
-        //     {
-        //       text: "Root node2",
-        //       children: ["Child node 12", "Child node 22"]
-        //     }
-        //   ]
-        // }
         { id: "p80", parent: "#", text: "Page0", state: { selected: false } },
         { id: "p90", parent: "#", text: "Page1", state: { selected: false } },
         { id: "p100", parent: "p90", text: "Page2", state: { selected: true } },

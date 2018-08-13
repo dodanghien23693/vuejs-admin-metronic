@@ -3,7 +3,6 @@
     <app-dropzone v-model="files" :config="dropzoneOptions"></app-dropzone>
     data dropzone: {{files}}
 </div>
-  <!-- <vue-dropzone ref="myVueDropzone" id="dropzone" :options="dropzoneOptions"></vue-dropzone> -->
 </template>
 <script>
 import AppDropzone from "@/components/app-dropzone/AppDropzone.vue";
