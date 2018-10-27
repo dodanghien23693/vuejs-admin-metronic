@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "AAAA;;;;gDAIgD",
+    "sources": [
+        "docs.tokens.scss"
+    ],
+    "names": [],
+    "file": "docs.tokens.css"
+}
